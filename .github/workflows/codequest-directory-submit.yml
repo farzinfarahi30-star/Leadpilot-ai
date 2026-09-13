@@ -40,7 +40,7 @@ jobs:
           const desc='CodeQuest Kids is a free coding-learning platform for ages 7–16 with guided missions, XP, badges, projects, JavaScript practice and an AI Coach. There is no subscription or joining fee.';
           async function postJSON(url,payload){const r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json','User-Agent':'CodeQuest-Kids-Launch-Runner'},body:JSON.stringify(payload)});return {status:r.status,text:(await r.text()).slice(0,1800)};}
           async function siteReachability(){try{const r=await fetch(SITE,{redirect:'follow'});const t=await r.text();results.push(['SITE',r.status,r.url,t.includes('CodeQuest')?'CodeQuest content detected':'content not detected']);}catch(e){results.push(['SITE','ERROR',e.message]);}}
-          async function qevra(){try{const r=await postJSON('https://qevra.app/api/submit',{url:SITE,email:EMAIL,name:'CodeQuest Kids',tagline:'Free coding adventures for ages 7–16',description:desc,category:'Education',board_notes:false});results.push(['Qevra',r.status,r.text]);}catch(e){results.push(['Qevra','ERROR',e.message]);}}
+          async function qevra(){try{const r=await postJSON('https://qevra.app/api/submit',{url:SITE,email:EMAIL,name:'CodeQuest Kids',tagline:'Free coding adventures for ages 7–16',description:desc,category:'SaaS',board_notes:false});results.push(['Qevra',r.status,r.text]);}catch(e){results.push(['Qevra','ERROR',e.message]);}}
           async function hypeStarAPI(){try{const r=await postJSON('https://hypestar.org/api/v1/listings',{url:SITE,kind:'site'});results.push(['Hype Star API',r.status,r.text]);}catch(e){results.push(['Hype Star API','ERROR',e.message]);}}
           async function browserSubmit(name,url){
             const b=await chromium.launch({headless:true});
@@ -56,13 +56,21 @@ jobs:
                 const id=(await e.getAttribute('id')||'').toLowerCase();const ph=(await e.getAttribute('placeholder')||'').toLowerCase();const aria=(await e.getAttribute('aria-label')||'').toLowerCase();
                 const key=`${nameA} ${id} ${ph} ${aria}`;
                 try{
-                  if(tag==='SELECT'){const opts=await e.locator('option').allTextContents();const pick=opts.find(x=>/^education$/i.test(x))||opts.find(x=>/^free$/i.test(x))||opts.find(x=>/^live$/i.test(x))||opts.find(x=>/^other$/i.test(x));if(pick)await e.selectOption({label:pick}).catch(()=>{});}
+                  if(tag==='SELECT'){
+                    const opts=await e.locator('option').allTextContents();
+                    const pick=opts.find(x=>/^education$/i.test(x))||opts.find(x=>/^software & saas$/i.test(x))||opts.find(x=>/^saas$/i.test(x))||opts.find(x=>/^free$/i.test(x))||opts.find(x=>/^live$/i.test(x))||opts.find(x=>/^other$/i.test(x));
+                    if(pick)await e.selectOption({label:pick}).catch(()=>{});
+                  }
                   else if(type==='email'||key.includes('email'))await e.fill(EMAIL);
                   else if(type==='url'||key.includes('url')||key.includes('website')||key.includes('homepage'))await e.fill(SITE);
-                  else if(key.includes('name')&&!key.includes('filename')&&!key.includes('username'))await e.fill('CodeQuest Kids');
+                  else if(key.includes('name')&&!key.includes('filename')&&!key.includes('username'))await e.fill(key.includes('founder')?'Farzin Farahi':'CodeQuest Kids');
                   else if(key.includes('tagline')||key.includes('one-line')||key.includes('short description'))await e.fill(short);
                   else if(key.includes('description')||tag==='TEXTAREA')await e.fill(desc);
-                  else if(key.includes('founder')||key.includes('company'))await e.fill('CodeQuest Kids');
+                  else if(key.includes('founder'))await e.fill('Farzin Farahi');
+                  else if(key.includes('company'))await e.fill('CodeQuest Kids');
+                  else if(key.includes('bio'))await e.fill('Founder of CodeQuest Kids, a free coding-learning platform for children and young learners.');
+                  else if(key.includes('origin story')||key.includes('why did you build')||key.includes('why you build'))await e.fill('CodeQuest Kids was created to make learning to code more accessible and engaging for children through guided missions, projects, practice and game-like progress.');
+                  else if(key.includes('pricing')){const opts=await e.locator('option').allTextContents();const pick=opts.find(x=>/^free$/i.test(x))||opts.find(x=>/free/i.test(x));if(pick)await e.selectOption({label:pick}).catch(()=>{});}
                   else if(key.includes('tag'))await e.fill('coding, kids, education, JavaScript, STEM, free');
                   else if(key.includes('logo'))await e.fill(SITE+'/favicon.ico');
                 }catch{}
@@ -71,10 +79,10 @@ jobs:
               let clicked=false;
               for(let i=0;i<await buttons.count();i++){
                 const x=buttons.nth(i);const txt=((await x.innerText().catch(()=>''))+' '+(await x.getAttribute('value').catch(()=>''))).toLowerCase();
-                if(/submit|send|share now|continue|add link|get on the runway/.test(txt)&&await x.isVisible().catch(()=>false)){await x.click({timeout:10000}).catch(()=>{});clicked=true;await p.waitForTimeout(1600);break;}
+                if(/submit|send|share now|continue|add link|get on the runway/.test(txt)&&await x.isVisible().catch(()=>false)){await x.click({timeout:10000}).catch(()=>{});clicked=true;await p.waitForTimeout(1800);break;}
               }
-              if(!clicked) { const links=p.getByRole('link',{name:/submit|add link/i}).first(); if(await links.count()&&await links.isVisible().catch(()=>false)){await links.click().catch(()=>{});await p.waitForTimeout(1000);} }
-              const after=(await p.locator('body').innerText()).slice(-1800);
+              if(!clicked){const links=p.getByRole('link',{name:/submit|add link/i}).first();if(await links.count()&&await links.isVisible().catch(()=>false)){await links.click().catch(()=>{});await p.waitForTimeout(1000);}}
+              const after=(await p.locator('body').innerText()).slice(-2200);
               results.push([name,p.url(),after]);
             }catch(e){results.push([name,'ERROR',e.message]);}
             finally{await b.close();}
@@ -87,6 +95,8 @@ jobs:
           async function hypeStarForm(){await browserSubmit('Hype Star form','https://hypestar.org/submit');}
           async function ignlab(){await browserSubmit('Ignlab Launch','https://launch.ignlab.net/');}
           async function p10015(){await browserSubmit('10015','https://10015.io/product-finder/submit');}
+          async function zearches(){await browserSubmit('Zearches','https://zearches.com/submit-website-free.php');}
+          async function linkrena(){await browserSubmit('Linkrena','https://linkrena.com/');}
           (async()=>{
             await siteReachability();
             await qevra();
@@ -99,6 +109,8 @@ jobs:
             await hypeStarForm();
             await ignlab();
             await p10015();
+            await zearches();
+            await linkrena();
             const stamp=new Date().toISOString();
             const lines=['Timestamp: '+stamp,'Site: '+SITE,'','=== RESULTS ===',...results.map(r=>r.map(x=>typeof x==='string'?x:JSON.stringify(x)).join(' | ')),''];
             fs.mkdirSync('launch-results',{recursive:true});
