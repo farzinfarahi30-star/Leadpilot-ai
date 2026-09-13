@@ -11,17 +11,20 @@ permissions:
 jobs:
   host-media:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Download CodeQuest Kids package from public Dropbox folder
+      - name: Install FFmpeg
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+
+      - name: Download and extract CodeQuest Kids package
         run: |
           set -euo pipefail
-          mkdir -p /tmp/cq/unpacked
+          mkdir -p /tmp/cq/unpacked /tmp/cq/normalized
           curl -L --fail --retry 3 --retry-delay 2 \
             'https://www.dropbox.com/scl/fo/78wrh8g8ay338z7ob19bb/APkrtyg62tb5s5bZo6pn2Ts?rlkey=k4y1b0mn10qvl4sh229e3a9jd&st=qur47vig&dl=1' \
             -o /tmp/cq/package.zip
@@ -35,13 +38,27 @@ jobs:
               if len(mp4s) != 30:
                   raise SystemExit(f'Expected 30 MP4s, found {len(mp4s)}')
               for i in mp4s:
-                  data = z.read(i)
                   target = out / Path(i.filename).name
-                  target.write_bytes(data)
+                  target.write_bytes(z.read(i))
           PY
-          find /tmp/cq/unpacked -maxdepth 1 -type f -name '*.mp4' -print
+          test "$(find /tmp/cq/unpacked -maxdepth 1 -type f -name '*.mp4' | wc -l)" -eq 30
 
-      - name: Publish 30 MP4s to a dedicated public branch
+      - name: Normalize all videos for Instagram Reels
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          for f in /tmp/cq/unpacked/*.mp4; do
+            base="$(basename "$f")"
+            ffmpeg -hide_banner -loglevel error -y \
+              -i "$f" \
+              -vf "fps=30,format=yuv420p" \
+              -c:v libx264 -preset veryfast -crf 20 \
+              -c:a aac -b:a 128k -movflags +faststart \
+              "/tmp/cq/normalized/$base"
+          done
+          test "$(find /tmp/cq/normalized -maxdepth 1 -type f -name '*.mp4' | wc -l)" -eq 30
+
+      - name: Publish 30 normalized MP4s
         run: |
           set -euo pipefail
           git config user.name 'github-actions[bot]'
@@ -55,8 +72,8 @@ jobs:
           fi
           rm -rf media
           mkdir -p media
-          cp /tmp/cq/unpacked/*.mp4 media/
+          cp /tmp/cq/normalized/*.mp4 media/
           test "$(find media -maxdepth 1 -type f -name '*.mp4' | wc -l)" -eq 30
           git add media/*.mp4
-          git commit -m 'Publish CodeQuest Kids Shorts media' || echo 'No media changes'
+          git commit -m 'Publish Instagram-compatible CodeQuest Kids Shorts' || echo 'No media changes'
           git push --force-with-lease origin HEAD:codequest-media
