@@ -1,0 +1,39 @@
+name: CodeQuest media host
+
+on:
+  push:
+    paths:
+      - '.github/workflows/codequest-media-host.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  publish-media:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download launch ZIP
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/cq
+          curl -L --fail --retry 3 --output /tmp/cq/launch.zip 'https://ucdbd68474ca68f3b83dfbd1b598.dl.dropboxusercontent.com/cd/0/get/DIC0SKwafsiqlRbdfNMGL-eKEPMFlDqwSG2h842QQURtOIFhIClaYDP80PSgtABr-fxczECc4vShBK6soSE307-Hbyw0ugget9nyjAC1IZy0C2pot8-a5W6a5ruBZRje7O5JBpTP5Kvg0uPbZq-LceWY6Bgnh8hR8QekT46MBidokA/file?c_luid=c99a4b4c'
+          unzip -q /tmp/cq/launch.zip -d /tmp/cq/unpacked
+
+      - name: Publish MP4 files into repository
+        run: |
+          set -euo pipefail
+          rm -rf codequest-media
+          mkdir -p codequest-media
+          find /tmp/cq/unpacked -type f -name '*.mp4' -print0 | while IFS= read -r -d '' f; do
+            cp "$f" "codequest-media/$(basename "$f")"
+          done
+          test "$(find codequest-media -maxdepth 1 -type f -name '*.mp4' | wc -l)" -eq 30
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add codequest-media
+          git diff --cached --quiet || git commit -m 'Publish CodeQuest Kids Shorts media'
+          git push
