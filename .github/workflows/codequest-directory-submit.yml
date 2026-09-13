@@ -1,0 +1,152 @@
+name: CodeQuest Kids Directory Submission Runner
+
+on:
+  push:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  submit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install browser automation
+        run: |
+          npm init -y >/dev/null 2>&1
+          npm install playwright@1.55.0 >/dev/null 2>&1
+          npx playwright install --with-deps chromium >/dev/null 2>&1
+
+      - name: Submit CodeQuest Kids to free directories
+        env:
+          SITE_URL: https://codequest-kids.azinahi123.workers.dev
+        run: |
+          node <<'NODE'
+          const { chromium } = require('playwright');
+
+          const SITE = process.env.SITE_URL;
+          const results = [];
+
+          async function qevra() {
+            try {
+              const r = await fetch('https://qevra.app/api/submit', {
+                method: 'POST',
+                headers: {'Content-Type':'application/json'},
+                body: JSON.stringify({
+                  url: SITE,
+                  name: 'CodeQuest Kids',
+                  tagline: 'Free coding adventures for ages 7–16',
+                  description: 'A free coding-learning platform for kids ages 7–16 with missions, XP, badges, projects, JavaScript practice and an AI Coach. No subscription or joining fee.',
+                  category: 'Education',
+                  board_notes: false
+                })
+              });
+              const text = await r.text();
+              results.push(['Qevra', r.status, text.slice(0,500)]);
+            } catch (e) { results.push(['Qevra','ERROR',e.message]); }
+          }
+
+          async function pageSubmit(name, url, opts={}) {
+            const browser = await chromium.launch({headless:true});
+            const page = await browser.newPage({ viewport: {width:1440,height:1000} });
+            try {
+              const response = await page.goto(url, {waitUntil:'domcontentloaded',timeout:30000});
+              await page.waitForTimeout(1200);
+              const title = await page.title();
+              const body = (await page.locator('body').innerText().catch(()=>'' )).slice(0,4000);
+              console.log(`\\n=== ${name} ===\\nURL ${url}\\nHTTP ${response?.status()}\\nTITLE ${title}\\n${body.slice(0,1500)}`);
+
+              if (opts.run && !/captcha|recaptcha|hcaptcha/i.test(body)) {
+                await opts.run(page);
+                await page.waitForTimeout(1500);
+                const afterUrl = page.url();
+                const after = (await page.locator('body').innerText().catch(()=>'' )).slice(0,2500);
+                results.push([name,'POST-ACTION',afterUrl+' | '+after.slice(0,350)]);
+              } else if (/captcha|recaptcha|hcaptcha/i.test(body)) {
+                results.push([name,'BLOCKED-CAPTCHA','No bypass attempted']);
+              } else {
+                results.push([name,'OPENED',`${response?.status()} ${title}`]);
+              }
+            } catch (e) {
+              results.push([name,'ERROR',e.message]);
+            } finally { await browser.close(); }
+          }
+
+          async function fillFirst(page, patterns, value) {
+            for (const p of patterns) {
+              const loc = page.locator(p).first();
+              if (await loc.count() && await loc.isVisible().catch(()=>false)) {
+                await loc.fill(value).catch(()=>{});
+                return true;
+              }
+            }
+            return false;
+          }
+
+          (async()=>{
+            // Account-free/API route first.
+            await qevra();
+
+            // Hype Star: documented no-account URL submission path.
+            await pageSubmit('Hype Star','https://hypestar.org/submit',{
+              run: async p => {
+                const ok = await fillFirst(p,[
+                  'input[placeholder*="yourproject.com" i]',
+                  'input[type="url"]',
+                  'input[name*="url" i]'
+                ],SITE);
+                if (!ok) throw new Error('Could not locate public URL field');
+                const buttons = p.getByRole('button',{name:/submit link/i});
+                if (await buttons.count()) await buttons.first().click();
+              }
+            });
+
+            // Ignlab: open the public submission page and submit only if there is no anti-bot gate.
+            await pageSubmit('Ignlab Launch','https://launch.ignlab.net/',{
+              run: async p => {
+                await fillFirst(p,['input[type="url"]','input[name*="url" i]'],SITE);
+                const b = p.getByRole('button',{name:/submit|launch/i}).first();
+                if (await b.count() && await b.isVisible().catch(()=>false)) await b.click();
+              }
+            });
+
+            // 10015: official free submission route.
+            await pageSubmit('10015','https://10015.io/product-finder/submit',{
+              run: async p => {
+                await fillFirst(p,['input[type="url"]','input[name*="url" i]'],SITE);
+                const b = p.getByRole('button',{name:/submit url|submit/i}).first();
+                if (await b.count() && await b.isVisible().catch(()=>false)) await b.click();
+              }
+            });
+
+            // ProductReveal: only attempt the public submission form if present.
+            await pageSubmit('ProductReveal','https://productreveal.online/',{
+              run: async p => {
+                const urlOk = await fillFirst(p,['input[type="url"]','input[name*="url" i]'],SITE);
+                const b = p.getByRole('button',{name:/submit|add|launch/i}).first();
+                if (urlOk && await b.count() && await b.isVisible().catch(()=>false)) await b.click();
+              }
+            });
+
+            // LaunchFree: public submission page; no attempt to defeat any bot control.
+            await pageSubmit('LaunchFree','https://launchfree.app/',{
+              run: async p => {
+                const urlOk = await fillFirst(p,['input[type="url"]','input[name*="url" i]'],SITE);
+                const b = p.getByRole('button',{name:/submit|launch|add/i}).first();
+                if (urlOk && await b.count() && await b.isVisible().catch(()=>false)) await b.click();
+              }
+            });
+
+            console.log('\\n=== RESULT SUMMARY ===');
+            for (const r of results) console.log(r.join(' | '));
+          })();
+          NODE
