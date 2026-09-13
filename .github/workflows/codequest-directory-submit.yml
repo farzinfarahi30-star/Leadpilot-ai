@@ -29,12 +29,12 @@ jobs:
       - name: Execute free directory submissions
         env:
           SITE_URL: https://codequest-kids.azinahi123.workers.dev
-          GITHUB_TOKEN: ${{ github.token }}
         run: |
           node <<'NODE'
           const { chromium } = require('playwright');
           const SITE = process.env.SITE_URL;
           const results = [];
+          let email = '';
 
           async function getPublicGithubEmail() {
             try {
@@ -45,8 +45,6 @@ jobs:
               return j.email || '';
             } catch { return ''; }
           }
-
-          const email = await getPublicGithubEmail();
 
           async function siteReachability() {
             const r = await fetch(SITE, {redirect:'follow'});
@@ -128,13 +126,7 @@ jobs:
               await setByAttrs(p,['input[name="featured_image"]','input[placeholder*="OG" i]','input[name*="featured" i]'], SITE + '/favicon.ico');
               const review = `CodeQuest Kids is a free browser-based coding-learning platform designed for children and teenagers ages 7–16. The product is built around the idea that early coding should feel like an activity children can actively do, rather than a long sequence of theory lessons. Learners can work through guided coding missions, earn XP and badges, build projects, practice JavaScript, and use an AI Coach for guided help. There is no subscription and no joining fee. The goal is to give families, homeschoolers, tutors, and educators a simple place where a learner can start coding and keep progressing without needing a paid course membership. The experience combines a progression system with hands-on projects so that learners can move from small tasks toward creating things of their own. Parents and educators can use the platform as a practical starting point for introducing programming concepts, experimentation, sequencing, logic, and problem solving. The project is intentionally positioned as a free learning tool rather than a replacement for a teacher or an established school curriculum. For a child who finds traditional coding lessons boring, the mission-based structure is meant to make the first steps more active and rewarding. CodeQuest Kids can also be useful for young learners who want to practice JavaScript in the browser and build a small portfolio of projects as they learn. The site is designed to be easy to access from a browser, with the emphasis on getting a learner into a first activity quickly. The platform is aimed at families and learning communities that want a genuinely free option rather than a free trial that later becomes a paid subscription. The public launch version focuses on the core learner journey: start a mission, practice, earn progress, make projects, and get help when stuck. The product is still an early-stage project, so honest feedback from parents, educators, tutors and young learners is valuable. The most useful feedback is whether the first ten minutes are clear, whether the missions feel motivating, and whether the project-building flow makes learners want to continue. CodeQuest Kids is available as a public web application and can be tried directly without buying a course or joining a paid program.`;
               await setByAttrs(p,['textarea[name="review"]','textarea'], review);
-              const features = [
-                'Guided coding missions for ages 7–16',
-                'XP, levels and badges for progression',
-                'Projects and portfolio building',
-                'JavaScript practice in the browser',
-                'AI Coach for guided help'
-              ];
+              const features = ['Guided coding missions for ages 7–16','XP, levels and badges for progression','Projects and portfolio building','JavaScript practice in the browser','AI Coach for guided help'];
               for(let i=0;i<5;i++) await setByAttrs(p,[`input[name="feature${i+1}"]`,`input[placeholder="Feature ${i+1}"]`],features[i]);
               await setByAttrs(p,['input[name="founder"]','input[name*="company" i]'], 'CodeQuest Kids');
               if(email) await setByAttrs(p,['input[name="email"]','input[type="email"]'],email);
@@ -200,6 +192,7 @@ jobs:
           }
 
           (async()=>{
+            email = await getPublicGithubEmail();
             await siteReachability();
             await qevra();
             await submitProductReveal();
@@ -209,5 +202,5 @@ jobs:
             await probeAndSimpleSubmit('10015','https://10015.io/product-finder/submit');
             console.log('\\n=== RESULT SUMMARY ===');
             for(const r of results) console.log(r.map(x=>typeof x==='string'?x:JSON.stringify(x)).join(' | '));
-          })();
+          })().catch(e=>{console.error(e);process.exit(1);});
           NODE
