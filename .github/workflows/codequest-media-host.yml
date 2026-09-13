@@ -1,0 +1,47 @@
+name: CodeQuest Kids Media Host
+
+on:
+  push:
+
+permissions:
+  contents: write
+
+jobs:
+  host-media:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download CodeQuest Kids package from public Dropbox folder
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/cq
+          curl -L --fail --retry 3 --retry-delay 2 \
+            'https://www.dropbox.com/scl/fo/78wrh8g8ay338z7ob19bb/APkrtyg62tb5s5bZo6pn2Ts?rlkey=k4y1b0mn10qvl4sh229e3a9jd&st=qur47vig&dl=1' \
+            -o /tmp/cq/package.zip
+          unzip -q /tmp/cq/package.zip -d /tmp/cq/unpacked
+          find /tmp/cq/unpacked -type f -name '*.mp4' -print
+
+      - name: Publish 30 MP4s to a dedicated public branch
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git fetch origin codequest-media || true
+          if git show-ref --verify --quiet refs/remotes/origin/codequest-media; then
+            git switch -C codequest-media origin/codequest-media
+          else
+            git switch --orphan codequest-media
+            git rm -rf . >/dev/null 2>&1 || true
+          fi
+          rm -rf media
+          mkdir -p media
+          find /tmp/cq/unpacked -type f -name '*.mp4' -print0 | sort -z | xargs -0 -I{} cp '{}' media/
+          test "$(find media -maxdepth 1 -type f -name '*.mp4' | wc -l)" -eq 30
+          git add media/*.mp4
+          git commit -m 'Publish CodeQuest Kids Shorts media' || echo 'No media changes'
+          git push --force-with-lease origin HEAD:codequest-media
