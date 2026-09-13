@@ -1,0 +1,80 @@
+name: CodeQuest Kids Open Free Submissions
+
+on:
+  workflow_dispatch:
+  push:
+
+permissions:
+  contents: read
+
+jobs:
+  submit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install Playwright
+        run: |
+          npm init -y >/dev/null 2>&1
+          npm install playwright@1.55.0 >/dev/null 2>&1
+          npx playwright install --with-deps chromium >/dev/null 2>&1
+      - name: Submit no-account listings
+        env:
+          SITE_URL: https://codequest-kids.azinahi123.workers.dev
+        run: |
+          node <<'NODE'
+          const { chromium } = require('playwright');
+          const SITE = process.env.SITE_URL;
+          const out = [];
+          async function postJSON(url, payload) {
+            const r = await fetch(url,{method:'POST',headers:{'content-type':'application/json','user-agent':'CodeQuest-Kids-Launch-Runner'},body:JSON.stringify(payload)});
+            const t = await r.text();
+            return {status:r.status,text:t.slice(0,1200)};
+          }
+          async function qevraNoop(){
+            try {
+              const r = await postJSON('https://qevra.app/api/submit',{
+                url:SITE,name:'CodeQuest Kids',tagline:'Free coding adventures for ages 7–16',
+                description:'A free coding-learning platform for kids ages 7–16 with missions, XP, badges, projects, JavaScript practice and an AI Coach.',
+                category:'Education',board_notes:false
+              });
+              out.push(['Qevra',r.status,r.text]);
+            } catch(e){ out.push(['Qevra','ERROR',e.message]); }
+          }
+          async function hypeStar(){
+            try {
+              const r=await postJSON('https://hypestar.org/api/v1/listings',{
+                url:SITE,
+                kind:'site',
+                category:'Other'
+              });
+              out.push(['HypeStar',r.status,r.text]);
+            } catch(e){ out.push(['HypeStar','ERROR',e.message]); }
+          }
+          async function linkrena(){
+            const b=await chromium.launch({headless:true});
+            const p=await b.newPage({viewport:{width:1440,height:1000}});
+            try{
+              await p.goto('https://linkrena.com/',{waitUntil:'domcontentloaded',timeout:30000});
+              await p.locator('input[type="url"],input').first().fill(SITE);
+              const buttons=p.getByRole('button',{name:/submit for free|submit/i});
+              if(await buttons.count()) { await buttons.first().click({timeout:10000}).catch(()=>{}); await p.waitForTimeout(1800); }
+              out.push(['Linkrena',p.url(),(await p.locator('body').innerText()).slice(-1200)]);
+            }catch(e){out.push(['Linkrena','ERROR',e.message]);}
+            finally{await b.close();}
+          }
+          async function site(){
+            const r=await fetch(SITE,{redirect:'follow'}); const t=await r.text();
+            out.push(['SITE',r.status,r.url,t.includes('CodeQuest'),t.length]);
+          }
+          (async()=>{
+            await site();
+            await hypeStar();
+            await linkrena();
+            await qevraNoop();
+            for(const x of out) console.log(x.map(v=>typeof v==='string'?v:JSON.stringify(v)).join(' | '));
+          })().catch(e=>{console.error(e);process.exit(1)});
+          NODE
