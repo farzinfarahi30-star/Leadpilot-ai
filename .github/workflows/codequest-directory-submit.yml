@@ -2,10 +2,12 @@ name: CodeQuest Kids Directory Submission Runner
 
 on:
   push:
+    paths-ignore:
+      - 'launch-results/**'
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   submit:
@@ -29,39 +31,54 @@ jobs:
           CONTACT_EMAIL: Azinahi123@gmail.com
         run: |
           node <<'NODE'
+          const fs=require('fs');
           const { chromium } = require('playwright');
           const SITE = process.env.SITE_URL;
           const EMAIL = process.env.CONTACT_EMAIL;
           const results=[];
           const short='Free coding adventures for kids ages 7–16.';
           const desc='CodeQuest Kids is a free coding-learning platform for ages 7–16 with guided missions, XP, badges, projects, JavaScript practice and an AI Coach. There is no subscription or joining fee.';
-
           async function postJSON(url,payload){const r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json','User-Agent':'CodeQuest-Kids-Launch-Runner'},body:JSON.stringify(payload)});return {status:r.status,text:(await r.text()).slice(0,1800)};}
-          async function siteReachability(){const r=await fetch(SITE,{redirect:'follow'});const t=await r.text();results.push(['SITE',r.status,r.url,t.includes('CodeQuest')?'CodeQuest content detected':'content not detected']);}
+          async function siteReachability(){try{const r=await fetch(SITE,{redirect:'follow'});const t=await r.text();results.push(['SITE',r.status,r.url,t.includes('CodeQuest')?'CodeQuest content detected':'content not detected']);}catch(e){results.push(['SITE','ERROR',e.message]);}}
           async function qevra(){try{const r=await postJSON('https://qevra.app/api/submit',{url:SITE,email:EMAIL,name:'CodeQuest Kids',tagline:'Free coding adventures for ages 7–16',description:desc,category:'Education',board_notes:false});results.push(['Qevra',r.status,r.text]);}catch(e){results.push(['Qevra','ERROR',e.message]);}}
           async function hypeStarAPI(){try{const r=await postJSON('https://hypestar.org/api/v1/listings',{url:SITE,kind:'site'});results.push(['Hype Star API',r.status,r.text]);}catch(e){results.push(['Hype Star API','ERROR',e.message]);}}
-          async function setVal(p,sel,val){const e=p.locator(sel).first();if(await e.count()&&await e.isVisible().catch(()=>false)){await e.fill(val).catch(()=>{});return true;}return false;}
-          async function clickRe(p,re){const x=p.getByRole('button',{name:re}).first();if(await x.count()&&await x.isVisible().catch(()=>false)){await x.click({timeout:10000}).catch(()=>{});return true;}return false;}
-          async function browserSubmit(name,url){const b=await chromium.launch({headless:true});const p=await b.newPage({viewport:{width:1440,height:1400}});try{await p.goto(url,{waitUntil:'domcontentloaded',timeout:45000});await p.waitForTimeout(1000);const body0=(await p.locator('body').innerText()).slice(0,2500);if(/captcha|recaptcha|hcaptcha/i.test(body0)){results.push([name,'BLOCKED-CAPTCHA']);return;}
-            const els=p.locator('input,textarea,select');
-            for(let i=0;i<await els.count();i++){const e=els.nth(i);const tag=await e.evaluate(x=>x.tagName).catch(()=> '');const type=(await e.getAttribute('type')||'').toLowerCase();const nameA=(await e.getAttribute('name')||'').toLowerCase();const ph=(await e.getAttribute('placeholder')||'').toLowerCase();const aria=(await e.getAttribute('aria-label')||'').toLowerCase();const key=`${nameA} ${ph} ${aria}`;try{
-              if(tag==='SELECT'){const opts=await e.locator('option').allTextContents();const pick=opts.find(x=>/education/i.test(x))||opts.find(x=>/^free$/i.test(x))||opts.find(x=>/live/i.test(x))||opts.find(x=>/other/i.test(x));if(pick)await e.selectOption({label:pick}).catch(()=>{});}
-              else if(type==='email'||key.includes('email'))await e.fill(EMAIL);
-              else if(type==='url'||key.includes('url')||key.includes('website')||key.includes('homepage'))await e.fill(SITE);
-              else if(key.includes('name')&&!key.includes('filename'))await e.fill('CodeQuest Kids');
-              else if(key.includes('tagline')||key.includes('one-line')||key.includes('short description'))await e.fill(short);
-              else if(key.includes('description')||tag==='TEXTAREA')await e.fill(desc);
-              else if(key.includes('founder')||key.includes('company'))await e.fill('CodeQuest Kids');
-              else if(key.includes('tag'))await e.fill('coding, kids, education, JavaScript, STEM, free');
-              else if(key.includes('logo'))await e.fill(SITE+'/favicon.ico');
-              else if(key.includes('category'))await e.fill('Education');
-            }catch{}}
-            await clickRe(p,/submit link|submit for review|submit free listing|submit tool|submit for free|share now/i);
-            await p.waitForTimeout(1800);
-            await clickRe(p,/skip|free listing|submit for review|submit tool|submit|send/i);
-            await p.waitForTimeout(1800);
-            const body=(await p.locator('body').innerText()).slice(-1600);results.push([name,p.url(),body]);
-          }catch(e){results.push([name,'ERROR',e.message]);}finally{await b.close();}}
+          async function browserSubmit(name,url){
+            const b=await chromium.launch({headless:true});
+            const p=await b.newPage({viewport:{width:1440,height:1400}});
+            try{
+              await p.goto(url,{waitUntil:'domcontentloaded',timeout:45000});await p.waitForTimeout(1000);
+              const body0=(await p.locator('body').innerText()).slice(0,2600);
+              if(/captcha|recaptcha|hcaptcha/i.test(body0)){results.push([name,'BLOCKED-CAPTCHA']);return;}
+              const els=p.locator('input,textarea,select');
+              for(let i=0;i<await els.count();i++){
+                const e=els.nth(i);const tag=await e.evaluate(x=>x.tagName).catch(()=> '');
+                const type=(await e.getAttribute('type')||'').toLowerCase();const nameA=(await e.getAttribute('name')||'').toLowerCase();
+                const id=(await e.getAttribute('id')||'').toLowerCase();const ph=(await e.getAttribute('placeholder')||'').toLowerCase();const aria=(await e.getAttribute('aria-label')||'').toLowerCase();
+                const key=`${nameA} ${id} ${ph} ${aria}`;
+                try{
+                  if(tag==='SELECT'){const opts=await e.locator('option').allTextContents();const pick=opts.find(x=>/^education$/i.test(x))||opts.find(x=>/^free$/i.test(x))||opts.find(x=>/^live$/i.test(x))||opts.find(x=>/^other$/i.test(x));if(pick)await e.selectOption({label:pick}).catch(()=>{});}
+                  else if(type==='email'||key.includes('email'))await e.fill(EMAIL);
+                  else if(type==='url'||key.includes('url')||key.includes('website')||key.includes('homepage'))await e.fill(SITE);
+                  else if(key.includes('name')&&!key.includes('filename')&&!key.includes('username'))await e.fill('CodeQuest Kids');
+                  else if(key.includes('tagline')||key.includes('one-line')||key.includes('short description'))await e.fill(short);
+                  else if(key.includes('description')||tag==='TEXTAREA')await e.fill(desc);
+                  else if(key.includes('founder')||key.includes('company'))await e.fill('CodeQuest Kids');
+                  else if(key.includes('tag'))await e.fill('coding, kids, education, JavaScript, STEM, free');
+                  else if(key.includes('logo'))await e.fill(SITE+'/favicon.ico');
+                }catch{}
+              }
+              const buttons=p.locator('button,input[type="submit"]');
+              let clicked=false;
+              for(let i=0;i<await buttons.count();i++){
+                const x=buttons.nth(i);const txt=((await x.innerText().catch(()=>''))+' '+(await x.getAttribute('value').catch(()=>''))).toLowerCase();
+                if(/submit|send|share now|continue|add link|get on the runway/.test(txt)&&await x.isVisible().catch(()=>false)){await x.click({timeout:10000}).catch(()=>{});clicked=true;await p.waitForTimeout(1600);break;}
+              }
+              if(!clicked) { const links=p.getByRole('link',{name:/submit|add link/i}).first(); if(await links.count()&&await links.isVisible().catch(()=>false)){await links.click().catch(()=>{});await p.waitForTimeout(1000);} }
+              const after=(await p.locator('body').innerText()).slice(-1800);
+              results.push([name,p.url(),after]);
+            }catch(e){results.push([name,'ERROR',e.message]);}
+            finally{await b.close();}
+          }
           async function turingLinks(){await browserSubmit('TuringLinks','https://turinglinks.com/submit');}
           async function listAI(){await browserSubmit('ListAi.cc','https://listai.cc/submit');}
           async function nextAI(){await browserSubmit('The Next AI','https://www.thenextai.com/submit-ai-tool/');}
@@ -70,5 +87,29 @@ jobs:
           async function hypeStarForm(){await browserSubmit('Hype Star form','https://hypestar.org/submit');}
           async function ignlab(){await browserSubmit('Ignlab Launch','https://launch.ignlab.net/');}
           async function p10015(){await browserSubmit('10015','https://10015.io/product-finder/submit');}
-          (async()=>{await siteReachability();await qevra();await hypeStarAPI();await turingLinks();await listAI();await nextAI();await productReveal();await launchFree();await hypeStarForm();await ignlab();await p10015();console.log('===RESULTS===');for(const r of results)console.log(r.map(x=>typeof x==='string'?x:JSON.stringify(x)).join(' | '));})().catch(e=>{console.error(e);process.exit(1);});
+          (async()=>{
+            await siteReachability();
+            await qevra();
+            await hypeStarAPI();
+            await turingLinks();
+            await listAI();
+            await nextAI();
+            await productReveal();
+            await launchFree();
+            await hypeStarForm();
+            await ignlab();
+            await p10015();
+            const stamp=new Date().toISOString();
+            const lines=['Timestamp: '+stamp,'Site: '+SITE,'','=== RESULTS ===',...results.map(r=>r.map(x=>typeof x==='string'?x:JSON.stringify(x)).join(' | ')),''];
+            fs.mkdirSync('launch-results',{recursive:true});
+            fs.writeFileSync('launch-results/latest.txt',lines.join('\n'));
+            console.log(lines.join('\n'));
+          })().catch(e=>{console.error(e);process.exit(1);});
           NODE
+      - name: Save launch results for verification
+        run: |
+          git config user.name 'CodeQuest Kids Launch Runner'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add launch-results/latest.txt
+          git commit -m 'Record CodeQuest directory submission results' || true
+          git push
