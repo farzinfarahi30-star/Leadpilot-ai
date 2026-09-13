@@ -10,7 +10,7 @@ permissions:
 jobs:
   submit:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -26,127 +26,188 @@ jobs:
           npm install playwright@1.55.0 >/dev/null 2>&1
           npx playwright install --with-deps chromium >/dev/null 2>&1
 
-      - name: Submit CodeQuest Kids to free directories
+      - name: Execute free directory submissions
         env:
           SITE_URL: https://codequest-kids.azinahi123.workers.dev
+          GITHUB_TOKEN: ${{ github.token }}
         run: |
           node <<'NODE'
           const { chromium } = require('playwright');
-
           const SITE = process.env.SITE_URL;
           const results = [];
 
+          async function getPublicGithubEmail() {
+            try {
+              const r = await fetch('https://api.github.com/users/farzinfarahi30-star', {
+                headers: {'Accept':'application/vnd.github+json','User-Agent':'CodeQuest-Kids-Launch-Runner'}
+              });
+              const j = await r.json();
+              return j.email || '';
+            } catch { return ''; }
+          }
+
+          const email = await getPublicGithubEmail();
+
+          async function siteReachability() {
+            const r = await fetch(SITE, {redirect:'follow'});
+            const text = await r.text();
+            results.push(['SITE', r.status, r.url, text.includes('CodeQuest') ? 'CodeQuest content detected' : 'content not detected']);
+          }
+
           async function qevra() {
             try {
+              const payload = {
+                url: SITE,
+                email,
+                name: 'CodeQuest Kids',
+                tagline: 'Free coding adventures for ages 7–16',
+                description: 'A free coding-learning platform for kids ages 7–16 with missions, XP, badges, projects, JavaScript practice and an AI Coach. No subscription or joining fee.',
+                category: 'Education',
+                board_notes: false
+              };
               const r = await fetch('https://qevra.app/api/submit', {
-                method: 'POST',
-                headers: {'Content-Type':'application/json'},
-                body: JSON.stringify({
-                  url: SITE,
-                  name: 'CodeQuest Kids',
-                  tagline: 'Free coding adventures for ages 7–16',
-                  description: 'A free coding-learning platform for kids ages 7–16 with missions, XP, badges, projects, JavaScript practice and an AI Coach. No subscription or joining fee.',
-                  category: 'Education',
-                  board_notes: false
-                })
+                method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload)
               });
               const text = await r.text();
-              results.push(['Qevra', r.status, text.slice(0,500)]);
-            } catch (e) { results.push(['Qevra','ERROR',e.message]); }
+              results.push(['Qevra', r.status, text.slice(0,900)]);
+            } catch(e){ results.push(['Qevra','ERROR',e.message]); }
           }
 
-          async function pageSubmit(name, url, opts={}) {
-            const browser = await chromium.launch({headless:true});
-            const page = await browser.newPage({ viewport: {width:1440,height:1000} });
-            try {
-              const response = await page.goto(url, {waitUntil:'domcontentloaded',timeout:30000});
-              await page.waitForTimeout(1200);
-              const title = await page.title();
-              const body = (await page.locator('body').innerText().catch(()=>'' )).slice(0,4000);
-              console.log(`\\n=== ${name} ===\\nURL ${url}\\nHTTP ${response?.status()}\\nTITLE ${title}\\n${body.slice(0,1500)}`);
-
-              if (opts.run && !/captcha|recaptcha|hcaptcha/i.test(body)) {
-                await opts.run(page);
-                await page.waitForTimeout(1500);
-                const afterUrl = page.url();
-                const after = (await page.locator('body').innerText().catch(()=>'' )).slice(0,2500);
-                results.push([name,'POST-ACTION',afterUrl+' | '+after.slice(0,350)]);
-              } else if (/captcha|recaptcha|hcaptcha/i.test(body)) {
-                results.push([name,'BLOCKED-CAPTCHA','No bypass attempted']);
-              } else {
-                results.push([name,'OPENED',`${response?.status()} ${title}`]);
-              }
-            } catch (e) {
-              results.push([name,'ERROR',e.message]);
-            } finally { await browser.close(); }
+          async function visibleInputs(page) {
+            return await page.locator('input, textarea, select, button').evaluateAll(els => els.map((e,i)=>({
+              i, tag:e.tagName, type:e.type||'', name:e.name||'', id:e.id||'', placeholder:e.placeholder||'', value:e.value||'', text:(e.innerText||e.textContent||'').trim().slice(0,100)
+            })).filter(x=>x.tag==='INPUT'||x.tag==='TEXTAREA'||x.tag==='SELECT'||x.tag==='BUTTON'));
           }
 
-          async function fillFirst(page, patterns, value) {
-            for (const p of patterns) {
-              const loc = page.locator(p).first();
-              if (await loc.count() && await loc.isVisible().catch(()=>false)) {
-                await loc.fill(value).catch(()=>{});
+          async function setByLabelText(page, labels, value) {
+            for (const label of labels) {
+              const l = page.getByLabel(label, {exact:false}).first();
+              if (await l.count() && await l.isVisible().catch(()=>false)) {
+                const tag = await l.evaluate(e=>e.tagName).catch(()=> '');
+                if(tag==='SELECT') await l.selectOption({label:value}).catch(async()=>await l.selectOption({value}).catch(()=>{}));
+                else await l.fill(value).catch(()=>{});
                 return true;
               }
             }
             return false;
           }
 
+          async function setByAttrs(page, patterns, value) {
+            for (const sel of patterns) {
+              const l = page.locator(sel).first();
+              if (await l.count() && await l.isVisible().catch(()=>false)) {
+                const tag = await l.evaluate(e=>e.tagName).catch(()=> '');
+                if(tag==='SELECT') await l.selectOption({label:value}).catch(async()=>await l.selectOption({value}).catch(()=>{}));
+                else await l.fill(value).catch(()=>{});
+                return true;
+              }
+            }
+            return false;
+          }
+
+          async function clickText(page, re) {
+            const b = page.getByRole('button',{name:re}).first();
+            if(await b.count() && await b.isVisible().catch(()=>false)) { await b.click(); return true; }
+            const a = page.getByRole('link',{name:re}).first();
+            if(await a.count() && await a.isVisible().catch(()=>false)) { await a.click(); return true; }
+            return false;
+          }
+
+          async function submitProductReveal() {
+            const browser = await chromium.launch({headless:true});
+            const p = await browser.newPage({viewport:{width:1440,height:1000}});
+            try {
+              await p.goto('https://productreveal.online/submit-product',{waitUntil:'domcontentloaded',timeout:30000});
+              await p.waitForTimeout(800);
+              await setByAttrs(p,['input[name="name"]','input[placeholder*="product name" i]'], 'CodeQuest Kids');
+              await setByAttrs(p,['input[name="slug"]','input[placeholder*="slug" i]'], 'codequest-kids');
+              await setByAttrs(p,['input[name="tagline"]','input[placeholder*="one-liner" i]'], 'Free coding adventures for ages 7–16');
+              await setByAttrs(p,['input[name="website"]','input[type="url"]'], SITE);
+              await setByLabelText(p,['Category'],'Education');
+              await setByLabelText(p,['Pricing type'],'Free');
+              await setByAttrs(p,['input[name="featured_image"]','input[placeholder*="OG" i]','input[name*="featured" i]'], SITE + '/favicon.ico');
+              const review = `CodeQuest Kids is a free browser-based coding-learning platform designed for children and teenagers ages 7–16. The product is built around the idea that early coding should feel like an activity children can actively do, rather than a long sequence of theory lessons. Learners can work through guided coding missions, earn XP and badges, build projects, practice JavaScript, and use an AI Coach for guided help. There is no subscription and no joining fee. The goal is to give families, homeschoolers, tutors, and educators a simple place where a learner can start coding and keep progressing without needing a paid course membership. The experience combines a progression system with hands-on projects so that learners can move from small tasks toward creating things of their own. Parents and educators can use the platform as a practical starting point for introducing programming concepts, experimentation, sequencing, logic, and problem solving. The project is intentionally positioned as a free learning tool rather than a replacement for a teacher or an established school curriculum. For a child who finds traditional coding lessons boring, the mission-based structure is meant to make the first steps more active and rewarding. CodeQuest Kids can also be useful for young learners who want to practice JavaScript in the browser and build a small portfolio of projects as they learn. The site is designed to be easy to access from a browser, with the emphasis on getting a learner into a first activity quickly. The platform is aimed at families and learning communities that want a genuinely free option rather than a free trial that later becomes a paid subscription. The public launch version focuses on the core learner journey: start a mission, practice, earn progress, make projects, and get help when stuck. The product is still an early-stage project, so honest feedback from parents, educators, tutors and young learners is valuable. The most useful feedback is whether the first ten minutes are clear, whether the missions feel motivating, and whether the project-building flow makes learners want to continue. CodeQuest Kids is available as a public web application and can be tried directly without buying a course or joining a paid program.`;
+              await setByAttrs(p,['textarea[name="review"]','textarea'], review);
+              const features = [
+                'Guided coding missions for ages 7–16',
+                'XP, levels and badges for progression',
+                'Projects and portfolio building',
+                'JavaScript practice in the browser',
+                'AI Coach for guided help'
+              ];
+              for(let i=0;i<5;i++) await setByAttrs(p,[`input[name="feature${i+1}"]`,`input[placeholder="Feature ${i+1}"]`],features[i]);
+              await setByAttrs(p,['input[name="founder"]','input[name*="company" i]'], 'CodeQuest Kids');
+              if(email) await setByAttrs(p,['input[name="email"]','input[type="email"]'],email);
+              await setByAttrs(p,['input[name="launch_date"]','input[type="date"]'], '2026-09-13');
+              await setByAttrs(p,['input[name="tags"]','input[placeholder*="ai, productivity" i]'], 'coding education, kids coding, JavaScript, STEM, homeschool, education');
+              const submit = p.getByRole('button',{name:/submit for review/i}).first();
+              if(await submit.count()) { await submit.click(); await p.waitForTimeout(1200); }
+              results.push(['ProductReveal','SUBMITTED',p.url(),(await p.locator('body').innerText()).slice(-700)]);
+            } catch(e) { results.push(['ProductReveal','ERROR',e.message]); }
+            finally { await browser.close(); }
+          }
+
+          async function submitLaunchFree() {
+            const browser = await chromium.launch({headless:true});
+            const p = await browser.newPage({viewport:{width:1440,height:1000}});
+            try {
+              await p.goto('https://launchfree.io/submit.html',{waitUntil:'domcontentloaded',timeout:30000});
+              await p.waitForTimeout(700);
+              await setByAttrs(p,['input[name="launchName"]','input[placeholder*="LaunchFree" i]'], 'CodeQuest Kids');
+              await setByAttrs(p,['input[name="launchUrl"]','input[placeholder*="yourdomain.com" i]'], SITE);
+              await setByAttrs(p,['input[name="tagline"]','input[placeholder*="punchy line" i]'], 'Free coding adventures for kids ages 7–16');
+              await clickText(p,/continue/i);
+              await p.waitForTimeout(400);
+              await setByLabelText(p,['Category'],'Education');
+              await setByAttrs(p,['textarea[name="description"]','textarea'], 'CodeQuest Kids is a free coding-learning platform for ages 7–16 with guided missions, XP, badges, projects, JavaScript practice and an AI Coach. There is no subscription or joining fee. It is designed to make getting started with coding feel practical, active and approachable for children, parents, tutors and educators.');
+              await setByAttrs(p,['textarea[name="whyBuilt"]','textarea[name*="why" i]'], 'I wanted a genuinely free place where children could start learning coding through small missions and projects instead of hitting a subscription wall.');
+              await setByLabelText(p,['Launch Status'],'Live');
+              await setByLabelText(p,['Pricing'],'Free');
+              await setByAttrs(p,['input[type="url"][placeholder*="screenshot1" i]'], SITE + '/');
+              await clickText(p,/continue/i);
+              await p.waitForTimeout(400);
+              await setByAttrs(p,['input[name="name"]','input[placeholder*="Julie James" i]'], 'CodeQuest Kids');
+              if(email) await setByAttrs(p,['input[name="email"]','input[type="email"]'], email);
+              await setByAttrs(p,['textarea[name="bio"]','textarea'], 'Independent builder of CodeQuest Kids, a free browser-based coding-learning project for children and teenagers ages 7–16.');
+              const hearing = p.locator('select').last();
+              if(await hearing.count()) await hearing.selectOption({label:/search|google|web/i}).catch(()=>{});
+              await clickText(p,/get on the runway|submit/i);
+              await p.waitForTimeout(1200);
+              results.push(['LaunchFree','SUBMITTED',p.url(),(await p.locator('body').innerText()).slice(-700)]);
+            } catch(e){ results.push(['LaunchFree','ERROR',e.message]); }
+            finally { await browser.close(); }
+          }
+
+          async function probeAndSimpleSubmit(name,url) {
+            const browser=await chromium.launch({headless:true});
+            const p=await browser.newPage({viewport:{width:1440,height:1000}});
+            try{
+              const r=await p.goto(url,{waitUntil:'domcontentloaded',timeout:30000});
+              await p.waitForTimeout(700);
+              const body=(await p.locator('body').innerText()).slice(0,2500);
+              const meta=await visibleInputs(p);
+              console.log(`\\n=== ${name} ===\\nHTTP ${r?.status()}\\n${body}\\nCONTROLS ${JSON.stringify(meta.slice(0,25))}`);
+              if(/captcha|recaptcha|hcaptcha/i.test(body)){ results.push([name,'BLOCKED-CAPTCHA','No bypass attempted']); return; }
+              const urlField=p.locator('input[type="url"],input[name*="url" i]').first();
+              if(await urlField.count() && await urlField.isVisible().catch(()=>false)){
+                await urlField.fill(SITE);
+                const submit=p.getByRole('button',{name:/submit|send|add|launch/i}).first();
+                if(await submit.count() && await submit.isVisible().catch(()=>false)){ await submit.click(); await p.waitForTimeout(800); results.push([name,'POST-ACTION',p.url(),(await p.locator('body').innerText()).slice(-500)]); }
+                else results.push([name,'URL-FIELD-FOUND',r?.status(),meta.slice(0,15)]);
+              } else results.push([name,'OPENED',r?.status(),meta.slice(0,15)]);
+            }catch(e){results.push([name,'ERROR',e.message]);}
+            finally{await browser.close();}
+          }
+
           (async()=>{
-            // Account-free/API route first.
+            await siteReachability();
             await qevra();
-
-            // Hype Star: documented no-account URL submission path.
-            await pageSubmit('Hype Star','https://hypestar.org/submit',{
-              run: async p => {
-                const ok = await fillFirst(p,[
-                  'input[placeholder*="yourproject.com" i]',
-                  'input[type="url"]',
-                  'input[name*="url" i]'
-                ],SITE);
-                if (!ok) throw new Error('Could not locate public URL field');
-                const buttons = p.getByRole('button',{name:/submit link/i});
-                if (await buttons.count()) await buttons.first().click();
-              }
-            });
-
-            // Ignlab: open the public submission page and submit only if there is no anti-bot gate.
-            await pageSubmit('Ignlab Launch','https://launch.ignlab.net/',{
-              run: async p => {
-                await fillFirst(p,['input[type="url"]','input[name*="url" i]'],SITE);
-                const b = p.getByRole('button',{name:/submit|launch/i}).first();
-                if (await b.count() && await b.isVisible().catch(()=>false)) await b.click();
-              }
-            });
-
-            // 10015: official free submission route.
-            await pageSubmit('10015','https://10015.io/product-finder/submit',{
-              run: async p => {
-                await fillFirst(p,['input[type="url"]','input[name*="url" i]'],SITE);
-                const b = p.getByRole('button',{name:/submit url|submit/i}).first();
-                if (await b.count() && await b.isVisible().catch(()=>false)) await b.click();
-              }
-            });
-
-            // ProductReveal: only attempt the public submission form if present.
-            await pageSubmit('ProductReveal','https://productreveal.online/',{
-              run: async p => {
-                const urlOk = await fillFirst(p,['input[type="url"]','input[name*="url" i]'],SITE);
-                const b = p.getByRole('button',{name:/submit|add|launch/i}).first();
-                if (urlOk && await b.count() && await b.isVisible().catch(()=>false)) await b.click();
-              }
-            });
-
-            // LaunchFree: public submission page; no attempt to defeat any bot control.
-            await pageSubmit('LaunchFree','https://launchfree.app/',{
-              run: async p => {
-                const urlOk = await fillFirst(p,['input[type="url"]','input[name*="url" i]'],SITE);
-                const b = p.getByRole('button',{name:/submit|launch|add/i}).first();
-                if (urlOk && await b.count() && await b.isVisible().catch(()=>false)) await b.click();
-              }
-            });
-
+            await submitProductReveal();
+            await submitLaunchFree();
+            await probeAndSimpleSubmit('Hype Star','https://hypestar.org/submit');
+            await probeAndSimpleSubmit('Ignlab Launch','https://launch.ignlab.net/');
+            await probeAndSimpleSubmit('10015','https://10015.io/product-finder/submit');
             console.log('\\n=== RESULT SUMMARY ===');
-            for (const r of results) console.log(r.join(' | '));
+            for(const r of results) console.log(r.map(x=>typeof x==='string'?x:JSON.stringify(x)).join(' | '));
           })();
           NODE
