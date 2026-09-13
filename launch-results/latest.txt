@@ -1,10 +1,10 @@
-Timestamp: 2026-09-13T15:42:55.051Z
+Timestamp: 2026-09-13T18:31:31.234Z
 Site: https://codequest-kids.azinahi123.workers.dev
 
 === RESULTS ===
 SITE | 200 | https://codequest-kids.azinahi123.workers.dev/ | CodeQuest content detected
 Qevra | 200 | {"ok":true,"id":"7d601bba-a9c1-4616-b028-366ebe9af867","slug":"codequest-kids","url":"https://qevra.app/s/codequest-kids?listed=16124790-b32a-486d-bad5-ec74bffda327","dofollow":true,"mail":false}
-Hype Star API | 400 | {"error":{"code":"invalid_category","message":"Choose one available category for this project."},"meta":{"apiVersion":"v1","requestId":"7513d8ea-ce1b-4ab8-b96b-592883867b84","timestamp":"2026-09-13T15:34:36.469Z"}}
+Hype Star API | 400 | {"error":{"code":"invalid_category","message":"Choose one available category for this project."},"meta":{"apiVersion":"v1","requestId":"01959f20-bf27-479f-ad44-621abead65f4","timestamp":"2026-09-13T18:23:11.944Z"}}
 TuringLinks | https://turinglinks.com/ | kit synchronization, and direct exports without watermarks.
 
 #social media
@@ -673,7 +673,7 @@ Paid
 Open source
 YOUR EMAIL (OPTIONAL — ONLY USED IF WE NEED TO REACH YOU, NEVER SHOWN PUBLICLY)
 + Add more details (optional — helps people trust and find your tool)
-WHAT IS 3 + 9?
+WHAT IS 8 + 4?
  Submit for review
 ⚡ IgnLab
 Image Converter
