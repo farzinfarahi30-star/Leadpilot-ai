@@ -1,0 +1,913 @@
+Timestamp: 2026-09-13T12:45:44.617Z
+Site: https://codequest-kids.azinahi123.workers.dev
+
+=== RESULTS ===
+SITE | 200 | https://codequest-kids.azinahi123.workers.dev/ | CodeQuest content detected
+Qevra | 200 | {"ok":true,"id":"7d601bba-a9c1-4616-b028-366ebe9af867","slug":"codequest-kids","url":"https://qevra.app/s/codequest-kids?listed=16124790-b32a-486d-bad5-ec74bffda327","dofollow":true,"mail":false}
+Hype Star API | 400 | {"error":{"code":"invalid_category","message":"Choose one available category for this project."},"meta":{"apiVersion":"v1","requestId":"5f77d092-37b8-4706-84db-6ad514a94c3e","timestamp":"2026-09-13T12:37:25.001Z"}}
+TuringLinks | https://turinglinks.com/ | kit synchronization, and direct exports without watermarks.
+
+#social media
+#design tool
+Visit ↗
+7
+/10
+b
+Business
+›
+Sales Training
+·
+TOOL
+·
+2 days ago
+Swaycove: Live Sales Objection Handling Tool
+focus2grow.app/swaycove
+
+Swaycove is a sales support tool that provides pre-written responses to common client objections in three escalation stages, designed to be used live during phone or video calls.
+
+#sales
+#objection handling
+Visit ↗
+Browse all 629 links →
+About TuringLinks
+
+An AI-curated directory of links worth keeping. Every link's title, summary, and category are generated and maintained with Gemini.
+
+629
+Links
+23
+Categories
+1.3k
+Tags
+581
+Sources
+
+Links added · last 8 weeks
+
+Explore the directory
+Trending this week
+1
+iTutor: AI-Powered Study Assistant
+11 views · itutor.study
+2
+Slidecove: Instagram and LinkedIn Carousel Editor
+11 views · focus2grow.app
+3
+Swaycove: Live Sales Objection Handling Tool
+10 views · focus2grow.app
+4
+CareerExplorer
+9 views · careerexplorer.com
+5
+CareerOneStop
+9 views · careeronestop.org
+Popular tags
+#ai
+#archives
+#artificial intelligence
+#cloud computing
+#coding
+#collaboration
+#content creation
+#cybersecurity
+#design
+#ecommerce
+#economics
+#education
+#entertainment
+#football
+#gaming
+#generative ai
+#government
+#hiring
+#history
+#javascript
+#journalism
+#learning
+#movies
+#news
+#open source
+#pop culture
+#productivity
+#programming
+#research
+#saas
+#science
+#social media
+#software
+#software development
+#software engineering
+#streaming
+#technology
+#television
+#video games
+#web development
+Top sources
+youtube.com
+9 links
+canlimacizlet.altervista.org
+5 links
+justintvlink.altervista.org
+5 links
+en.wikipedia.org
+4 links
+ideatogame.com
+4 links
+vibetutor.online
+4 links
+Browse all sources →
+Turing
+Links
+
+An AI-curated directory of links worth keeping.
+
+Every link's title, summary, category, and tags are written and maintained by AI (Google Gemini).
+
+DISCOVER
+Directory
+Sources
+A–Z index
+Free tools
+Random link
+Submit a link
+TURINGLINKS
+About
+How it works
+FAQ
+Contact
+LEGAL
+Privacy Policy
+Terms of Service
+© 2026 TuringLinks · AI-curated link directory
+×
+A
+
+Hi, I'm Ada, your AI guide 👋
+Looking for a link or a topic? Ask me!
+
+A
+Ask Ada
+AI guide · find a link
+ListAi.cc | https://listai.cc/submit | rd listings are permanently free. No credit card, no trial period, no hidden fees.
+
+Live Within 24 Hours
+
+We review every submission personally and publish approved tools within 24-48 hours.
+
+What you get for free
+No account required
+Permanently free listing
+Reviewed by humans
+SEO-optimized listing page
+Shown in category pages
+Included in search results
+Want even more visibility?
+
+Featured tools get 10x more clicks, appear at the top of category pages, and are highlighted in our newsletter to 5,000+ subscribers.
+
+View Featured Plans
+G
+M
+C
+J
+
+Join 1,300+ listed tools
+
+Trusted by AI builders worldwide
+
+Submit Your Tool
+
+Fill in the details below. Required fields are marked with *
+
+Tool Name *
+Category *
+Select a category
+Writing & Content
+Image Generation
+Video & Animation
+Audio & Music
+Chatbots & Assistants
+Code & Development
+Marketing & SEO
+Productivity
+Data & Analytics
+Design & UI
+Education & Research
+Business & Finance
+Customer Support
+Social Media
+AI Agents & Automation
+Healthcare & Science
+Legal & Compliance
+HR & Recruiting
+Sales & CRM
+Translation & Language
+Website URL *
+Description *
+
+Aim for 2-3 sentences. A good description improves search visibility.
+
+Your Name
+Your Email *
+Submit Tool for Free
+
+By submitting, you confirm this is a legitimate AI tool and you have the right to list it. We review every submission before publishing.
+
+No spam, ever
+Human-reviewed
+Live in 24h
+ListAi.cc
+
+Discover the best AI tools for every task. Updated daily with new tools and honest reviews.
+
+DIRECTORY
+All Categories
+Best AI Tools
+Compare Tools
+Alternatives
+Blog & Guides
+TOP CATEGORIES
+AI Writing Tools
+AI Image Generators
+AI Coding Assistants
+AI Video Tools
+AI Productivity
+AI Chatbots
+POPULAR LISTS
+Best Writing Tools
+Best Image Generators
+Free AI Tools
+Best Code Tools
+ChatGPT Alternatives
+Midjourney Alternatives
+Copilot Alternatives
+COMPARISONS
+ChatGPT vs Claude
+Midjourney vs DALL-E 3
+Copilot vs Cursor
+ElevenLabs vs Murf
+Suno vs Udio
+Perplexity vs ChatGPT
+AI TOOLS FOR
+Developers
+Marketers
+Designers
+Writers
+Students
+Entrepreneurs
+COMPANY
+About Us
+Submit a Tool
+Get Featured
+Contact
+Privacy Policy
+Terms of Service
+
+© 2026 ListAi.cc. All rights reserved.
+
+Privacy
+Terms
+Contact
+The Next AI | https://www.thenextai.com/submit-ai-tool/ | l must be accessible
+Clear one-line description (max 120 chars)
+Full description of features & use cases
+Correct category selected
+Accurate pricing model
+Valid contact email
+Logo URL (optional but recommended)
+Relevant tags (improves searchability)
+⚡ What Gets Approved Faster
+Complete all optional fields
+Detailed full description
+High-quality logo image
+Accurate, specific category
+Real working product (not coming soon)
+Clear unique value proposition
+🌍 We Accept Tools For
+AI Automation & Workflows
+Coding & Developer Tools
+Chatbots & AI Assistants
+Image & Video Generation
+Writing & Content Creation
+Audio, Voice & Music AI
+Marketing & SEO Tools
+Research & Data Analysis
+Education & Learning
+Design & UI Tools
+💡 Pro Tip
+
+Tools with complete descriptions, clear use cases and accurate categories get approved faster and rank higher in our search. Spend 10 minutes filling out your submission properly — it pays off in traffic.
+
+FREQUENTLY ASKED QUESTIONS
+Everything About Submitting Your AI Tool
+
+Common questions from AI builders, SaaS founders and indie hackers
+
+How do I submit my AI tool for free?
+▼
+Do I get a dofollow backlink when I list my AI tool?
+▼
+What is the difference between free and featured listing?
+▼
+How long does it take to get listed after submitting?
+▼
+Is The Next AI better than Product Hunt for AI tools?
+▼
+Can I submit my AI tool from India or other countries?
+▼
+What types of AI tools can be submitted?
+▼
+What happens after my AI tool is approved?
+▼
+Can I update my tool listing after it goes live?
+▼
+How do I get a backlink from The Next AI for SEO?
+▼
+Ready to Get Your AI Tool Discovered?
+
+Join 3,200+ tools already reaching 120,000+ monthly AI enthusiasts. Submit free in under 5 minutes.
+
+🚀 Submit Free Now
+📂 Browse Directory
+Please fill in all required fields ✦
+THE
+Next
+AI
+
+The internet's most complete AI tools directory. Discover, compare, and find the perfect AI for any task.
+
+𝕏
+in
+▶
+EXPLORE
+All AI Tools
+Categories
+AI Tools Directory
+Blog
+COMPANY
+About Us
+Contact
+Advertise
+Submit a Tool
+LEGAL
+Privacy Policy
+Terms of Service
+Cookie Policy
+Sitemap
+© 2026 The Next AI · Built with ❤️ for AI explorers everywhere
+AI Tools
+Directory
+AI Tools 2026
+Free & Paid
+ProductReveal | https://productreveal.online/submit-product | ProductReveal
+Home
+Products
+Categories
+Blog
+Submit Product
+About
+Contact
+Submit Product
+
+SUBMIT
+
+Share your product with ProductReveal
+
+Free listing. No account required. Every submission is reviewed by a human editor before it goes live.
+
+Basic information
+Product name *
+Product slug *
+
+lowercase-with-hyphens
+
+Tagline *
+
+Short one-liner
+
+Website URL *
+Category *
+Choose a category
+Developer Tools
+Ad Blockers
+Development
+Pricing type *
+Free
+Free
+Freemium
+Paid
+Free Trial
+Media
+Featured image *
+
+Used as the OG/social preview
+
+Product logo (optional)
+Gallery images (optional)
+Full review / description
+Your review * — 0 words
+H2
+H3
+H4
+Image
+Table
+¶ Paragraph
+
+
+
+
+Minimum 500 words, maximum 5000 words. Use headings, lists, quotes, images, and links — write it like a blog review.
+
+5 Key features *
+Feature 1
+Feature 2
+Feature 3
+Feature 4
+Feature 5
+Maker & contact
+Founder / company name *
+Contact email *
+Launch date *
+Extras (optional)
+YouTube demo URL
+Twitter / X URL
+LinkedIn URL
+Coupon code / offer
+Tags
+
+Comma separated
+
+Short pros
+
+One per line
+
+Short cons
+
+One per line
+
+By submitting, you agree to our terms and editorial policy. Submissions are moderated and not auto-published.
+
+Submit for review
+ProductReveal
+
+ProductReveal helps you discover the best new AI tools, SaaS apps, templates, plugins, and digital products launched by makers around the world.
+
+Subscribe
+Explore
+Home
+Products
+Categories
+Blog
+Submit Product
+Company
+About
+Contact
+Advertise
+Write for Us
+Trust
+Privacy Policy
+Terms & Conditions
+Disclaimer
+Editorial Policy
+Sitemap
+
+© 2026 ProductReveal. All rights reserved.
+
+Product listings may include affiliate or referral links.
+LaunchFree | https://launchfree.io/submit.html | LaunchFree
+THE RUNWAY
+Browse
+Get on the runway ↑
+FREE FOREVER. NO GATEKEEPING.
+Your launch deserves
+a runway.
+
+If you're building it, it belongs here. Get in front of the people who need to see what you're building.
+
+🔗
+FREE DOFOLLOW BACKLINK INCLUDED
+
+Every listing on The Runway includes a permanent dofollow backlink to your site. Real SEO value, no charge, no tricks. Good for domain authority from day one.
+
+Here's what happens after you submit
+01
+Instant confirmation
+You'll receive an email confirming we received your submission.
+02
+24h review
+We review every submission. Not an algorithm. A real person.
+03
+You're on the runway
+Your launch gets a permanent page and newsletter feature.
+THE BASICS
+2
+YOUR LAUNCH
+3
+ABOUT YOU
+4
+CONFIRM
+What are you building?
+
+Help people understand what you're putting on the runway.
+
+CATEGORY *
+SaaS
+Dev Tools
+AI / ML
+Marketing
+Productivity
+E-commerce
+Creator Tools
+Fintech
+Education
+Health
+Community
+Entertainment
+Service
+Lifestyle
+Affiliate
+Travel
+Other
+DESCRIPTION *Min 100 characters
+0/1200
+WHY DID YOU BUILD THIS? *Your origin story
+LAUNCH STATUS
+Select status...
+Live
+Beta / Early Access
+Coming Soon
+In Development
+PRICING
+Select pricing...
+Free
+Freemium
+Paid
+One-time Purchase
+Subscription
+Open Source
+MONTHLY REVENUE (MRR) Optional
+Shown as a badge on your listing. Builds trust with visitors browsing the runway.
+SCREENSHOTSOptional. Up to 3 direct image URLs
+1
+2
+3
+Back
+Continue
+LaunchFree
+
+Every launch needs a runway. Yours is free.
+
+Home  ·  Browse  ·  Privacy  ·  Terms  ·  © 2026 Automated Income Tools LLC
+
+☕ Support The Runway
+Hype Star form | https://hypestar.org/submit | re, and this does not create an account or a payment record.
+
+OPTIONAL · SUPPORT HYPE STAR
+Add a badge, or skip for now.
+
+Add the general badge to a relevant public page on your site. We will check the visible link and, after publication, may show SUPPORTS HYPE STAR on the profile. This never changes review, placement, rank, visibility, or outbound-link treatment.
+
+Copy adaptive badge HTML
+
+The compact SVG follows color-scheme. nofollow, ugc, and sponsored are accepted.
+
+Public page containing the badge
+
+Use the exact public page. The host must match this project's site. See every badge option.
+
+I added it — verify & submit
+Skip for now & submit
+
+Skipping does not change whether your project can be published or where it appears.
+
+FREE PUBLISH PATH
+
+Five clear steps. No identity or payment step.
+
+Review the source facts first. Anonymous submission never grants editing or ownership rights; it simply gives a useful public project a path into the directory.
+
+01
+Add a public URL
+
+We read the project page you choose and nothing private.
+
+02
+Review the source facts
+
+See the title, description, and canonical project URL first.
+
+03
+Choose kind + category
+
+Tell people and agents how the project should be discovered.
+
+04
+Support or skip
+
+Optionally add a badge, or explicitly skip with no change to review or rank.
+
+05
+Submit for review
+
+No account is created. Permanent basic inclusion starts when the reviewed profile goes live.
+
+EDITORIAL PREVIEW POLICY
+
+Capture first. Keep owner controls clear.
+
+A screenshot of the public project page can appear after editorial review without waiting for a claim. Authorized project representatives and rights holders can request correction, replacement, or removal. Logos remain neutral until supplied or separately cleared.
+
+Agent skill and API guide →
+
+OPEN LISTING
+
+Give your project a place to be found.
+
+Submit a public project URL for permanent basic inclusion after review. No account, email, card, payment, or automatic renewal.
+
+List a project — free
+Hype Star
+
+Useful projects. Direct destinations. Open to agents.
+
+Browse
+Spotlights
+Agent skill
+Badges
+Newsletter
+API docs
+How it works
+Terms
+Privacy
+List free
+Listing dashboard
+hypestar.org
+Ignlab Launch | https://launch.ignlab.net/submit.html | Ignlab
+Launch
+Browse
+Submit your tool
+
+Free, no account needed. Every submission is reviewed before it goes live.
+
+TOOL NAME
+WEBSITE URL
+Your product's homepage — a bare domain or subdomain, not a specific page (e.g. https://example.com, not https://example.com/blog/post).
+TAGLINE (SHORT, ONE LINE)
+DESCRIPTION
+CATEGORY
+Productivity
+Developer Tools
+Design
+Marketing
+AI
+Analytics
+Finance
+No-Code
+Security
+Other
+TAGS (COMMA-SEPARATED, OPTIONAL)
+PRICING
+Free
+Freemium
+Paid
+Open source
+YOUR EMAIL (OPTIONAL — ONLY USED IF WE NEED TO REACH YOU, NEVER SHOWN PUBLICLY)
++ Add more details (optional — helps people trust and find your tool)
+WHAT IS 7 + 4?
+ Submit for review
+⚡ IgnLab
+Image Converter
+CSS Generator
+SVG Tools
+Blob Generator
+Data Extractor
+Code Transformer
+Email Tester
+Clamp Scale
+QR Codes
+Pixel Art
+PrintLab
+Music Blocks
+Agile Hub
+Launch
+Support
+© 2026 IgnLab
+10015 | https://10015.io/product-finder/submit | op placement, Google indexing, and a dofollow backlink.
+How it works
+Enter your product's URL — we fetch your site's data and pre-fill the submission form for you.
+Review the form, pick your categories and tags, and submit your product.
+Our team reviews your submission and publishes it. You'll get an email when your product is live.
+
+Free submissions join the standard review queue, which takes 3-4 months. Want to go live within 24 hours? You can purchase a priority review for a one-time $9.99 fee right after submitting.
+
+Browse product categories
+Productivity
+Development
+Design
+Marketing
+Business
+Finance
+AI
+Social Media
+Lifestyle
+Frequently asked questions
+Is it free to submit my product?
+
+Yes. Submitting a product to Product Finder is completely free. Every submission goes through a manual quality review before it is published.
+
+How long does the review take?
+
+Free submissions join the standard review queue, which takes 3-4 months due to the volume of submissions. If you don't want to wait, you can get a priority review for a one-time $9.99 fee and your product goes live within 24 hours.
+
+What can I submit?
+
+Products, tools, SaaS, mobile and desktop apps, browser extensions, and add-ons. Anything with a live website can be submitted.
+
+Do I get a backlink to my website?
+
+Every published product gets its own listing page on 10015.io. Links on free listings are nofollow; featured products (from $2.99/month) get a Google-indexed product page and a dofollow backlink from a high-DA domain.
+
+How can I get more visibility after my product is listed?
+
+You can feature your product to get top placement on the Product Finder home page, category and tag pages, a featured badge, and SEO benefits like Google indexing and a dofollow backlink.
+
+Can I update my product information later?
+
+Yes. Reach out to contact@10015.io with your changes and we'll update your listing.
+
+Cookie Disclaimer
+
+We use cookies (and other similar technologies) to collect data to improve your experience on 10015 Tools. By using 10015.io, you’re agreeing to the collection of data as described in our Privacy Policy.
+
+Dismiss
+Submit Your Product
+About
+Terms of Use
+Privacy Policy
+Contact
+Made with
+in Earth
+Zearches | https://zearches.com/submit-website-free.php | TE SUBMISSION
+
+Made something?
+Let’s get it discovered.
+
+A new project, a growing business, your own corner of the internet. Give people another way to find it.
+
+Free listing, with no payment or account.
+Submit your direct website URL once.
+Choose the most relevant category.
+Automatic checks for spam, duplicates and tracking links.
+
+Accepted websites are added to their category and the latest submissions feed.
+
+Explore the directory
+A HOME FOR YOUR NEXT LINK
+100% FREE
+Submit your website
+
+Share what you’ve built. We’ll help people find it.
+
+Website URL
+required
+
+Include https:// and use your direct website URL. No affiliate or tracking links.
+
+Website name
+optional
+
+Up to 30 characters. Leave blank to use your URL.
+
+Category
+required
+Choose the best fit
+General Websites
+Personal Blogs & Journals
+Business & Company Sites
+Local Services & Shops
+E-commerce & Online Stores
+Software & SaaS Tools
+SEO, Marketing & Growth
+Crypto, Web3 & DeFi
+Finance, Investing & Money
+Health, Fitness & Wellness
+Food, Cooking & Recipes
+Travel & Tourism
+Education & Learning
+Tech, Gadgets & Reviews
+Entertainment & Media
+Gaming & Esports
+Portfolios & Creative Work
+Non-Profit & Charity
+Forums & Communities
+Resources, Tools & Directories
+Short description
+required
+
+50–250 characters. Tell us what your site offers, without extra links.
+
+185/250
+Leave this field empty
+Submit website for free
+
+No account. No payment. Automatically screened.
+
+By submitting, you confirm you may share this website and accept our listing terms. Guidelines · Privacy
+
+A FEW USEFUL ANSWERS
+
+Before you hit submit.
+
+Simple rules help keep the directory useful for everyone.
+
+All submission guidelines
+Is it really free?
+What should I write in my description?
+Can I submit a blog?
+Why was my submission rejected?
+Will a listing guarantee rankings or indexing?
+How can I update or remove a listing?
+Zearches
+.
+
+A little more discovery.
+A better-connected web.
+
+Explore
+All categories
+Latest websites
+Find a useful website
+About Zearches
+RSS feed
+For website owners
+Submit a website
+How it works
+Listing policy
+Contact & report a listing
+team@zearches.com
+
+© 2026 Zearches.com
+
+Privacy & cookies
+Listing terms
+XML sitemap
+Back to top ↑
+Linkrena | https://linkrena.com/submit?url=https%3A%2F%2Fcodequest-kids.azinahi123.workers.dev | Skip to content
+Linkrena
+Tools
+Categories
+Launches
+Arena
+NEW
+Search
+Submit
+Sign in
+Linkrena
+/
+Submit
+Submit a tool
+
+Free, and it stays free. Every submission goes through the same quality check as tools we find ourselves.
+
+Product URL
+Name
+One-line description
+Say what it does, not why it is great. Concrete descriptions get approved faster.
+Email (optional)
+Used to tell you when the listing goes live and to let you claim it. Nothing else.
+Submit for review
+WHAT HAPPENS NEXT
+1
+We fetch your page, take a screenshot and pull out the details.
+2
+It is scored for quality, safety and whether it duplicates an existing listing.
+3
+Clear the bar and it publishes automatically. Borderline cases get a human look.
+4
+Once live, the listing is re-checked on a schedule so it stays accurate.
+DISCOVER
+All tools
+Categories
+Free tools
+Recent launches
+Search
+PARTICIPATE
+Submit a tool
+Arena
+Hall of Fame
+Arena rules
+Pricing
+FOR MACHINES
+JSON API
+OpenAPI spec
+llms.txt
+RSS feed
+Sitemap
+ABOUT
+How this works
+Terms
+Privacy
+
+© 2026 Linkrena. The self-running directory of AI tools and agents.
+
+Listings re-checked continuously.
