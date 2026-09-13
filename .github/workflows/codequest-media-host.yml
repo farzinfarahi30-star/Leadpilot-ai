@@ -18,8 +18,12 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Install FFmpeg
-        run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+      - name: Setup FFmpeg
+        uses: FedericoCarboni/setup-ffmpeg@v3
+        with:
+          ffmpeg-version: release
+          linking-type: static
+          github-token: ${{ github.token }}
 
       - name: Download and extract CodeQuest Kids package
         run: |
@@ -38,15 +42,13 @@ jobs:
               if len(mp4s) != 30:
                   raise SystemExit(f'Expected 30 MP4s, found {len(mp4s)}')
               for i in mp4s:
-                  target = out / Path(i.filename).name
-                  target.write_bytes(z.read(i))
+                  (out / Path(i.filename).name).write_bytes(z.read(i))
           PY
           test "$(find /tmp/cq/unpacked -maxdepth 1 -type f -name '*.mp4' | wc -l)" -eq 30
 
       - name: Normalize all videos for Instagram Reels
         run: |
           set -euo pipefail
-          shopt -s nullglob
           for f in /tmp/cq/unpacked/*.mp4; do
             base="$(basename "$f")"
             ffmpeg -hide_banner -loglevel error -y \
