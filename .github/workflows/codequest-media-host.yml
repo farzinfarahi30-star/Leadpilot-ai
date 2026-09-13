@@ -2,6 +2,8 @@ name: CodeQuest Kids Media Host
 
 on:
   push:
+    branches: [main]
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -19,12 +21,25 @@ jobs:
       - name: Download CodeQuest Kids package from public Dropbox folder
         run: |
           set -euo pipefail
-          mkdir -p /tmp/cq
+          mkdir -p /tmp/cq/unpacked
           curl -L --fail --retry 3 --retry-delay 2 \
             'https://www.dropbox.com/scl/fo/78wrh8g8ay338z7ob19bb/APkrtyg62tb5s5bZo6pn2Ts?rlkey=k4y1b0mn10qvl4sh229e3a9jd&st=qur47vig&dl=1' \
             -o /tmp/cq/package.zip
-          unzip -q /tmp/cq/package.zip -d /tmp/cq/unpacked
-          find /tmp/cq/unpacked -type f -name '*.mp4' -print
+          python3 - <<'PY'
+          from pathlib import Path
+          from zipfile import ZipFile
+          src = Path('/tmp/cq/package.zip')
+          out = Path('/tmp/cq/unpacked')
+          with ZipFile(src) as z:
+              mp4s = [i for i in z.infolist() if i.filename.lower().endswith('.mp4')]
+              if len(mp4s) != 30:
+                  raise SystemExit(f'Expected 30 MP4s, found {len(mp4s)}')
+              for i in mp4s:
+                  data = z.read(i)
+                  target = out / Path(i.filename).name
+                  target.write_bytes(data)
+          PY
+          find /tmp/cq/unpacked -maxdepth 1 -type f -name '*.mp4' -print
 
       - name: Publish 30 MP4s to a dedicated public branch
         run: |
@@ -40,7 +55,7 @@ jobs:
           fi
           rm -rf media
           mkdir -p media
-          find /tmp/cq/unpacked -type f -name '*.mp4' -print0 | sort -z | xargs -0 -I{} cp '{}' media/
+          cp /tmp/cq/unpacked/*.mp4 media/
           test "$(find media -maxdepth 1 -type f -name '*.mp4' | wc -l)" -eq 30
           git add media/*.mp4
           git commit -m 'Publish CodeQuest Kids Shorts media' || echo 'No media changes'
