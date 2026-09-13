@@ -1,10 +1,10 @@
-Timestamp: 2026-09-13T12:45:44.617Z
+Timestamp: 2026-09-13T15:42:55.051Z
 Site: https://codequest-kids.azinahi123.workers.dev
 
 === RESULTS ===
 SITE | 200 | https://codequest-kids.azinahi123.workers.dev/ | CodeQuest content detected
 Qevra | 200 | {"ok":true,"id":"7d601bba-a9c1-4616-b028-366ebe9af867","slug":"codequest-kids","url":"https://qevra.app/s/codequest-kids?listed=16124790-b32a-486d-bad5-ec74bffda327","dofollow":true,"mail":false}
-Hype Star API | 400 | {"error":{"code":"invalid_category","message":"Choose one available category for this project."},"meta":{"apiVersion":"v1","requestId":"5f77d092-37b8-4706-84db-6ad514a94c3e","timestamp":"2026-09-13T12:37:25.001Z"}}
+Hype Star API | 400 | {"error":{"code":"invalid_category","message":"Choose one available category for this project."},"meta":{"apiVersion":"v1","requestId":"7513d8ea-ce1b-4ab8-b96b-592883867b84","timestamp":"2026-09-13T15:34:36.469Z"}}
 TuringLinks | https://turinglinks.com/ | kit synchronization, and direct exports without watermarks.
 
 #social media
@@ -50,11 +50,11 @@ Trending this week
 iTutor: AI-Powered Study Assistant
 11 views · itutor.study
 2
-Slidecove: Instagram and LinkedIn Carousel Editor
+Swaycove: Live Sales Objection Handling Tool
 11 views · focus2grow.app
 3
-Swaycove: Live Sales Objection Handling Tool
-10 views · focus2grow.app
+Slidecove: Instagram and LinkedIn Carousel Editor
+11 views · focus2grow.app
 4
 CareerExplorer
 9 views · careerexplorer.com
@@ -673,7 +673,7 @@ Paid
 Open source
 YOUR EMAIL (OPTIONAL — ONLY USED IF WE NEED TO REACH YOU, NEVER SHOWN PUBLICLY)
 + Add more details (optional — helps people trust and find your tool)
-WHAT IS 7 + 4?
+WHAT IS 3 + 9?
  Submit for review
 ⚡ IgnLab
 Image Converter
