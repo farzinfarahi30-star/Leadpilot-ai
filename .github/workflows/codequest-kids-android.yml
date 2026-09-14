@@ -3,9 +3,6 @@ name: CodeQuest Kids Android Build
 on:
   push:
     branches: [codequest-kids-android-build]
-    paths:
-      - 'codequest-kids-android/**'
-      - '.github/workflows/codequest-kids-android.yml'
   workflow_dispatch:
 
 permissions:
@@ -20,33 +17,26 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
       - name: Set up Java 17
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
-
       - name: Set up Android SDK 36
         uses: android-actions/setup-android@v3
-
       - name: Install Android 36 SDK
         run: sdkmanager 'platform-tools' 'platforms;android-36' 'build-tools;36.0.0'
-
       - name: Set up Gradle 8.9
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.9'
-
       - name: Build debug APK
         run: gradle --no-daemon assembleDebug
-
       - name: Package APK
         run: |
           mkdir -p dist
           cp app/build/outputs/apk/debug/app-debug.apk dist/CodeQuest-Kids-1.2.0-debug.apk
           ls -lh dist/CodeQuest-Kids-1.2.0-debug.apk
-
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
