@@ -30,16 +30,26 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.9'
-      - name: Build debug APK
-        run: gradle --no-daemon assembleDebug
-      - name: Package APK
+      - name: Build release APK
+        run: gradle --no-daemon assembleRelease
+      - name: Package release APK
         run: |
           mkdir -p dist
-          cp app/build/outputs/apk/debug/app-debug.apk dist/CodeQuest-Kids-1.2.0-debug.apk
-          ls -lh dist/CodeQuest-Kids-1.2.0-debug.apk
-      - name: Upload APK artifact
+          cp app/build/outputs/apk/release/app-release-unsigned.apk dist/CodeQuest-Kids-1.2.0-release-unsigned.apk
+          sha256sum dist/CodeQuest-Kids-1.2.0-release-unsigned.apk | tee dist/SHA256SUMS.txt
+      - name: Upload release APK
         uses: actions/upload-artifact@v4
         with:
-          name: CodeQuest-Kids-Android-APK
-          path: codequest-kids-android/dist/CodeQuest-Kids-1.2.0-debug.apk
+          name: CodeQuest-Kids-Android-Release-Unsigned
+          path: codequest-kids-android/dist/*
+          retention-days: 30
+      - name: Package Android signing tools
+        working-directory: /
+        run: |
+          tar -C "$ANDROID_HOME/build-tools/36.0.0" -czf /tmp/android-signing-tools-36.0.0.tar.gz apksigner zipalign lib
+      - name: Upload Android signing tools
+        uses: actions/upload-artifact@v4
+        with:
+          name: Android-Signing-Tools-36.0.0
+          path: /tmp/android-signing-tools-36.0.0.tar.gz
           retention-days: 30
