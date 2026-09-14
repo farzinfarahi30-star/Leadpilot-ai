@@ -1,11 +1,11 @@
-Timestamp: 2026-09-13T18:31:31.234Z
+Timestamp: 2026-09-14T20:44:31.367Z
 Site: https://codequest-kids.azinahi123.workers.dev
 
 === RESULTS ===
 SITE | 200 | https://codequest-kids.azinahi123.workers.dev/ | CodeQuest content detected
 Qevra | 200 | {"ok":true,"id":"7d601bba-a9c1-4616-b028-366ebe9af867","slug":"codequest-kids","url":"https://qevra.app/s/codequest-kids?listed=16124790-b32a-486d-bad5-ec74bffda327","dofollow":true,"mail":false}
-Hype Star API | 400 | {"error":{"code":"invalid_category","message":"Choose one available category for this project."},"meta":{"apiVersion":"v1","requestId":"01959f20-bf27-479f-ad44-621abead65f4","timestamp":"2026-09-13T18:23:11.944Z"}}
-TuringLinks | https://turinglinks.com/ | kit synchronization, and direct exports without watermarks.
+Hype Star API | 400 | {"error":{"code":"invalid_category","message":"Choose one available category for this project."},"meta":{"apiVersion":"v1","requestId":"6be34532-948a-43bc-8c67-3d3ed371e830","timestamp":"2026-09-14T20:36:13.098Z"}}
+TuringLinks | https://turinglinks.com/ | on, and direct exports without watermarks.
 
 #social media
 #design tool
@@ -19,7 +19,7 @@ Sales Training
 ·
 TOOL
 ·
-2 days ago
+3 days ago
 Swaycove: Live Sales Objection Handling Tool
 focus2grow.app/swaycove
 
@@ -48,7 +48,7 @@ Explore the directory
 Trending this week
 1
 iTutor: AI-Powered Study Assistant
-11 views · itutor.study
+12 views · itutor.study
 2
 Swaycove: Live Sales Objection Handling Tool
 11 views · focus2grow.app
@@ -56,11 +56,11 @@ Swaycove: Live Sales Objection Handling Tool
 Slidecove: Instagram and LinkedIn Carousel Editor
 11 views · focus2grow.app
 4
-CareerExplorer
-9 views · careerexplorer.com
-5
 CareerOneStop
 9 views · careeronestop.org
+5
+Hamza Tariq AI Tutor at VibeTutor
+8 views · vibetutor.online
 Popular tags
 #ai
 #archives
@@ -673,7 +673,7 @@ Paid
 Open source
 YOUR EMAIL (OPTIONAL — ONLY USED IF WE NEED TO REACH YOU, NEVER SHOWN PUBLICLY)
 + Add more details (optional — helps people trust and find your tool)
-WHAT IS 8 + 4?
+WHAT IS 2 + 2?
  Submit for review
 ⚡ IgnLab
 Image Converter
