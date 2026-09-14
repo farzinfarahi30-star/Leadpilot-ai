@@ -34,10 +34,10 @@ jobs:
           gradle-version: '8.9'
       - name: Build release APK and AAB
         run: gradle --no-daemon assembleRelease bundleRelease
-      - name: Align APK and package release outputs
+      - name: Package release outputs
         run: |
           mkdir -p dist
-          zipalign -f -p 4 app/build/outputs/apk/release/app-release-unsigned.apk dist/CodeQuest-Kids-1.2.0-release-aligned-unsigned.apk
+          cp app/build/outputs/apk/release/app-release-unsigned.apk dist/CodeQuest-Kids-1.2.0-release-unsigned.apk
           cp app/build/outputs/bundle/release/app-release.aab dist/CodeQuest-Kids-1.2.0-release-unsigned.aab
           sha256sum dist/* | tee dist/SHA256SUMS.txt
       - name: Upload release outputs
@@ -45,14 +45,4 @@ jobs:
         with:
           name: CodeQuest-Kids-Android-Release-Unsigned
           path: codequest-kids-android/dist/*
-          retention-days: 30
-      - name: Package Android signing tools
-        working-directory: /
-        run: |
-          tar -C "$ANDROID_HOME/build-tools/36.0.0" -czf /tmp/android-signing-tools-36.0.0.tar.gz apksigner zipalign lib
-      - name: Upload Android signing tools
-        uses: actions/upload-artifact@v4
-        with:
-          name: Android-Signing-Tools-36.0.0
-          path: /tmp/android-signing-tools-36.0.0.tar.gz
           retention-days: 30
