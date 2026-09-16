@@ -1,45 +1,45 @@
-Timestamp: 2026-09-13T18:31:31.234Z
+Timestamp: 2026-09-16T14:18:04.600Z
 Site: https://codequest-kids.azinahi123.workers.dev
 
 === RESULTS ===
 SITE | 200 | https://codequest-kids.azinahi123.workers.dev/ | CodeQuest content detected
-Qevra | 200 | {"ok":true,"id":"7d601bba-a9c1-4616-b028-366ebe9af867","slug":"codequest-kids","url":"https://qevra.app/s/codequest-kids?listed=16124790-b32a-486d-bad5-ec74bffda327","dofollow":true,"mail":false}
-Hype Star API | 400 | {"error":{"code":"invalid_category","message":"Choose one available category for this project."},"meta":{"apiVersion":"v1","requestId":"01959f20-bf27-479f-ad44-621abead65f4","timestamp":"2026-09-13T18:23:11.944Z"}}
-TuringLinks | https://turinglinks.com/ | kit synchronization, and direct exports without watermarks.
+Qevra | ERROR | fetch failed
+Hype Star API | ERROR | fetch failed
+TuringLinks | https://turinglinks.com/ | e world's most widely used web search engine. It provides fast access to information across the internet, including websites, images, videos, news, and specialized tools.
 
-#social media
-#design tool
+#search
+#web
 Visit ↗
-7
+1
 /10
-b
-Business
+t
+Technology
 ›
-Sales Training
+Google Services
 ·
-TOOL
+OTHER
 ·
-2 days ago
-Swaycove: Live Sales Objection Handling Tool
-focus2grow.app/swaycove
+1 day ago
+Google Search Unavailable Post
+share.google/kPwr1fIgu3eWA4YV9
 
-Swaycove is a sales support tool that provides pre-written responses to common client objections in three escalation stages, designed to be used live during phone or video calls.
+A placeholder page indicating that the requested Google Share link is no longer active or accessible.
 
-#sales
-#objection handling
+#google
+#dead link
 Visit ↗
-Browse all 629 links →
+Browse all 650 links →
 About TuringLinks
 
 An AI-curated directory of links worth keeping. Every link's title, summary, and category are generated and maintained with Gemini.
 
-629
+650
 Links
 23
 Categories
-1.3k
+1.4k
 Tags
-581
+595
 Sources
 
 Links added · last 8 weeks
@@ -47,20 +47,20 @@ Links added · last 8 weeks
 Explore the directory
 Trending this week
 1
+Swaycove: Live Sales Objection Handling Tool
+12 views · focus2grow.app
+2
+Slidecove: Instagram and LinkedIn Carousel Editor
+12 views · focus2grow.app
+3
 iTutor: AI-Powered Study Assistant
 11 views · itutor.study
-2
-Swaycove: Live Sales Objection Handling Tool
-11 views · focus2grow.app
-3
-Slidecove: Instagram and LinkedIn Carousel Editor
-11 views · focus2grow.app
 4
 CareerExplorer
 9 views · careerexplorer.com
 5
-CareerOneStop
-9 views · careeronestop.org
+O*NET OnLine
+9 views · onetonline.org
 Popular tags
 #ai
 #archives
@@ -105,6 +105,8 @@ Popular tags
 Top sources
 youtube.com
 9 links
+share.google
+8 links
 canlimacizlet.altervista.org
 5 links
 justintvlink.altervista.org
@@ -112,8 +114,6 @@ justintvlink.altervista.org
 en.wikipedia.org
 4 links
 ideatogame.com
-4 links
-vibetutor.online
 4 links
 Browse all sources →
 Turing
@@ -560,88 +560,10 @@ Every launch needs a runway. Yours is free.
 Home  ·  Browse  ·  Privacy  ·  Terms  ·  © 2026 Automated Income Tools LLC
 
 ☕ Support The Runway
-Hype Star form | https://hypestar.org/submit | re, and this does not create an account or a payment record.
+Hype Star form | ERROR | page.goto: Timeout 45000ms exceeded.
+Call log:
+  - navigating to "https://hypestar.org/submit", waiting until "domcontentloaded"
 
-OPTIONAL · SUPPORT HYPE STAR
-Add a badge, or skip for now.
-
-Add the general badge to a relevant public page on your site. We will check the visible link and, after publication, may show SUPPORTS HYPE STAR on the profile. This never changes review, placement, rank, visibility, or outbound-link treatment.
-
-Copy adaptive badge HTML
-
-The compact SVG follows color-scheme. nofollow, ugc, and sponsored are accepted.
-
-Public page containing the badge
-
-Use the exact public page. The host must match this project's site. See every badge option.
-
-I added it — verify & submit
-Skip for now & submit
-
-Skipping does not change whether your project can be published or where it appears.
-
-FREE PUBLISH PATH
-
-Five clear steps. No identity or payment step.
-
-Review the source facts first. Anonymous submission never grants editing or ownership rights; it simply gives a useful public project a path into the directory.
-
-01
-Add a public URL
-
-We read the project page you choose and nothing private.
-
-02
-Review the source facts
-
-See the title, description, and canonical project URL first.
-
-03
-Choose kind + category
-
-Tell people and agents how the project should be discovered.
-
-04
-Support or skip
-
-Optionally add a badge, or explicitly skip with no change to review or rank.
-
-05
-Submit for review
-
-No account is created. Permanent basic inclusion starts when the reviewed profile goes live.
-
-EDITORIAL PREVIEW POLICY
-
-Capture first. Keep owner controls clear.
-
-A screenshot of the public project page can appear after editorial review without waiting for a claim. Authorized project representatives and rights holders can request correction, replacement, or removal. Logos remain neutral until supplied or separately cleared.
-
-Agent skill and API guide →
-
-OPEN LISTING
-
-Give your project a place to be found.
-
-Submit a public project URL for permanent basic inclusion after review. No account, email, card, payment, or automatic renewal.
-
-List a project — free
-Hype Star
-
-Useful projects. Direct destinations. Open to agents.
-
-Browse
-Spotlights
-Agent skill
-Badges
-Newsletter
-API docs
-How it works
-Terms
-Privacy
-List free
-Listing dashboard
-hypestar.org
 Ignlab Launch | https://launch.ignlab.net/submit.html | Ignlab
 Launch
 Browse
@@ -673,7 +595,7 @@ Paid
 Open source
 YOUR EMAIL (OPTIONAL — ONLY USED IF WE NEED TO REACH YOU, NEVER SHOWN PUBLICLY)
 + Add more details (optional — helps people trust and find your tool)
-WHAT IS 8 + 4?
+WHAT IS 9 + 5?
  Submit for review
 ⚡ IgnLab
 Image Converter
