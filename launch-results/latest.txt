@@ -1,10 +1,10 @@
-Timestamp: 2026-09-16T14:18:04.600Z
+Timestamp: 2026-09-16T14:43:35.183Z
 Site: https://codequest-kids.azinahi123.workers.dev
 
 === RESULTS ===
 SITE | 200 | https://codequest-kids.azinahi123.workers.dev/ | CodeQuest content detected
-Qevra | ERROR | fetch failed
-Hype Star API | ERROR | fetch failed
+Qevra | 200 | {"ok":true,"id":"7d601bba-a9c1-4616-b028-366ebe9af867","slug":"codequest-kids","url":"https://qevra.app/s/codequest-kids?listed=16124790-b32a-486d-bad5-ec74bffda327","dofollow":true,"mail":false}
+Hype Star API | 400 | {"error":{"code":"invalid_category","message":"Choose one available category for this project."},"meta":{"apiVersion":"v1","requestId":"b1c8510f-6851-4196-a77c-c606f7485b7e","timestamp":"2026-09-16T14:35:15.977Z"}}
 TuringLinks | https://turinglinks.com/ | e world's most widely used web search engine. It provides fast access to information across the internet, including websites, images, videos, news, and specialized tools.
 
 #search
@@ -560,10 +560,85 @@ Every launch needs a runway. Yours is free.
 Home  ·  Browse  ·  Privacy  ·  Terms  ·  © 2026 Automated Income Tools LLC
 
 ☕ Support The Runway
-Hype Star form | ERROR | page.goto: Timeout 45000ms exceeded.
-Call log:
-  - navigating to "https://hypestar.org/submit", waiting until "domcontentloaded"
+Hype Star form | https://hypestar.org/submit | ry submission. We do not ask who you are, and this does not create an account or a payment record.
 
+REQUIRED FOR A NEW FREE LISTING
+Add the Hype Star badge, then submit.
+
+Paste this existing badge HTML onto any public page of your site. We first check your homepage and a few common paths. If it is somewhere else, share that exact URL. Paid listings do not need a backlink. Listings already approved stay listed without one.
+
+Copy adaptive badge HTML
+
+Reuse this hypestar-badge snippet. nofollow, ugc, and sponsored are accepted.
+
+Page URL if it is not on your homepage
+
+Optional at first. If we cannot find the badge quickly, paste the exact page. The host must match this project's site. See every badge option.
+
+Verify badge & submit
+
+FREE PUBLISH PATH
+
+Five clear steps. No identity or payment step.
+
+Review the source facts first. Anonymous submission never grants editing or ownership rights; it simply gives a useful public project a path into the directory.
+
+01
+Add a public URL
+
+We read the project page you choose and nothing private.
+
+02
+Review the source facts
+
+See the title, description, and canonical project URL first.
+
+03
+Choose kind + category
+
+Tell people and agents how the project should be discovered.
+
+04
+Add the badge
+
+Copy the existing badge HTML onto any public page. We check the homepage first.
+
+05
+Submit for review
+
+No account is created. Permanent basic inclusion starts when the reviewed profile goes live.
+
+EDITORIAL PREVIEW POLICY
+
+Capture first. Keep owner controls clear.
+
+A screenshot of the public project page can appear after editorial review without waiting for a claim. Authorized project representatives and rights holders can request correction, replacement, or removal. Logos remain neutral until supplied or separately cleared.
+
+Agent skill and API guide →
+
+OPEN LISTING
+
+Give your project a place to be found.
+
+Submit a public project URL for permanent basic inclusion after review. No account, email, card, payment, or automatic renewal.
+
+List a project — free
+Hype Star
+
+Useful projects. Direct destinations. Open to agents.
+
+Browse
+Spotlights
+Agent skill
+Badges
+Newsletter
+API docs
+How it works
+Terms
+Privacy
+List free
+Listing dashboard
+hypestar.org
 Ignlab Launch | https://launch.ignlab.net/submit.html | Ignlab
 Launch
 Browse
@@ -595,7 +670,7 @@ Paid
 Open source
 YOUR EMAIL (OPTIONAL — ONLY USED IF WE NEED TO REACH YOU, NEVER SHOWN PUBLICLY)
 + Add more details (optional — helps people trust and find your tool)
-WHAT IS 9 + 5?
+WHAT IS 3 + 9?
  Submit for review
 ⚡ IgnLab
 Image Converter
