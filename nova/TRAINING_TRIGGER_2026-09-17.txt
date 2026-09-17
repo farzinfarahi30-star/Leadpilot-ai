@@ -1,0 +1,1 @@
+Nova GPU automation trigger. The training workflow uses the existing resumable Nova source and Modal T4 compute.
