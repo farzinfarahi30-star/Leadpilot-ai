@@ -1,0 +1,4 @@
+{"category":"math","prompt":"What is 17 + 25?","answer":"42"}
+{"category":"math","prompt":"A box has 4 rows of 6 apples. How many apples are there?","answer":"24"}
+{"category":"logic","prompt":"All robots in room A are blue. Nova is a robot in room A. What color is Nova?","answer":"blue"}
+{"category":"coding","prompt":"Write Python to square a number x.","answer":"def square(x):\n    return x * x"}
