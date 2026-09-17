@@ -1,45 +1,45 @@
-Timestamp: 2026-09-13T18:31:31.234Z
+Timestamp: 2026-09-17T12:13:48.136Z
 Site: https://codequest-kids.azinahi123.workers.dev
 
 === RESULTS ===
 SITE | 200 | https://codequest-kids.azinahi123.workers.dev/ | CodeQuest content detected
 Qevra | 200 | {"ok":true,"id":"7d601bba-a9c1-4616-b028-366ebe9af867","slug":"codequest-kids","url":"https://qevra.app/s/codequest-kids?listed=16124790-b32a-486d-bad5-ec74bffda327","dofollow":true,"mail":false}
-Hype Star API | 400 | {"error":{"code":"invalid_category","message":"Choose one available category for this project."},"meta":{"apiVersion":"v1","requestId":"01959f20-bf27-479f-ad44-621abead65f4","timestamp":"2026-09-13T18:23:11.944Z"}}
-TuringLinks | https://turinglinks.com/ | kit synchronization, and direct exports without watermarks.
+Hype Star API | 400 | {"error":{"code":"invalid_category","message":"Choose one available category for this project."},"meta":{"apiVersion":"v1","requestId":"a9cf6fef-80a1-4f55-aa18-ab60c13e8ae4","timestamp":"2026-09-17T12:05:28.628Z"}}
+TuringLinks | https://turinglinks.com/ | power systems. It works offline, requires no account, and helps users track components, wiring, and maintenance schedules for mixed-hardware setups.
 
-#social media
-#design tool
+#solar
+#off-grid
 Visit ↗
 7
 /10
-b
-Business
+h
+Health
 ›
-Sales Training
+Mental Health
 ·
 TOOL
 ·
-2 days ago
-Swaycove: Live Sales Objection Handling Tool
-focus2grow.app/swaycove
+1 day ago
+RAADS-R Test Online Screener
+raadsr.org
 
-Swaycove is a sales support tool that provides pre-written responses to common client objections in three escalation stages, designed to be used live during phone or video calls.
+An online assessment tool providing RAADS-R-style screening for adults to reflect on social, communication, sensory, and pattern-related traits.
 
-#sales
-#objection handling
+#autism
+#neurodiversity
 Visit ↗
-Browse all 629 links →
+Browse all 662 links →
 About TuringLinks
 
 An AI-curated directory of links worth keeping. Every link's title, summary, and category are generated and maintained with Gemini.
 
-629
+662
 Links
 23
 Categories
-1.3k
+1.4k
 Tags
-581
+602
 Sources
 
 Links added · last 8 weeks
@@ -47,25 +47,24 @@ Links added · last 8 weeks
 Explore the directory
 Trending this week
 1
+Swaycove: Live Sales Objection Handling Tool
+12 views · focus2grow.app
+2
+Slidecove: Instagram and LinkedIn Carousel Editor
+12 views · focus2grow.app
+3
 iTutor: AI-Powered Study Assistant
 11 views · itutor.study
-2
-Swaycove: Live Sales Objection Handling Tool
-11 views · focus2grow.app
-3
-Slidecove: Instagram and LinkedIn Carousel Editor
-11 views · focus2grow.app
 4
 CareerExplorer
 9 views · careerexplorer.com
 5
-CareerOneStop
-9 views · careeronestop.org
+O*NET OnLine
+8 views · onetonline.org
 Popular tags
 #ai
 #archives
 #artificial intelligence
-#cloud computing
 #coding
 #collaboration
 #content creation
@@ -84,6 +83,7 @@ Popular tags
 #javascript
 #journalism
 #learning
+#live streaming
 #movies
 #news
 #open source
@@ -105,15 +105,15 @@ Popular tags
 Top sources
 youtube.com
 9 links
-canlimacizlet.altervista.org
-5 links
 justintvlink.altervista.org
-5 links
+8 links
+share.google
+8 links
+canlimacizlet.altervista.org
+7 links
 en.wikipedia.org
 4 links
 ideatogame.com
-4 links
-vibetutor.online
 4 links
 Browse all sources →
 Turing
@@ -560,25 +560,22 @@ Every launch needs a runway. Yours is free.
 Home  ·  Browse  ·  Privacy  ·  Terms  ·  © 2026 Automated Income Tools LLC
 
 ☕ Support The Runway
-Hype Star form | https://hypestar.org/submit | re, and this does not create an account or a payment record.
+Hype Star form | https://hypestar.org/submit | ry submission. We do not ask who you are, and this does not create an account or a payment record.
 
-OPTIONAL · SUPPORT HYPE STAR
-Add a badge, or skip for now.
+REQUIRED FOR A NEW FREE LISTING
+Add the Hype Star badge, then submit.
 
-Add the general badge to a relevant public page on your site. We will check the visible link and, after publication, may show SUPPORTS HYPE STAR on the profile. This never changes review, placement, rank, visibility, or outbound-link treatment.
+Paste this existing badge HTML onto any public page of your site. We first check your homepage and a few common paths. If it is somewhere else, share that exact URL. Paid listings do not need a backlink. Listings already approved stay listed without one.
 
 Copy adaptive badge HTML
 
-The compact SVG follows color-scheme. nofollow, ugc, and sponsored are accepted.
+Reuse this hypestar-badge snippet. nofollow, ugc, and sponsored are accepted.
 
-Public page containing the badge
+Page URL if it is not on your homepage
 
-Use the exact public page. The host must match this project's site. See every badge option.
+Optional at first. If we cannot find the badge quickly, paste the exact page. The host must match this project's site. See every badge option.
 
-I added it — verify & submit
-Skip for now & submit
-
-Skipping does not change whether your project can be published or where it appears.
+Verify badge & submit
 
 FREE PUBLISH PATH
 
@@ -602,9 +599,9 @@ Choose kind + category
 Tell people and agents how the project should be discovered.
 
 04
-Support or skip
+Add the badge
 
-Optionally add a badge, or explicitly skip with no change to review or rank.
+Copy the existing badge HTML onto any public page. We check the homepage first.
 
 05
 Submit for review
@@ -673,7 +670,7 @@ Paid
 Open source
 YOUR EMAIL (OPTIONAL — ONLY USED IF WE NEED TO REACH YOU, NEVER SHOWN PUBLICLY)
 + Add more details (optional — helps people trust and find your tool)
-WHAT IS 8 + 4?
+WHAT IS 4 + 4?
  Submit for review
 ⚡ IgnLab
 Image Converter
