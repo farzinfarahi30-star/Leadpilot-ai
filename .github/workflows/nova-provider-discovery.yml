@@ -1,0 +1,52 @@
+name: Nova provider discovery
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [nova-gpu]
+    paths:
+      - ".github/workflows/nova-provider-discovery.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  discover:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check Modal credentials
+        env:
+          X: ${{ secrets.MODAL_TOKEN_ID }}
+          Y: ${{ secrets.MODAL_TOKEN_SECRET }}
+        run: if [ -n "$X" ] && [ -n "$Y" ]; then echo "MODAL=present"; else echo "MODAL=missing"; fi
+      - name: Check Kaggle credentials
+        env:
+          X: ${{ secrets.KAGGLE_API_TOKEN }}
+          Y: ${{ secrets.KAGGLE_USERNAME }}
+          Z: ${{ secrets.KAGGLE_KEY }}
+        run: if [ -n "$X" ] || { [ -n "$Y" ] && [ -n "$Z" ]; }; then echo "KAGGLE=present"; else echo "KAGGLE=missing"; fi
+      - name: Check Hugging Face token
+        env:
+          X: ${{ secrets.HF_TOKEN }}
+          Y: ${{ secrets.HUGGINGFACE_TOKEN }}
+        run: if [ -n "$X" ] || [ -n "$Y" ]; then echo "HF=present"; else echo "HF=missing"; fi
+      - name: Check Saturn token
+        env:
+          X: ${{ secrets.SATURN_TOKEN }}
+        run: if [ -n "$X" ]; then echo "SATURN=present"; else echo "SATURN=missing"; fi
+      - name: Check RunPod key
+        env:
+          X: ${{ secrets.RUNPOD_API_KEY }}
+        run: if [ -n "$X" ]; then echo "RUNPOD=present"; else echo "RUNPOD=missing"; fi
+      - name: Check generic cloud keys
+        env:
+          A: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          B: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          C: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
+          D: ${{ secrets.AZURE_CREDENTIALS }}
+        run: |
+          [ -n "$A" ] && [ -n "$B" ] && echo "AWS=present" || echo "AWS=missing"
+          [ -n "$C" ] && echo "GCP=present" || echo "GCP=missing"
+          [ -n "$D" ] && echo "AZURE=present" || echo "AZURE=missing"
+      - name: Summary marker
+        run: echo "Provider discovery completed without printing secret values."
