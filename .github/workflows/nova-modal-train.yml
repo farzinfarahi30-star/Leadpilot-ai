@@ -1,0 +1,72 @@
+name: Nova AI GPU training
+
+on:
+  push:
+    branches: [nova-gpu]
+    paths:
+      - "nova/**"
+      - "nova_ai/**"
+      - "data/reasoning.jsonl"
+      - ".github/workflows/nova-modal-train.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  train:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    env:
+      MODAL_TOKEN_ID: ${{ secrets.MODAL_TOKEN_ID }}
+      MODAL_TOKEN_SECRET: ${{ secrets.MODAL_TOKEN_SECRET }}
+    steps:
+      - name: Checkout Nova GPU branch
+        uses: actions/checkout@v4
+
+      - name: Verify Modal credentials are available
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$MODAL_TOKEN_ID" || { echo "MODAL_TOKEN_ID secret is missing"; exit 2; }
+          test -n "$MODAL_TOKEN_SECRET" || { echo "MODAL_TOKEN_SECRET secret is missing"; exit 2; }
+          echo "Modal credentials detected (values not printed)."
+
+      - name: Install Modal CLI
+        run: python -m pip install -U modal
+
+      - name: Run resumable Nova T4 training chunks
+        shell: bash
+        run: |
+          set -euo pipefail
+          for i in $(seq 1 6); do
+            echo "=== MODAL NOVA CHUNK $i/6 ==="
+            modal run nova/modal_train.py
+            echo "=== CHECKPOINT INVENTORY ==="
+            modal volume ls nova-ai-checkpoints /checkpoints || true
+            if modal volume ls nova-ai-checkpoints /checkpoints | grep -q 'nova-final.pt'; then
+              echo "NOVA_FINAL_FOUND=1"
+              break
+            fi
+          done
+          modal volume ls nova-ai-checkpoints /checkpoints
+          modal volume ls nova-ai-checkpoints /checkpoints | grep -q 'nova-final.pt'
+
+      - name: Download final checkpoint
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts
+          modal volume get nova-ai-checkpoints /checkpoints/nova-final.pt artifacts/nova-final.pt
+          modal volume get nova-ai-checkpoints /checkpoints/nova-final.json artifacts/nova-final.json
+          modal volume get nova-ai-checkpoints /checkpoints/nova-final.tokenizer.json artifacts/nova-final.tokenizer.json || true
+          sha256sum artifacts/nova-final.pt | tee artifacts/nova-final.sha256
+          test -s artifacts/nova-final.pt
+
+      - name: Publish final checkpoint as workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: nova-final
+          path: artifacts/
+          if-no-files-found: error
+          retention-days: 30
