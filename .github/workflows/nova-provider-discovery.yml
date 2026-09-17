@@ -11,56 +11,64 @@ permissions:
   contents: read
 
 jobs:
-  discover:
+  modal:
     runs-on: ubuntu-latest
+    continue-on-error: true
+    env:
+      ID: ${{ secrets.MODAL_TOKEN_ID }}
+      SECRET: ${{ secrets.MODAL_TOKEN_SECRET }}
     steps:
-      - name: Modal credentials PRESENT
-        if: ${{ secrets.MODAL_TOKEN_ID != '' && secrets.MODAL_TOKEN_SECRET != '' }}
-        run: echo "provider=modal"
-      - name: Modal credentials MISSING
-        if: ${{ secrets.MODAL_TOKEN_ID == '' || secrets.MODAL_TOKEN_SECRET == '' }}
-        run: echo "modal unavailable"
-      - name: Kaggle credentials PRESENT
-        if: ${{ secrets.KAGGLE_API_TOKEN != '' || (secrets.KAGGLE_USERNAME != '' && secrets.KAGGLE_KEY != '') }}
-        run: echo "provider=kaggle"
-      - name: Kaggle credentials MISSING
-        if: ${{ secrets.KAGGLE_API_TOKEN == '' && (secrets.KAGGLE_USERNAME == '' || secrets.KAGGLE_KEY == '') }}
-        run: echo "kaggle unavailable"
-      - name: Hugging Face token PRESENT
-        if: ${{ secrets.HF_TOKEN != '' || secrets.HUGGINGFACE_TOKEN != '' }}
-        run: echo "provider=huggingface"
-      - name: Hugging Face token MISSING
-        if: ${{ secrets.HF_TOKEN == '' && secrets.HUGGINGFACE_TOKEN == '' }}
-        run: echo "huggingface unavailable"
-      - name: Saturn token PRESENT
-        if: ${{ secrets.SATURN_TOKEN != '' }}
-        run: echo "provider=saturn"
-      - name: Saturn token MISSING
-        if: ${{ secrets.SATURN_TOKEN == '' }}
-        run: echo "saturn unavailable"
-      - name: RunPod key PRESENT
-        if: ${{ secrets.RUNPOD_API_KEY != '' }}
-        run: echo "provider=runpod"
-      - name: RunPod key MISSING
-        if: ${{ secrets.RUNPOD_API_KEY == '' }}
-        run: echo "runpod unavailable"
-      - name: AWS credentials PRESENT
-        if: ${{ secrets.AWS_ACCESS_KEY_ID != '' && secrets.AWS_SECRET_ACCESS_KEY != '' }}
-        run: echo "provider=aws"
-      - name: AWS credentials MISSING
-        if: ${{ secrets.AWS_ACCESS_KEY_ID == '' || secrets.AWS_SECRET_ACCESS_KEY == '' }}
-        run: echo "aws unavailable"
-      - name: GCP credential PRESENT
-        if: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY != '' }}
-        run: echo "provider=gcp"
-      - name: GCP credential MISSING
-        if: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY == '' }}
-        run: echo "gcp unavailable"
-      - name: Azure credential PRESENT
-        if: ${{ secrets.AZURE_CREDENTIALS != '' }}
-        run: echo "provider=azure"
-      - name: Azure credential MISSING
-        if: ${{ secrets.AZURE_CREDENTIALS == '' }}
-        run: echo "azure unavailable"
-      - name: Complete
-        run: echo "Discovery complete; secret values were never printed."
+      - run: test -n "$ID" && test -n "$SECRET"
+  kaggle:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    env:
+      TOKEN: ${{ secrets.KAGGLE_API_TOKEN }}
+      USERNAME: ${{ secrets.KAGGLE_USERNAME }}
+      KEY: ${{ secrets.KAGGLE_KEY }}
+    steps:
+      - run: test -n "$TOKEN" || { test -n "$USERNAME" && test -n "$KEY"; }
+  huggingface:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    env:
+      TOKEN: ${{ secrets.HF_TOKEN }}
+      ALT: ${{ secrets.HUGGINGFACE_TOKEN }}
+    steps:
+      - run: test -n "$TOKEN" || test -n "$ALT"
+  saturn:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    env:
+      TOKEN: ${{ secrets.SATURN_TOKEN }}
+    steps:
+      - run: test -n "$TOKEN"
+  runpod:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    env:
+      TOKEN: ${{ secrets.RUNPOD_API_KEY }}
+    steps:
+      - run: test -n "$TOKEN"
+  aws:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    env:
+      ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      SECRET: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+    steps:
+      - run: test -n "$ID" && test -n "$SECRET"
+  gcp:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    env:
+      KEY: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
+    steps:
+      - run: test -n "$KEY"
+  azure:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    env:
+      CREDS: ${{ secrets.AZURE_CREDENTIALS }}
+    steps:
+      - run: test -n "$CREDS"
