@@ -33,14 +33,14 @@ jobs:
           t=time.time(); tokens=0
           for i in range(20):
               opt.zero_grad(set_to_none=True)
-              out=m(x,y)
-              loss=out.loss if hasattr(out,'loss') else out
+              logits,loss=m(x,y)
               loss.backward(); opt.step(); tokens += x.numel()
-              if i==0: print('first_step_seconds=',round(time.time()-t,3))
+              if i==0: print('first_step_seconds=',round(time.time()-t,3), flush=True)
           dt=time.time()-t
+          tps=tokens/dt
           print('steps=20')
           print('tokens=',tokens)
           print('seconds=',round(dt,3))
-          print('tokens_per_second=',round(tokens/dt,2))
-          print('estimated_hours_50m=',round(50_000_000/(tokens/dt)/3600,2))
+          print('tokens_per_second=',round(tps,2))
+          print('estimated_hours_50m=',round(50_000_000/tps/3600,2))
           PY
