@@ -14,58 +14,48 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set up Java 17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '17'
 
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: Install Android SDK 35
+      - name: Install Android SDK components
         shell: bash
         run: |
-          yes | sdkmanager --licenses >/dev/null 2>&1 || true
-          sdkmanager 'platforms;android-35' 'build-tools;35.0.0'
+          set -euo pipefail
+          export ANDROID_HOME="${ANDROID_HOME:-/usr/local/lib/android/sdk}"
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses >/dev/null 2>&1 || true
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" 'platform-tools' 'platforms;android-35' 'build-tools;35.0.0'
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.10.2'
 
-      - name: Generate clean Android project
+      - name: Generate Android project
         shell: bash
         run: |
           set -euo pipefail
           APP=CodeQuestKidsBuild/App
           mkdir -p "$APP/app/src/main/java/com/codequestkids/learn"
-          mkdir -p "$APP/app/src/main/res/values"
-          mkdir -p "$APP/app/src/main/res/drawable"
-
+          mkdir -p "$APP/app/src/main/res/values" "$APP/app/src/main/res/drawable"
           cat > "$APP/settings.gradle" <<'EOF'
           pluginManagement { repositories { google(); mavenCentral(); gradlePluginPortal() } }
           dependencyResolutionManagement { repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS); repositories { google(); mavenCentral() } }
           rootProject.name='CodeQuestKidsApp'
           include ':app'
           EOF
-
           cat > "$APP/build.gradle" <<'EOF'
-          plugins {
-              id 'com.android.application' version '8.7.3' apply false
-          }
+          plugins { id 'com.android.application' version '8.7.3' apply false }
           EOF
-
           cat > "$APP/gradle.properties" <<'EOF'
           org.gradle.jvmargs=-Xmx2048m -Dfile.encoding=UTF-8
           EOF
-
           cat > "$APP/app/build.gradle" <<'EOF'
           plugins { id 'com.android.application' }
-
           android {
               namespace 'com.codequestkids.learn'
               compileSdk 35
-
               defaultConfig {
                   applicationId 'com.codequestkids.learn'
                   minSdk 24
@@ -73,7 +63,6 @@ jobs:
                   versionCode 4
                   versionName '1.2.1'
               }
-
               signingConfigs {
                   release {
                       storeFile file(System.getenv('ANDROID_KEYSTORE_FILE'))
@@ -82,38 +71,18 @@ jobs:
                       keyPassword System.getenv('ANDROID_KEY_PASSWORD')
                   }
               }
-
               buildTypes {
-                  release {
-                      minifyEnabled false
-                      shrinkResources false
-                      signingConfig signingConfigs.release
-                  }
+                  release { minifyEnabled false; shrinkResources false; signingConfig signingConfigs.release }
               }
-
-              compileOptions {
-                  sourceCompatibility JavaVersion.VERSION_17
-                  targetCompatibility JavaVersion.VERSION_17
-              }
+              compileOptions { sourceCompatibility JavaVersion.VERSION_17; targetCompatibility JavaVersion.VERSION_17 }
           }
           EOF
-
           cat > "$APP/app/src/main/AndroidManifest.xml" <<'EOF'
           <?xml version="1.0" encoding="utf-8"?>
           <manifest xmlns:android="http://schemas.android.com/apk/res/android">
               <uses-permission android:name="android.permission.INTERNET" />
-              <application
-                  android:allowBackup="false"
-                  android:icon="@drawable/ic_launcher"
-                  android:roundIcon="@drawable/ic_launcher"
-                  android:label="@string/app_name"
-                  android:supportsRtl="true"
-                  android:theme="@style/AppTheme"
-                  android:usesCleartextTraffic="false">
-                  <activity
-                      android:name=".MainActivity"
-                      android:exported="true"
-                      android:screenOrientation="portrait">
+              <application android:allowBackup="false" android:icon="@drawable/ic_launcher" android:roundIcon="@drawable/ic_launcher" android:label="@string/app_name" android:supportsRtl="true" android:theme="@style/AppTheme" android:usesCleartextTraffic="false">
+                  <activity android:name=".MainActivity" android:exported="true" android:screenOrientation="portrait">
                       <intent-filter>
                           <action android:name="android.intent.action.MAIN" />
                           <category android:name="android.intent.category.LAUNCHER" />
@@ -122,25 +91,12 @@ jobs:
               </application>
           </manifest>
           EOF
-
           cat > "$APP/app/src/main/res/values/strings.xml" <<'EOF'
-          <resources>
-              <string name="app_name">CodeQuest Kids</string>
-          </resources>
+          <resources><string name="app_name">CodeQuest Kids</string></resources>
           EOF
-
           cat > "$APP/app/src/main/res/values/styles.xml" <<'EOF'
-          <resources>
-              <style name="AppTheme" parent="android:style/Theme.Material.Light.NoActionBar">
-                  <item name="android:fontFamily">sans</item>
-                  <item name="android:colorAccent">#2257D6</item>
-                  <item name="android:navigationBarColor">#FFFFFF</item>
-                  <item name="android:statusBarColor">#FFFFFF</item>
-                  <item name="android:windowLightStatusBar">true</item>
-              </style>
-          </resources>
+          <resources><style name="AppTheme" parent="android:style/Theme.Material.Light.NoActionBar"><item name="android:fontFamily">sans</item><item name="android:colorAccent">#2257D6</item><item name="android:navigationBarColor">#FFFFFF</item><item name="android:statusBarColor">#FFFFFF</item><item name="android:windowLightStatusBar">true</item></style></resources>
           EOF
-
           cat > "$APP/app/src/main/res/drawable/ic_launcher.xml" <<'EOF'
           <vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="48dp" android:height="48dp" android:viewportWidth="48" android:viewportHeight="48">
               <path android:fillColor="#2257D6" android:pathData="M24,2A22,22 0,1 0,24 46A22,22 0,1 0,24 2" />
@@ -148,11 +104,10 @@ jobs:
               <path android:fillColor="#FFFFFF" android:pathData="M31,30h7v4h-7z" />
           </vector>
           EOF
-
           cat > "$APP/app/src/main/java/com/codequestkids/learn/MainActivity.java" <<'EOF'
           package com.codequestkids.learn;
-
           import android.app.Activity;
+          import android.content.Intent;
           import android.graphics.Color;
           import android.net.Uri;
           import android.os.Bundle;
@@ -166,135 +121,19 @@ jobs:
           import android.widget.Button;
           import android.widget.LinearLayout;
           import android.widget.TextView;
-
           public class MainActivity extends Activity {
-              private static final String SITE = "https://codequest-kids.azinahi123.workers.dev";
-              private static final String HOST = "codequest-kids.azinahi123.workers.dev";
-              private WebView web;
-              private View offline;
-
-              @Override
-              protected void onCreate(Bundle state) {
-                  super.onCreate(state);
-                  buildUi();
-                  configureWebView();
-                  if (state == null) web.loadUrl(SITE); else web.restoreState(state);
-              }
-
-              private void buildUi() {
-                  LinearLayout root = new LinearLayout(this);
-                  root.setOrientation(LinearLayout.VERTICAL);
-                  root.setBackgroundColor(Color.WHITE);
-
-                  web = new WebView(this);
-                  offline = offlineView();
-                  offline.setVisibility(View.GONE);
-
-                  root.addView(web, new LinearLayout.LayoutParams(-1, -1, 1));
-                  root.addView(offline, new LinearLayout.LayoutParams(-1, -1));
-                  setContentView(root);
-              }
-
-              private View offlineView() {
-                  LinearLayout box = new LinearLayout(this);
-                  box.setOrientation(LinearLayout.VERTICAL);
-                  box.setGravity(Gravity.CENTER);
-                  box.setPadding(48, 48, 48, 48);
-
-                  TextView title = new TextView(this);
-                  title.setText("CodeQuest Kids");
-                  title.setTextSize(28);
-                  title.setTextColor(Color.rgb(22, 33, 62));
-                  title.setGravity(Gravity.CENTER);
-
-                  TextView message = new TextView(this);
-                  message.setText("Couldn’t load CodeQuest Kids.\n\nCheck your internet connection and try again.");
-                  message.setTextSize(17);
-                  message.setGravity(Gravity.CENTER);
-                  message.setPadding(0, 20, 0, 24);
-
-                  Button retry = new Button(this);
-                  retry.setText("Try again");
-                  retry.setOnClickListener(v -> { offline.setVisibility(View.GONE); web.setVisibility(View.VISIBLE); web.loadUrl(SITE); });
-
-                  box.addView(title);
-                  box.addView(message);
-                  box.addView(retry);
-                  return box;
-              }
-
-              private void configureWebView() {
-                  WebSettings s = web.getSettings();
-                  s.setJavaScriptEnabled(true);
-                  s.setDomStorageEnabled(true);
-                  s.setDatabaseEnabled(true);
-                  s.setSupportZoom(false);
-                  s.setBuiltInZoomControls(false);
-                  s.setDisplayZoomControls(false);
-                  s.setAllowFileAccess(false);
-                  s.setAllowContentAccess(false);
-                  s.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);
-                  s.setTextZoom(100);
-
-                  web.setBackgroundColor(Color.WHITE);
-                  web.setWebViewClient(new WebViewClient() {
-                      @Override
-                      public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
-                          return route(request.getUrl());
-                      }
-
-                      @Override
-                      public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                          return route(Uri.parse(url));
-                      }
-
-                      @Override
-                      public void onPageFinished(WebView view, String url) {
-                          web.setVisibility(View.VISIBLE);
-                          offline.setVisibility(View.GONE);
-                      }
-
-                      @Override
-                      public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
-                          if (request.isForMainFrame()) showOffline();
-                      }
-                  });
-              }
-
-              private boolean route(Uri uri) {
-                  if (uri == null) return true;
-                  String scheme = uri.getScheme();
-                  String host = uri.getHost();
-                  if ("https".equalsIgnoreCase(scheme) && host != null && (HOST.equalsIgnoreCase(host) || host.endsWith("." + HOST))) {
-                      return false;
-                  }
-                  if ("http".equalsIgnoreCase(scheme) || "https".equalsIgnoreCase(scheme)) {
-                      startActivity(new android.content.Intent(android.content.Intent.ACTION_VIEW, uri));
-                  }
-                  return true;
-              }
-
-              private void showOffline() {
-                  web.setVisibility(View.GONE);
-                  offline.setVisibility(View.VISIBLE);
-              }
-
-              @Override
-              public void onBackPressed() {
-                  if (web.canGoBack()) web.goBack(); else super.onBackPressed();
-              }
-
-              @Override
-              protected void onSaveInstanceState(Bundle out) {
-                  web.saveState(out);
-                  super.onSaveInstanceState(out);
-              }
-
-              @Override
-              protected void onDestroy() {
-                  if (web != null) web.destroy();
-                  super.onDestroy();
-              }
+              private static final String SITE="https://codequest-kids.azinahi123.workers.dev";
+              private static final String HOST="codequest-kids.azinahi123.workers.dev";
+              private WebView web; private View offline;
+              @Override protected void onCreate(Bundle state){super.onCreate(state);buildUi();configure();if(state==null)web.loadUrl(SITE);else web.restoreState(state);}
+              private void buildUi(){LinearLayout root=new LinearLayout(this);root.setOrientation(LinearLayout.VERTICAL);root.setBackgroundColor(Color.WHITE);web=new WebView(this);offline=offlineView();offline.setVisibility(View.GONE);root.addView(web,new LinearLayout.LayoutParams(-1,-1,1));root.addView(offline,new LinearLayout.LayoutParams(-1,-1));setContentView(root);}
+              private View offlineView(){LinearLayout box=new LinearLayout(this);box.setOrientation(LinearLayout.VERTICAL);box.setGravity(Gravity.CENTER);box.setPadding(48,48,48,48);TextView t=new TextView(this);t.setText("CodeQuest Kids");t.setTextSize(28);t.setTextColor(Color.rgb(22,33,62));t.setGravity(Gravity.CENTER);TextView m=new TextView(this);m.setText("Couldn’t load CodeQuest Kids.\n\nCheck your internet connection and try again.");m.setTextSize(17);m.setGravity(Gravity.CENTER);m.setPadding(0,20,0,24);Button b=new Button(this);b.setText("Try again");b.setOnClickListener(v->{offline.setVisibility(View.GONE);web.setVisibility(View.VISIBLE);web.loadUrl(SITE);});box.addView(t);box.addView(m);box.addView(b);return box;}
+              private void configure(){WebSettings s=web.getSettings();s.setJavaScriptEnabled(true);s.setDomStorageEnabled(true);s.setDatabaseEnabled(true);s.setSupportZoom(false);s.setBuiltInZoomControls(false);s.setDisplayZoomControls(false);s.setAllowFileAccess(false);s.setAllowContentAccess(false);s.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);s.setTextZoom(100);web.setBackgroundColor(Color.WHITE);web.setWebViewClient(new WebViewClient(){@Override public boolean shouldOverrideUrlLoading(WebView v,WebResourceRequest r){return route(r.getUrl());}@Override public boolean shouldOverrideUrlLoading(WebView v,String u){return route(Uri.parse(u));}@Override public void onPageFinished(WebView v,String u){web.setVisibility(View.VISIBLE);offline.setVisibility(View.GONE);}@Override public void onReceivedError(WebView v,WebResourceRequest r,WebResourceError e){if(r.isForMainFrame())showOffline();}});}
+              private boolean route(Uri u){if(u==null)return true;String sc=u.getScheme(),h=u.getHost();if("https".equalsIgnoreCase(sc)&&h!=null&&(HOST.equalsIgnoreCase(h)||h.endsWith("."+HOST)))return false;if("http".equalsIgnoreCase(sc)||"https".equalsIgnoreCase(sc))startActivity(new Intent(Intent.ACTION_VIEW,u));return true;}
+              private void showOffline(){web.setVisibility(View.GONE);offline.setVisibility(View.VISIBLE);}
+              @Override public void onBackPressed(){if(web.canGoBack())web.goBack();else super.onBackPressed();}
+              @Override protected void onSaveInstanceState(Bundle out){web.saveState(out);super.onSaveInstanceState(out);}
+              @Override protected void onDestroy(){if(web!=null)web.destroy();super.onDestroy();}
           }
           EOF
 
@@ -303,14 +142,7 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p "$GITHUB_WORKSPACE/CodeQuestKidsBuild/keys"
-          keytool -genkeypair -v \
-            -keystore "$GITHUB_WORKSPACE/CodeQuestKidsBuild/keys/codequest-kids-release.jks" \
-            -storetype JKS \
-            -storepass 'CodeQuestKids2026' \
-            -keypass 'CodeQuestKids2026' \
-            -alias 'codequestkids' \
-            -keyalg RSA -keysize 2048 -validity 10000 \
-            -dname 'CN=CodeQuest Kids, OU=CodeQuest Kids, O=CodeQuest Kids, L=Remote, ST=Global, C=US'
+          keytool -genkeypair -v -keystore "$GITHUB_WORKSPACE/CodeQuestKidsBuild/keys/codequest-kids-release.jks" -storetype JKS -storepass 'CodeQuestKids2026' -keypass 'CodeQuestKids2026' -alias 'codequestkids' -keyalg RSA -keysize 2048 -validity 10000 -dname 'CN=CodeQuest Kids, OU=CodeQuest Kids, O=CodeQuest Kids, L=Remote, ST=Global, C=US'
           echo "ANDROID_KEYSTORE_FILE=$GITHUB_WORKSPACE/CodeQuestKidsBuild/keys/codequest-kids-release.jks" >> "$GITHUB_ENV"
           echo 'ANDROID_KEYSTORE_PASSWORD=CodeQuestKids2026' >> "$GITHUB_ENV"
           echo 'ANDROID_KEY_ALIAS=codequestkids' >> "$GITHUB_ENV"
@@ -326,12 +158,12 @@ jobs:
           set -euo pipefail
           APK='CodeQuestKidsBuild/App/app/build/outputs/apk/release/app-release.apk'
           test -s "$APK"
-          AAPT2="$ANDROID_HOME/build-tools/35.0.0/aapt2"
-          APKSIGNER="$ANDROID_HOME/build-tools/35.0.0/apksigner"
-          "$AAPT2" dump badging "$APK" | tee /tmp/badging.txt
+          AAPT="$ANDROID_HOME/build-tools/35.0.0/aapt2"
+          SIGNER="$ANDROID_HOME/build-tools/35.0.0/apksigner"
+          "$AAPT" dump badging "$APK" | tee /tmp/badging.txt
           grep -q "package: name='com.codequestkids.learn' versionCode='4' versionName='1.2.1'" /tmp/badging.txt
           grep -q "application-label:'CodeQuest Kids'" /tmp/badging.txt
-          "$APKSIGNER" verify --verbose "$APK"
+          "$SIGNER" verify --verbose "$APK"
           sha256sum "$APK" | tee CodeQuestKidsBuild/SHA256.txt
           cp "$APK" CodeQuestKidsBuild/CodeQuest-Kids-1.2.1-release.apk
 
