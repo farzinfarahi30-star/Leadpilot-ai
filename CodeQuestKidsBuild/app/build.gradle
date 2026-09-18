@@ -1,15 +1,15 @@
 plugins { id 'com.android.application' }
 
 android {
-    namespace 'com.codequestkids.app'
+    namespace 'com.kodonest.junior'
     compileSdk 35
 
     defaultConfig {
-        applicationId 'com.codequestkids.app'
+        applicationId 'com.kodonest.junior'
         minSdk 24
         targetSdk 35
-        versionCode 4
-        versionName '1.2.1'
+        versionCode 1
+        versionName '1.0.0'
     }
 
     signingConfigs {
