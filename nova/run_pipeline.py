@@ -7,7 +7,6 @@ import math
 import os
 import random
 import shutil
-import time
 import urllib.request
 import zipfile
 from pathlib import Path
@@ -42,8 +41,9 @@ def bootstrap_corpus() -> Path:
     target = CORPUS / "wiki.train.tokens"
     license_path = CORPUS / "CORPUS_LICENSE.json"
     manifest_path = CORPUS / "CORPUS_MANIFEST.json"
-    url = "https://s3.amazonaws.com/research.metamind.io/wikitext/wikitext-103-v1.zip"
-    if not target.exists() or target.stat().st_size < TARGET:
+    url = "https://research.metamind.io.s3-us-west-2.amazonaws.com/wikitext/wikitext-103-v1.zip"
+    minimum_bytes = TARGET + CONTEXT + 1
+    if not target.exists() or target.stat().st_size < minimum_bytes:
         archive = ROOT / "state" / "wikitext.zip"
         if not archive.exists():
             urllib.request.urlretrieve(url, archive)
@@ -52,12 +52,20 @@ def bootstrap_corpus() -> Path:
             if not candidates:
                 raise RuntimeError("WikiText train file not found in archive")
             with z.open(candidates[0]) as src, target.open("wb") as dst:
-                shutil.copyfileobj(src, dst, 1024 * 1024)
+                remaining = max(TARGET + 1_000_000, 60_000_000)
+                while remaining > 0:
+                    chunk = src.read(min(1024 * 1024, remaining))
+                    if not chunk:
+                        break
+                    dst.write(chunk)
+                    remaining -= len(chunk)
     license_doc = {
         "licensed": True,
-        "license": "CC BY-SA 4.0",
+        "license": "CC BY-SA 4.0 (dataset-info metadata); current dataset card also lists CC BY-SA 3.0/GFDL",
         "source": "https://huggingface.co/datasets/Salesforce/wikitext",
         "source_archive": url,
+        "source_metadata": "Hugging Face Salesforce/wikitext dataset; config wikitext-103-v1",
+        "token_definition": "UTF-8 byte tokens for Nova byte-level language model",
         "training_policy": "public licensed corpus; synthetic data disabled for pretraining",
     }
     license_path.write_text(json.dumps(license_doc, indent=2), encoding="utf-8")
