@@ -1,11 +1,11 @@
-Timestamp: 2026-09-17T12:13:48.136Z
+Timestamp: 2026-09-18T10:27:40.350Z
 Site: https://codequest-kids.azinahi123.workers.dev
 
 === RESULTS ===
 SITE | 200 | https://codequest-kids.azinahi123.workers.dev/ | CodeQuest content detected
 Qevra | 200 | {"ok":true,"id":"7d601bba-a9c1-4616-b028-366ebe9af867","slug":"codequest-kids","url":"https://qevra.app/s/codequest-kids?listed=16124790-b32a-486d-bad5-ec74bffda327","dofollow":true,"mail":false}
-Hype Star API | 400 | {"error":{"code":"invalid_category","message":"Choose one available category for this project."},"meta":{"apiVersion":"v1","requestId":"a9cf6fef-80a1-4f55-aa18-ab60c13e8ae4","timestamp":"2026-09-17T12:05:28.628Z"}}
-TuringLinks | https://turinglinks.com/ | power systems. It works offline, requires no account, and helps users track components, wiring, and maintenance schedules for mixed-hardware setups.
+Hype Star API | 400 | {"error":{"code":"invalid_category","message":"Choose one available category for this project."},"meta":{"apiVersion":"v1","requestId":"664bae93-283a-42fa-9a1d-1205826d2e9c","timestamp":"2026-09-18T10:19:22.221Z"}}
+TuringLinks | https://turinglinks.com/ | igned to document, map, and manage off-grid solar power systems. It works offline, requires no account, and helps users track components, wiring, and maintenance schedules for mixed-hardware setups.
 
 #solar
 #off-grid
@@ -19,7 +19,7 @@ Mental Health
 ·
 TOOL
 ·
-1 day ago
+2 days ago
 RAADS-R Test Online Screener
 raadsr.org
 
@@ -47,20 +47,20 @@ Links added · last 8 weeks
 Explore the directory
 Trending this week
 1
-Swaycove: Live Sales Objection Handling Tool
-12 views · focus2grow.app
-2
-Slidecove: Instagram and LinkedIn Carousel Editor
-12 views · focus2grow.app
-3
 iTutor: AI-Powered Study Assistant
-11 views · itutor.study
-4
+12 views · itutor.study
+2
 CareerExplorer
-9 views · careerexplorer.com
+11 views · careerexplorer.com
+3
+CareerOneStop
+10 views · careeronestop.org
+4
+Time.is: Exact Atomic Clock Time
+10 views · time.is
 5
 O*NET OnLine
-8 views · onetonline.org
+9 views · onetonline.org
 Popular tags
 #ai
 #archives
@@ -670,7 +670,7 @@ Paid
 Open source
 YOUR EMAIL (OPTIONAL — ONLY USED IF WE NEED TO REACH YOU, NEVER SHOWN PUBLICLY)
 + Add more details (optional — helps people trust and find your tool)
-WHAT IS 4 + 4?
+WHAT IS 3 + 8?
  Submit for review
 ⚡ IgnLab
 Image Converter
