@@ -1,11 +1,11 @@
-Timestamp: 2026-09-17T12:17:02.256Z
+Timestamp: 2026-09-18T15:19:34.051Z
 Site: https://codequest-kids.azinahi123.workers.dev
 
 === RESULTS ===
 SITE | 200 | https://codequest-kids.azinahi123.workers.dev/ | CodeQuest content detected
 Qevra | 200 | {"ok":true,"id":"7d601bba-a9c1-4616-b028-366ebe9af867","slug":"codequest-kids","url":"https://qevra.app/s/codequest-kids?listed=16124790-b32a-486d-bad5-ec74bffda327","dofollow":true,"mail":false}
-Hype Star API | 400 | {"error":{"code":"invalid_category","message":"Choose one available category for this project."},"meta":{"apiVersion":"v1","requestId":"cd276ffb-61ec-4496-935c-d966c35f4a77","timestamp":"2026-09-17T12:08:44.232Z"}}
-TuringLinks | https://turinglinks.com/ | power systems. It works offline, requires no account, and helps users track components, wiring, and maintenance schedules for mixed-hardware setups.
+Hype Star API | 400 | {"error":{"code":"invalid_category","message":"Choose one available category for this project."},"meta":{"apiVersion":"v1","requestId":"3f45838a-dcd2-4a88-9d4a-24cbc5ef1492","timestamp":"2026-09-18T15:11:15.476Z"}}
+TuringLinks | https://turinglinks.com/ | and manage off-grid solar power systems. It works offline, requires no account, and helps users track components, wiring, and maintenance schedules for mixed-hardware setups.
 
 #solar
 #off-grid
@@ -19,7 +19,7 @@ Mental Health
 ·
 TOOL
 ·
-1 day ago
+2 days ago
 RAADS-R Test Online Screener
 raadsr.org
 
@@ -47,20 +47,20 @@ Links added · last 8 weeks
 Explore the directory
 Trending this week
 1
-Swaycove: Live Sales Objection Handling Tool
-12 views · focus2grow.app
-2
-Slidecove: Instagram and LinkedIn Carousel Editor
-12 views · focus2grow.app
-3
 iTutor: AI-Powered Study Assistant
-11 views · itutor.study
-4
+12 views · itutor.study
+2
 CareerExplorer
-9 views · careerexplorer.com
+10 views · careerexplorer.com
+3
+CareerOneStop
+10 views · careeronestop.org
+4
+Hamza Tariq AI Tutor at VibeTutor
+10 views · vibetutor.online
 5
-O*NET OnLine
-8 views · onetonline.org
+Time.is: Exact Atomic Clock Time
+10 views · time.is
 Popular tags
 #ai
 #archives
@@ -560,12 +560,7 @@ Every launch needs a runway. Yours is free.
 Home  ·  Browse  ·  Privacy  ·  Terms  ·  © 2026 Automated Income Tools LLC
 
 ☕ Support The Runway
-Hype Star form | https://hypestar.org/submit | ry submission. We do not ask who you are, and this does not create an account or a payment record.
-
-REQUIRED FOR A NEW FREE LISTING
-Add the Hype Star badge, then submit.
-
-Paste this existing badge HTML onto any public page of your site. We first check your homepage and a few common paths. If it is somewhere else, share that exact URL. Paid listings do not need a backlink. Listings already approved stay listed without one.
+Hype Star form | https://hypestar.org/submit | of your site. We first check your homepage and a few common paths. If it is somewhere else, share that exact URL. Paid listings do not need a backlink. Listings already approved stay listed without one.
 
 Copy adaptive badge HTML
 
@@ -591,7 +586,7 @@ We read the project page you choose and nothing private.
 02
 Review the source facts
 
-See the title, description, and canonical project URL first.
+See the title, description, and canonical project URL first. The site must be in English.
 
 03
 Choose kind + category
@@ -606,13 +601,13 @@ Copy the existing badge HTML onto any public page. We check the homepage first.
 05
 Submit for review
 
-No account is created. Permanent basic inclusion starts when the reviewed profile goes live.
+No account is created. A homepage screenshot is optional and greatly improves the listing. Permanent basic inclusion starts when the reviewed profile goes live.
 
 EDITORIAL PREVIEW POLICY
 
 Capture first. Keep owner controls clear.
 
-A screenshot of the public project page can appear after editorial review without waiting for a claim. Authorized project representatives and rights holders can request correction, replacement, or removal. Logos remain neutral until supplied or separately cleared.
+Upload an optional homepage screenshot with your submission—it uses the same listing preview storage and greatly improves the card. If you skip it, a screenshot of the public project page can still appear after editorial review. Authorized project representatives and rights holders can request correction, replacement, or removal. Logos remain neutral until supplied or separately cleared.
 
 Agent skill and API guide →
 
@@ -670,7 +665,7 @@ Paid
 Open source
 YOUR EMAIL (OPTIONAL — ONLY USED IF WE NEED TO REACH YOU, NEVER SHOWN PUBLICLY)
 + Add more details (optional — helps people trust and find your tool)
-WHAT IS 3 + 5?
+WHAT IS 3 + 3?
  Submit for review
 ⚡ IgnLab
 Image Converter
