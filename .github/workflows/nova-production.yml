@@ -10,85 +10,83 @@ permissions:
 
 env:
   NOVA_TARGET_TOKENS: "50000000"
-  NOVA_CHUNK_TOKENS: "25000000"
-  NOVA_RESUME: "1"
   NOVA_ALLOW_SYNTHETIC: "0"
   TORCH_THREADS: "4"
 
 jobs:
-  pretrain-1:
+  corpus:
     runs-on: ubuntu-latest
-    timeout-minutes: 345
+    timeout-minutes: 30
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           ref: nova-production
 
-      - name: Prepare Python
+      - name: Prepare corpus tools
         run: |
           python -m pip install --upgrade pip
-          python -m pip install --index-url https://download.pytorch.org/whl/cpu "torch==2.5.1"
           python -m pip install pyarrow
 
-      - name: Train first 25M tokens
+      - name: Build licensed corpus
         run: |
-          python nova/run_pipeline.py --stage auto
-          cat state/pipeline.json
+          for attempt in 1 2 3; do
+            if python nova/bootstrap_corpus.py; then exit 0; fi
+            echo "corpus bootstrap attempt $attempt failed; retrying"
+            rm -f state/wikitext-train-00000-of-00002.parquet.tmp
+            sleep 5
+          done
+          exit 1
 
-      - name: Upload first checkpoint
+      - name: Validate corpus
+        run: |
+          test -f corpus/wiki.train.tokens
+          test -f corpus/CORPUS_LICENSE.json
+          test -f corpus/CORPUS_MANIFEST.json
+          bytes=$(wc -c < corpus/wiki.train.tokens)
+          test "$bytes" -ge "$((NOVA_TARGET_TOKENS + 129))"
+          python - <<'PY'
+          import json, pathlib
+          p=pathlib.Path("corpus/CORPUS_LICENSE.json")
+          x=json.loads(p.read_text())
+          assert x.get("licensed") is True
+          assert not x.get("synthetic_pretraining", True)
+          print("LICENSE_OK")
+          PY
+          echo "CORPUS_BYTES=$bytes"
+
+      - name: Publish corpus
         uses: actions/upload-artifact@v4
         with:
-          name: nova-stage-1
+          name: nova-corpus
           path: |
-            state/model_checkpoint.pt
-            state/pipeline.json
-            corpus/CORPUS_LICENSE.json
-            corpus/CORPUS_MANIFEST.json
             corpus/wiki.train.tokens
-          if-no-files-found: error
-          retention-days: 7
-
-  pretrain-2:
-    needs: pretrain-1
-    runs-on: ubuntu-latest
-    timeout-minutes: 345
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          ref: nova-production
-
-      - name: Prepare Python
-        run: |
-          python -m pip install --upgrade pip
-          python -m pip install --index-url https://download.pytorch.org/whl/cpu "torch==2.5.1"
-
-      - name: Download first checkpoint
-        uses: actions/download-artifact@v4
-        with:
-          name: nova-stage-1
-          path: .
-
-      - name: Train second 25M tokens
-        run: |
-          python nova/run_pipeline.py --stage auto
-          cat state/pipeline.json
-
-      - name: Upload second checkpoint
-        uses: actions/upload-artifact@v4
-        with:
-          name: nova-stage-2
-          path: |
-            state/model_checkpoint.pt
-            state/pipeline.json
             corpus/CORPUS_LICENSE.json
             corpus/CORPUS_MANIFEST.json
           if-no-files-found: error
           retention-days: 7
 
-  finalize:
-    needs: pretrain-2
+  experts:
+    needs: corpus
+    strategy:
+      fail-fast: false
+      max-parallel: 14
+      matrix:
+        include:
+          - { expert: 0, tokens: 3571429 }
+          - { expert: 1, tokens: 3571429 }
+          - { expert: 2, tokens: 3571429 }
+          - { expert: 3, tokens: 3571429 }
+          - { expert: 4, tokens: 3571429 }
+          - { expert: 5, tokens: 3571429 }
+          - { expert: 6, tokens: 3571429 }
+          - { expert: 7, tokens: 3571429 }
+          - { expert: 8, tokens: 3571428 }
+          - { expert: 9, tokens: 3571428 }
+          - { expert: 10, tokens: 3571428 }
+          - { expert: 11, tokens: 3571428 }
+          - { expert: 12, tokens: 3571428 }
+          - { expert: 13, tokens: 3571428 }
     runs-on: ubuntu-latest
     timeout-minutes: 120
     steps:
@@ -97,40 +95,85 @@ jobs:
         with:
           ref: nova-production
 
-      - name: Prepare Python
+      - name: Prepare CPU PyTorch
         run: |
           python -m pip install --upgrade pip
           python -m pip install --index-url https://download.pytorch.org/whl/cpu "torch==2.5.1"
 
-      - name: Download second checkpoint
+      - name: Download licensed corpus
         uses: actions/download-artifact@v4
         with:
-          name: nova-stage-2
+          name: nova-corpus
           path: .
 
-      - name: Download corpus metadata
-        uses: actions/download-artifact@v4
-        with:
-          name: nova-stage-1
-          path: .
-
-      - name: Verify corpus handoff
+      - name: Verify training inputs
         run: |
           test -f corpus/wiki.train.tokens
           test -f corpus/CORPUS_LICENSE.json
           test -f corpus/CORPUS_MANIFEST.json
-          bytes=$(wc -c < corpus/wiki.train.tokens)
-          test "$bytes" -ge "$((NOVA_TARGET_TOKENS + 129))"
-          echo "CORPUS_BYTES=$bytes"
 
-      - name: Run SFT DPO evaluation and promotion
-        env:
-          NOVA_CHUNK_TOKENS: "0"
+      - name: Train expert with checkpoint retries
         run: |
-          python nova/run_pipeline.py --stage auto
-          cat state/sft.json
-          cat state/dpo.json
-          cat state/evaluation.json
+          for attempt in 1 2 3; do
+            if python nova/train_expert.py --expert \${{ matrix.expert }} --tokens \${{ matrix.tokens }}; then
+              exit 0
+            fi
+            echo "expert \${{ matrix.expert }} attempt $attempt failed; retrying from local checkpoint"
+            sleep 5
+          done
+          exit 1
+
+      - name: Validate expert
+        run: |
+          python - <<'PY'
+          import torch
+          from pathlib import Path
+          p=Path("state") / f"expert_\${{ matrix.expert }}.pt"
+          x=torch.load(p,map_location="cpu",weights_only=False)
+          assert int(x["expert_idx"]) == int("\${{ matrix.expert }}")
+          assert int(x["tokens_seen"]) == int("\${{ matrix.tokens }}")
+          assert int(x["parameters"]) > 3_000_000
+          print("EXPERT_OK", p)
+          PY
+
+      - name: Publish expert checkpoint
+        uses: actions/upload-artifact@v4
+        with:
+          name: nova-expert-\${{ matrix.expert }}
+          path: state/expert_\${{ matrix.expert }}.pt
+          if-no-files-found: error
+          retention-days: 7
+
+  finalize:
+    needs: experts
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: nova-production
+
+      - name: Prepare CPU PyTorch
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install --index-url https://download.pytorch.org/whl/cpu "torch==2.5.1"
+
+      - name: Download all production inputs
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Assemble and finalize Nova
+        run: |
+          mkdir -p state corpus
+          cp artifacts/nova-corpus/corpus/* corpus/
+          find artifacts -name 'expert_*.pt' -exec cp {} state/ \\;
+          python nova/merge_experts.py
+          test -s production/final.pt
+          test -s production/final_manifest.json
+          test -s production/verification.json
+          test -s state/evaluation.json
           cat production/final_manifest.json
           cat production/verification.json
 
