@@ -1,0 +1,140 @@
+name: Nova AI Kaggle GPU training
+
+on:
+  push:
+    branches: [nova-gpu]
+    paths:
+      - "nova/kaggle_trigger.txt"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: nova-kaggle-training
+  cancel-in-progress: true
+
+jobs:
+  train:
+    runs-on: ubuntu-latest
+    timeout-minutes: 710
+    env:
+      KAGGLE_API_TOKEN: ${{ secrets.KAGGLE_API_TOKEN }}
+      KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
+      KAGGLE_KEY: ${{ secrets.KAGGLE_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Authenticate Kaggle
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install -q kaggle==1.8.3
+          if [ -n "${KAGGLE_API_TOKEN:-}" ]; then
+            echo "KAGGLE_TOKEN_CONFIGURED=1"
+          elif [ -n "${KAGGLE_USERNAME:-}" ] && [ -n "${KAGGLE_KEY:-}" ]; then
+            echo "KAGGLE_LEGACY_CONFIGURED=1"
+          else
+            echo "No Kaggle credentials configured in repository secrets."
+            exit 2
+          fi
+          kaggle kernels list --page-size 1 >/dev/null
+          echo "KAGGLE_AUTH=OK"
+
+      - name: Create and run Nova Kaggle kernel
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p .kaggle-nova
+          python - <<'PY'
+          import json, os, subprocess, urllib.request
+          token=os.environ.get("KAGGLE_API_TOKEN","").strip()
+          user=os.environ.get("KAGGLE_USERNAME","").strip()
+          if not user and token:
+              req=urllib.request.Request(
+                  "https://www.kaggle.com/api/v1/user",
+                  headers={"Authorization": f"Bearer {token}", "User-Agent": "nova-kaggle-runner"},
+              )
+              with urllib.request.urlopen(req, timeout=60) as r:
+                  data=json.load(r)
+              user=data.get("userName") or data.get("username") or data.get("displayName")
+          if not user:
+              raise SystemExit("Unable to resolve Kaggle username")
+          meta={
+              "id": f"{user}/nova-ai-50m",
+              "title": "Nova AI 50M production training",
+              "code_file": "nova_train.py",
+              "language": "python",
+              "kernel_type": "script",
+              "is_private": True,
+              "enable_gpu": True,
+              "enable_internet": True,
+          }
+          open(".kaggle-nova/kernel-metadata.json","w").write(json.dumps(meta,indent=2))
+          PY
+          cat > .kaggle-nova/nova_train.py <<'PY'
+          import os, shutil, subprocess, sys
+          from pathlib import Path
+          repo=Path("/kaggle/working/Leadpilot-ai")
+          subprocess.run(["git","clone","--depth","1","--branch","nova-gpu","https://github.com/farzinfarahi30-star/Leadpilot-ai.git",str(repo)],check=True)
+          os.chdir(repo/"nova")
+          os.environ["HF_HOME"]="/kaggle/working/hf"
+          os.environ["HF_DATASETS_CACHE"]="/kaggle/working/hf/datasets"
+          subprocess.run([sys.executable,"-m","pip","install","-q","datasets>=4.0","tokenizers>=0.21"],check=True)
+          subprocess.run([sys.executable,"-m","pip","install","-q","-r","requirements.txt"],check=True)
+          import torch
+          print("NOVA_KAGGLE_GPU",torch.cuda.is_available(),torch.cuda.device_count(),flush=True)
+          if not torch.cuda.is_available(): raise RuntimeError("CUDA GPU unavailable")
+          subprocess.run([sys.executable,"autopilot.py","--checkpoint","/kaggle/working/nova-stream.pt","--pretrain-tokens","50000000","--chunk-seconds","39600","--sft-steps","1500","--pref-steps","400","--prepare-posttrain","--do-posttrain"],check=True)
+          art=Path("/kaggle/working/nova-artifacts"); art.mkdir(parents=True,exist_ok=True)
+          for p in [Path("/kaggle/working/nova-stream.pt"),Path("checkpoints/nova-instruct.pt"),Path("checkpoints/nova-preference.pt"),Path("checkpoints/nova-final.pt"),Path("checkpoints/nova-final.json"),Path("checkpoints/nova-final.tokenizer.json")]:
+              if p.exists(): shutil.copy2(p,art/p.name)
+          print("NOVA_KAGGLE_COMPLETE",flush=True)
+          PY
+          kaggle kernels push -p .kaggle-nova
+          echo "KAGGLE_KERNEL_PUSHED=1"
+
+      - name: Wait for kernel completion
+        shell: bash
+        run: |
+          set -euo pipefail
+          for i in $(seq 1 690); do
+            echo "Polling Kaggle kernel: $i/690"
+            kaggle kernels status "$(python - <<'PY'
+          import json
+          m=json.load(open('.kaggle-nova/kernel-metadata.json'))
+          print(m["id"])
+          PY
+          )" || true
+            out="$(kaggle kernels list --mine --page-size 20 2>/dev/null || true)"
+            echo "$out"
+            echo "$out" | grep -Eiq "complete|error|failed|cancelled" && break || true
+            sleep 60
+          done
+
+      - name: Download Nova artifacts
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts
+          KERNEL_ID="$(python - <<'PY'
+          import json
+          print(json.load(open('.kaggle-nova/kernel-metadata.json'))["id"])
+          PY
+          )"
+          kaggle kernels output "$KERNEL_ID" -p artifacts
+          test -s artifacts/nova-final.pt
+          sha256sum artifacts/nova-final.pt | tee artifacts/nova-final.sha256
+
+      - name: Record status
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p .nova-status
+          printf '{"workflow":"Nova AI Kaggle GPU training","status":"%s","run_id":"%s","recorded_utc":"%s"}\n' "${{ job.status }}" "${{ github.run_id }}" "$(date -u +%Y-%m-%dT%H:%M:%SZ)" > .nova-status/kaggle-training.json
+          git config user.name "Nova Kaggle Training"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .nova-status/kaggle-training.json
+          git commit -m "Record Nova Kaggle training status" || true
+          git push origin HEAD:nova-gpu || true
