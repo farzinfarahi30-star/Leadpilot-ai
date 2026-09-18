@@ -393,7 +393,6 @@ jobs:
             }
           }
 EOF
-          EOF
           cp "$GITHUB_WORKSPACE/CodeQuestKidsBuild/MainActivity.java" "$APP/app/src/main/java/com/codequestkids/app/MainActivity.java"
 
       - name: Create release signing key
