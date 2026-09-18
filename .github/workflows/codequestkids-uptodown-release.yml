@@ -6,6 +6,12 @@ on:
       - codequestkids-uptodown-clean-build-20260918
   workflow_dispatch:
 
+env:
+  EXPECTED_PACKAGE: com.codequestkids.app
+  EXPECTED_VERSION: 1.2.1
+  EXPECTED_VERSION_CODE: "4"
+  CANONICAL_APK: CodeQuest-Kids-1.2.1-UPTODOWN-VERIFIED-V4.apk
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -34,13 +40,20 @@ jobs:
         with:
           gradle-version: '8.10.2'
 
+      - name: Clean old APK outputs
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf CodeQuestKidsBuild/app/build
+          find CodeQuestKidsBuild -type f -name '*.apk' -delete || true
+          rm -f CodeQuestKidsBuild/SHA256.txt CodeQuestKidsBuild/UPLOAD_THIS_APK.txt CodeQuestKidsBuild/UPTODOWN_METADATA.txt
+
       - name: Create release signing key
         shell: bash
         run: |
           set -euo pipefail
           mkdir -p "$GITHUB_WORKSPACE/CodeQuestKidsBuild/keys"
           keytool -genkeypair -v             -keystore "$GITHUB_WORKSPACE/CodeQuestKidsBuild/keys/codequest-kids-release.jks"             -storetype JKS             -storepass 'CodeQuestKids2026'             -keypass 'CodeQuestKids2026'             -alias 'codequestkids'             -keyalg RSA             -keysize 2048             -validity 10000             -dname 'CN=CodeQuest Kids, OU=CodeQuest Kids, O=CodeQuest Kids, L=Remote, ST=Global, C=US'
-
           echo "ANDROID_KEYSTORE_FILE=$GITHUB_WORKSPACE/CodeQuestKidsBuild/keys/codequest-kids-release.jks" >> "$GITHUB_ENV"
           echo "ANDROID_KEYSTORE_PASSWORD=CodeQuestKids2026" >> "$GITHUB_ENV"
           echo "ANDROID_KEY_ALIAS=codequestkids" >> "$GITHUB_ENV"
@@ -51,27 +64,53 @@ jobs:
         shell: bash
         run: gradle --no-daemon clean assembleRelease
 
-      - name: Validate package and signature
+      - name: Produce one canonical APK
         shell: bash
         run: |
           set -euo pipefail
-          APK="CodeQuestKidsBuild/app/build/outputs/apk/release/app-release.apk"
-          test -s "$APK"
+          SRC="CodeQuestKidsBuild/app/build/outputs/apk/release/app-release.apk"
+          OUT="CodeQuestKidsBuild/$CANONICAL_APK"
+          test -s "$SRC"
+          cp "$SRC" "$OUT"
+          test -s "$OUT"
 
-          "$ANDROID_HOME/build-tools/35.0.0/aapt2" dump badging "$APK" | tee "$RUNNER_TEMP/badging.txt"
-          grep -q "package: name='com.codequestkids.app' versionCode='4' versionName='1.2.1'" "$RUNNER_TEMP/badging.txt"
-          grep -q "application-label:'CodeQuest Kids'" "$RUNNER_TEMP/badging.txt"
+      - name: Verify canonical APK (fail closed)
+        shell: bash
+        run: |
+          set -euo pipefail
+          APK="CodeQuestKidsBuild/$CANONICAL_APK"
+          python3 CodeQuestKidsBuild/scripts/verify_uptodown_apk.py "$APK"
+          SHA="$(sha256sum "$APK" | awk '{print $1}')"
+          printf '%s  %s\n' "$SHA" "$CANONICAL_APK" | tee CodeQuestKidsBuild/SHA256.txt
+          cat > CodeQuestKidsBuild/UPTODOWN_METADATA.txt <<EOF
+          UPLOAD THIS FILE ONLY:
+          $CANONICAL_APK
 
-          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose "$APK"
-          sha256sum "$APK" | tee CodeQuestKidsBuild/SHA256.txt
-          cp "$APK" CodeQuestKidsBuild/CodeQuest-Kids-1.2.1-Uptodown.apk
+          Package: $EXPECTED_PACKAGE
+          Version: $EXPECTED_VERSION
+          Version code: $EXPECTED_VERSION_CODE
+          App name: CodeQuest Kids
+          SHA256: $SHA
+          EOF
+          printf '%s\n' "$CANONICAL_APK" > CodeQuestKidsBuild/UPLOAD_THIS_APK.txt
+
+      - name: Ensure artifact contains exactly one APK
+        shell: bash
+        run: |
+          set -euo pipefail
+          APK_COUNT="$(find CodeQuestKidsBuild -maxdepth 1 -type f -name '*.apk' | wc -l)"
+          test "$APK_COUNT" -eq 1
+          test -f "CodeQuestKidsBuild/$CANONICAL_APK"
+          test "$(find CodeQuestKidsBuild -maxdepth 1 -type f -name '*.apk' -printf '%f\n')" = "$CANONICAL_APK"
 
       - name: Upload final APK
         uses: actions/upload-artifact@v4
         with:
-          name: CodeQuest-Kids-1.2.1-Uptodown
+          name: CodeQuest-Kids-UPTODOWN-1.2.1-V4-VERIFIED
           path: |
-            CodeQuestKidsBuild/CodeQuest-Kids-1.2.1-Uptodown.apk
+            CodeQuestKidsBuild/${{ env.CANONICAL_APK }}
             CodeQuestKidsBuild/SHA256.txt
+            CodeQuestKidsBuild/UPLOAD_THIS_APK.txt
+            CodeQuestKidsBuild/UPTODOWN_METADATA.txt
           if-no-files-found: error
           retention-days: 30
