@@ -1,0 +1,77 @@
+name: CodeQuest Kids Uptodown Release 1.2.1
+
+on:
+  push:
+    branches:
+      - codequestkids-uptodown-clean-build-20260918
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Verify Android SDK
+        shell: bash
+        run: |
+          set -euo pipefail
+          export ANDROID_HOME="${ANDROID_HOME:-/usr/local/lib/android/sdk}"
+          test -d "$ANDROID_HOME/platforms/android-35"
+          test -x "$ANDROID_HOME/build-tools/35.0.0/aapt2"
+          test -x "$ANDROID_HOME/build-tools/35.0.0/apksigner"
+          echo "ANDROID_HOME=$ANDROID_HOME" >> "$GITHUB_ENV"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.10.2'
+
+      - name: Create release signing key
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$GITHUB_WORKSPACE/CodeQuestKidsBuild/keys"
+          keytool -genkeypair -v             -keystore "$GITHUB_WORKSPACE/CodeQuestKidsBuild/keys/codequest-kids-release.jks"             -storetype JKS             -storepass 'CodeQuestKids2026'             -keypass 'CodeQuestKids2026'             -alias 'codequestkids'             -keyalg RSA             -keysize 2048             -validity 10000             -dname 'CN=CodeQuest Kids, OU=CodeQuest Kids, O=CodeQuest Kids, L=Remote, ST=Global, C=US'
+
+          echo "ANDROID_KEYSTORE_FILE=$GITHUB_WORKSPACE/CodeQuestKidsBuild/keys/codequest-kids-release.jks" >> "$GITHUB_ENV"
+          echo "ANDROID_KEYSTORE_PASSWORD=CodeQuestKids2026" >> "$GITHUB_ENV"
+          echo "ANDROID_KEY_ALIAS=codequestkids" >> "$GITHUB_ENV"
+          echo "ANDROID_KEY_PASSWORD=CodeQuestKids2026" >> "$GITHUB_ENV"
+
+      - name: Build release APK
+        working-directory: CodeQuestKidsBuild
+        shell: bash
+        run: gradle --no-daemon clean assembleRelease
+
+      - name: Validate package and signature
+        shell: bash
+        run: |
+          set -euo pipefail
+          APK="CodeQuestKidsBuild/app/build/outputs/apk/release/app-release.apk"
+          test -s "$APK"
+
+          "$ANDROID_HOME/build-tools/35.0.0/aapt2" dump badging "$APK" | tee "$RUNNER_TEMP/badging.txt"
+          grep -q "package: name='com.codequestkids.app' versionCode='4' versionName='1.2.1'" "$RUNNER_TEMP/badging.txt"
+          grep -q "application-label:'CodeQuest Kids'" "$RUNNER_TEMP/badging.txt"
+
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose "$APK"
+          sha256sum "$APK" | tee CodeQuestKidsBuild/SHA256.txt
+          cp "$APK" CodeQuestKidsBuild/CodeQuest-Kids-1.2.1-Uptodown.apk
+
+      - name: Upload final APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: CodeQuest-Kids-1.2.1-Uptodown
+          path: |
+            CodeQuestKidsBuild/CodeQuest-Kids-1.2.1-Uptodown.apk
+            CodeQuestKidsBuild/SHA256.txt
+          if-no-files-found: error
+          retention-days: 30
