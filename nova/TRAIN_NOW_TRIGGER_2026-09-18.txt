@@ -1,1 +1,0 @@
-Nova GPU execution trigger for the existing resumable training workflow. No source changes; this file exists only to trigger the configured GPU runner on the nova-gpu branch.
