@@ -1,0 +1,9 @@
+<resources>
+    <style name="Theme.CodeQuestKids" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:fontFamily">sans</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:statusBarColor">@color/cq_navy</item>
+        <item name="android:navigationBarColor">@color/cq_navy</item>
+        <item name="android:colorAccent">@color/cq_blue</item>
+    </style>
+</resources>
