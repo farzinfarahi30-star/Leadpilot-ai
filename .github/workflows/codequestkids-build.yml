@@ -1,9 +1,9 @@
-name: Build CodeQuest Kids 1.2.1
+name: Build CodeQuest Kids Uptodown 1.2.1
 
 on:
   push:
     branches:
-      - codequestkids-build-20260917
+      - codequestkids-uptodown-fix-20260918
   workflow_dispatch:
 
 jobs:
@@ -34,16 +34,16 @@ jobs:
         with:
           gradle-version: '8.10.2'
 
-      - name: Generate Android project
+      - name: Generate native Android project
         shell: bash
         run: |
           set -euo pipefail
           APP=CodeQuestKidsBuild/App
-          mkdir -p "$APP/app/src/main/java/com/codequestkids/learn"
+          mkdir -p "$APP/app/src/main/java/com/codequestkids/app"
           mkdir -p "$APP/app/src/main/res/values" "$APP/app/src/main/res/drawable"
           cat > "$APP/settings.gradle" <<'EOF'
           pluginManagement { repositories { google(); mavenCentral(); gradlePluginPortal() } }
-          dependencyResolutionManagement { repositories { google(); mavenCentral() } }
+          dependencyResolutionManagement { repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS); repositories { google(); mavenCentral() } }
           rootProject.name='CodeQuestKidsApp'
           include ':app'
           EOF
@@ -56,10 +56,10 @@ jobs:
           cat > "$APP/app/build.gradle" <<'EOF'
           plugins { id 'com.android.application' }
           android {
-              namespace 'com.codequestkids.learn'
+              namespace 'com.codequestkids.app'
               compileSdk 35
               defaultConfig {
-                  applicationId 'com.codequestkids.learn'
+                  applicationId 'com.codequestkids.app'
                   minSdk 24
                   targetSdk 35
                   versionCode 4
@@ -79,63 +79,275 @@ jobs:
               compileOptions { sourceCompatibility JavaVersion.VERSION_17; targetCompatibility JavaVersion.VERSION_17 }
           }
           EOF
-          cat > "$APP/app/src/main/AndroidManifest.xml" <<'EOF'
-          <?xml version="1.0" encoding="utf-8"?>
-          <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-              <uses-permission android:name="android.permission.INTERNET" />
-              <application android:allowBackup="false" android:icon="@drawable/ic_launcher" android:roundIcon="@drawable/ic_launcher" android:label="@string/app_name" android:supportsRtl="true" android:theme="@style/AppTheme" android:usesCleartextTraffic="false">
-                  <activity android:name=".MainActivity" android:exported="true" android:screenOrientation="portrait">
-                      <intent-filter>
-                          <action android:name="android.intent.action.MAIN" />
-                          <category android:name="android.intent.category.LAUNCHER" />
-                      </intent-filter>
-                  </activity>
-              </application>
-          </manifest>
-          EOF
           cat > "$APP/app/src/main/res/values/strings.xml" <<'EOF'
           <resources><string name="app_name">CodeQuest Kids</string></resources>
           EOF
           cat > "$APP/app/src/main/res/values/styles.xml" <<'EOF'
-          <resources><style name="AppTheme" parent="android:style/Theme.Material.Light.NoActionBar"><item name="android:fontFamily">sans</item><item name="android:colorAccent">#2257D6</item><item name="android:navigationBarColor">#FFFFFF</item><item name="android:statusBarColor">#FFFFFF</item><item name="android:windowLightStatusBar">true</item></style></resources>
+          <resources>
+            <style name="AppTheme" parent="android:style/Theme.Material.Light.NoActionBar">
+              <item name="android:fontFamily">sans</item>
+              <item name="android:windowLightStatusBar">true</item>
+              <item name="android:statusBarColor">#FFFFFF</item>
+              <item name="android:navigationBarColor">#FFFFFF</item>
+              <item name="android:colorAccent">#2257D6</item>
+            </style>
+          </resources>
           EOF
           cat > "$APP/app/src/main/res/drawable/ic_launcher.xml" <<'EOF'
-          <vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="48dp" android:height="48dp" android:viewportWidth="48" android:viewportHeight="48">
-              <path android:fillColor="#2257D6" android:pathData="M24,2A22,22 0,1 0,24 46A22,22 0,1 0,24 2" />
-              <path android:fillColor="#FFFFFF" android:pathData="M15,14L29,24L15,34V29L23,24L15,19Z" />
-              <path android:fillColor="#FFFFFF" android:pathData="M31,30h7v4h-7z" />
+          <vector xmlns:android="http://schemas.android.com/apk/res/android"
+              android:width="48dp" android:height="48dp"
+              android:viewportWidth="48" android:viewportHeight="48">
+            <path android:fillColor="#2257D6" android:pathData="M24,2A22,22 0,1 0,24 46A22,22 0,1 0,24 2" />
+            <path android:fillColor="#FFFFFF" android:pathData="M15,14L29,24L15,34V29L23,24L15,19Z" />
+            <path android:fillColor="#FFFFFF" android:pathData="M31,30h7v4h-7z" />
           </vector>
           EOF
-          cat > "$APP/app/src/main/java/com/codequestkids/learn/MainActivity.java" <<'EOF'
-          package com.codequestkids.learn;
+          cat > "$APP/app/src/main/AndroidManifest.xml" <<'EOF'
+          <?xml version="1.0" encoding="utf-8"?>
+          <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+            <uses-permission android:name="android.permission.INTERNET" />
+            <application
+              android:allowBackup="false"
+              android:icon="@drawable/ic_launcher"
+              android:roundIcon="@drawable/ic_launcher"
+              android:label="@string/app_name"
+              android:supportsRtl="true"
+              android:theme="@style/AppTheme"
+              android:usesCleartextTraffic="false">
+              <activity android:name=".MainActivity"
+                android:exported="true"
+                android:screenOrientation="portrait">
+                <intent-filter>
+                  <action android:name="android.intent.action.MAIN" />
+                  <category android:name="android.intent.category.LAUNCHER" />
+                </intent-filter>
+              </activity>
+            </application>
+          </manifest>
+          EOF
+          cat > "$APP/app/src/main/java/com/codequestkids/app/MainActivity.java" <<'EOF'
+          package com.codequestkids.app;
+
           import android.app.Activity;
+          import android.app.AlertDialog;
+          import android.content.Context;
           import android.content.Intent;
+          import android.content.SharedPreferences;
           import android.graphics.Color;
           import android.net.Uri;
           import android.os.Bundle;
           import android.view.Gravity;
           import android.view.View;
-          import android.webkit.WebResourceError;
+          import android.webkit.WebChromeClient;
           import android.webkit.WebResourceRequest;
           import android.webkit.WebSettings;
           import android.webkit.WebView;
           import android.webkit.WebViewClient;
           import android.widget.Button;
           import android.widget.LinearLayout;
+          import android.widget.ProgressBar;
+          import android.widget.ScrollView;
+          import android.widget.Spinner;
+          import android.widget.ArrayAdapter;
           import android.widget.TextView;
+          import java.util.ArrayList;
+          import java.util.Arrays;
+          import java.util.List;
+
           public class MainActivity extends Activity {
-              private static final String SITE="https://codequest-kids.azinahi123.workers.dev";
-              private static final String HOST="codequest-kids.azinahi123.workers.dev";
-              private WebView web; private View offline;
-              @Override protected void onCreate(Bundle state){super.onCreate(state);buildUi();configure();if(state==null)web.loadUrl(SITE);else web.restoreState(state);}
-              private void buildUi(){LinearLayout root=new LinearLayout(this);root.setOrientation(LinearLayout.VERTICAL);root.setBackgroundColor(Color.WHITE);web=new WebView(this);offline=offlineView();offline.setVisibility(View.GONE);root.addView(web,new LinearLayout.LayoutParams(-1,-1,1));root.addView(offline,new LinearLayout.LayoutParams(-1,-1));setContentView(root);}
-              private View offlineView(){LinearLayout box=new LinearLayout(this);box.setOrientation(LinearLayout.VERTICAL);box.setGravity(Gravity.CENTER);box.setPadding(48,48,48,48);TextView t=new TextView(this);t.setText("CodeQuest Kids");t.setTextSize(28);t.setTextColor(Color.rgb(22,33,62));t.setGravity(Gravity.CENTER);TextView m=new TextView(this);m.setText("Couldn’t load CodeQuest Kids.\n\nCheck your internet connection and try again.");m.setTextSize(17);m.setGravity(Gravity.CENTER);m.setPadding(0,20,0,24);Button b=new Button(this);b.setText("Try again");b.setOnClickListener(v->{offline.setVisibility(View.GONE);web.setVisibility(View.VISIBLE);web.loadUrl(SITE);});box.addView(t);box.addView(m);box.addView(b);return box;}
-              private void configure(){WebSettings s=web.getSettings();s.setJavaScriptEnabled(true);s.setDomStorageEnabled(true);s.setDatabaseEnabled(true);s.setSupportZoom(false);s.setBuiltInZoomControls(false);s.setDisplayZoomControls(false);s.setAllowFileAccess(false);s.setAllowContentAccess(false);s.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);s.setTextZoom(100);web.setBackgroundColor(Color.WHITE);web.setWebViewClient(new WebViewClient(){@Override public boolean shouldOverrideUrlLoading(WebView v,WebResourceRequest r){return route(r.getUrl());}@Override public boolean shouldOverrideUrlLoading(WebView v,String u){return route(Uri.parse(u));}@Override public void onPageFinished(WebView v,String u){web.setVisibility(View.VISIBLE);offline.setVisibility(View.GONE);}@Override public void onReceivedError(WebView v,WebResourceRequest r,WebResourceError e){if(r.isForMainFrame())showOffline();}});}
-              private boolean route(Uri u){if(u==null)return true;String sc=u.getScheme(),h=u.getHost();if("https".equalsIgnoreCase(sc)&&h!=null&&(HOST.equalsIgnoreCase(h)||h.endsWith("."+HOST)))return false;if("http".equalsIgnoreCase(sc)||"https".equalsIgnoreCase(sc))startActivity(new Intent(Intent.ACTION_VIEW,u));return true;}
-              private void showOffline(){web.setVisibility(View.GONE);offline.setVisibility(View.VISIBLE);}
-              @Override public void onBackPressed(){if(web.canGoBack())web.goBack();else super.onBackPressed();}
-              @Override protected void onSaveInstanceState(Bundle out){web.saveState(out);super.onSaveInstanceState(out);}
-              @Override protected void onDestroy(){if(web!=null)web.destroy();super.onDestroy();}
+            private static final String SITE = "https://codequest-kids.azinahi123.workers.dev";
+            private static final String HOST = "codequest-kids.azinahi123.workers.dev";
+            private static final int BG = Color.rgb(248,250,252);
+            private static final int TEXT = Color.rgb(22,33,62);
+            private static final int BLUE = Color.rgb(34,87,214);
+            private final String[] tracks = {"7–9","10–12","13–16"};
+            private SharedPreferences prefs;
+            private LinearLayout root;
+            private int screen = 0;
+            private String track;
+
+            @Override public void onCreate(Bundle state) {
+              super.onCreate(state);
+              prefs = getSharedPreferences("progress", Context.MODE_PRIVATE);
+              track = prefs.getString("track", "10–12");
+              showHome();
+            }
+
+            private TextView text(String value, float size, boolean bold) {
+              TextView t = new TextView(this);
+              t.setText(value);
+              t.setTextSize(size);
+              t.setTextColor(TEXT);
+              t.setPadding(0,8,0,8);
+              if (bold) t.setTypeface(null, 1);
+              return t;
+            }
+
+            private Button button(String label, View.OnClickListener click) {
+              Button b = new Button(this);
+              b.setText(label);
+              b.setAllCaps(false);
+              b.setOnClickListener(click);
+              return b;
+            }
+
+            private ScrollView shell(String title, String subtitle) {
+              ScrollView scroll = new ScrollView(this);
+              root = new LinearLayout(this);
+              root.setOrientation(LinearLayout.VERTICAL);
+              root.setPadding(32,28,32,32);
+              root.setBackgroundColor(BG);
+              TextView h = text(title, 30, true);
+              root.addView(h);
+              root.addView(text(subtitle, 16, false));
+              scroll.addView(root);
+              setContentView(scroll);
+              return scroll;
+            }
+
+            private void showHome() {
+              screen = 0;
+              shell("CodeQuest Kids", "Build games. Learn code. Create the future.");
+              root.addView(text("Your learning track", 20, true));
+              Spinner sp = new Spinner(this);
+              sp.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, tracks));
+              int idx = Arrays.asList(tracks).indexOf(track);
+              if (idx < 0) idx = 1;
+              sp.setSelection(idx);
+              sp.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
+                public void onNothingSelected(android.widget.AdapterView<?> p) {}
+                public void onItemSelected(android.widget.AdapterView<?> p, View v, int pos, long id) {
+                  track = tracks[pos];
+                  prefs.edit().putString("track", track).apply();
+                }
+              });
+              root.addView(sp, new LinearLayout.LayoutParams(-1, -2));
+              root.addView(progressCard(), new LinearLayout.LayoutParams(-1, -2));
+              root.addView(text("Learn", 20, true));
+              root.addView(button("Missions", v -> showMissions()));
+              root.addView(button("Coding Lab", v -> showCodingLab()));
+              root.addView(button("Online Academy", v -> showOnlineAcademy()));
+              root.addView(button("Parent / Guardian Progress", v -> showParent()));
+              root.addView(text("Works offline for track selection, missions and progress. Online Academy uses the official CodeQuest Kids site.", 14, false));
+            }
+
+            private View progressCard() {
+              LinearLayout box = new LinearLayout(this);
+              box.setOrientation(LinearLayout.VERTICAL);
+              box.setPadding(20,18,20,18);
+              box.setBackgroundColor(Color.WHITE);
+              int xp = prefs.getInt("xp_"+track, 0);
+              int completed = prefs.getInt("completed_"+track, 0);
+              box.addView(text("Track: "+track, 18, true));
+              box.addView(text(xp+" XP  •  "+completed+" missions completed", 16, false));
+              ProgressBar p = new ProgressBar(this, null, android.R.attr.progressBarStyleHorizontal);
+              p.setMax(100);
+              p.setProgress(Math.min(100, completed * 25));
+              box.addView(p, new LinearLayout.LayoutParams(-1, 24));
+              return box;
+            }
+
+            private String[] missionSet() {
+              if (track.equals("7–9")) return new String[]{"Make a character move","Collect stars","Build a clickable button","Tell a coding story"};
+              if (track.equals("13–16")) return new String[]{"Use arrays and objects","Manage game state","Handle DOM events","Debug a broken program","Build a mini web game"};
+              return new String[]{"Use variables","Master loops","Write functions","Fix a JavaScript bug","Build a mini game"};
+            }
+
+            private void showMissions() {
+              screen = 1;
+              shell("Missions • "+track, "Finish missions to earn local XP.");
+              String[] missions = missionSet();
+              int completed = prefs.getInt("completed_"+track, 0);
+              for (int i=0;i<missions.length;i++) {
+                final int n = i;
+                Button b = button((i < completed ? "✓ " : "") + missions[i] + "  +25 XP", v -> {
+                  if (n < prefs.getInt("completed_"+track,0)) return;
+                  int next = Math.min(missions.length, n+1);
+                  prefs.edit().putInt("completed_"+track,next).putInt("xp_"+track,next*25).apply();
+                  showMissions();
+                });
+                root.addView(b);
+              }
+              root.addView(button("Back to Home", v -> showHome()));
+            }
+
+            private void showParent() {
+              screen = 2;
+              shell("Parent / Guardian", "Progress stored locally on this device.");
+              int total = 0;
+              for (String t : tracks) total += prefs.getInt("completed_"+t,0);
+              int xp = 0;
+              for (String t : tracks) xp += prefs.getInt("xp_"+t,0);
+              root.addView(text("Current track: "+track, 18, true));
+              root.addView(text("Total XP: "+xp+"\nMissions completed: "+total+"\nNo account or advertising is required.", 17, false));
+              root.addView(button("Reset local progress", v -> new AlertDialog.Builder(this)
+                .setTitle("Reset progress?")
+                .setMessage("This removes only CodeQuest Kids progress stored on this device.")
+                .setNegativeButton("Cancel", null)
+                .setPositiveButton("Reset", (d,w) -> { prefs.edit().clear().putString("track","10–12").apply(); track="10–12"; showParent(); })
+                .show()));
+              root.addView(button("Back to Home", v -> showHome()));
+            }
+
+            private void showCodingLab() {
+              screen = 3;
+              WebView w = codingLab();
+              setContentView(w);
+            }
+
+            private WebView codingLab() {
+              WebView w = new WebView(this);
+              WebSettings s = w.getSettings();
+              s.setJavaScriptEnabled(true);
+              s.setDomStorageEnabled(true);
+              s.setAllowFileAccess(false);
+              s.setAllowContentAccess(false);
+              s.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);
+              w.setWebChromeClient(new WebChromeClient());
+              w.setBackgroundColor(BG);
+              String starter = "const player = { name: 'Nova', score: 0 };\nplayer.score += 10;\nconsole.log(player.name, player.score);";
+              String html = "<!doctype html><meta name='viewport' content='width=device-width,initial-scale=1'>"
+                + "<style>body{font-family:sans-serif;background:#f8fafc;padding:20px;color:#16213e}textarea{width:100%;height:260px;font:15px monospace;padding:12px;box-sizing:border-box}button{padding:12px 18px;margin:8px 0;font-size:16px}pre{background:#111;color:#eee;padding:12px;min-height:90px;white-space:pre-wrap}iframe{width:1px;height:1px;border:0}</style>"
+                + "<h1>AI Coding Lab</h1><p>Write JavaScript and run it in a sandboxed iframe.</p>"
+                + "<textarea id='code'></textarea><br><button onclick='run()'>Run code</button><button onclick='document.getElementById("code").value=starter'>Starter</button><button onclick='history.back()'>Back</button><pre id='out'>Console output appears here.</pre><iframe id='runner' sandbox='allow-scripts'></iframe>"
+                + "<script>const starter=" + org.jsonQuote(starter) + ";document.getElementById('code').value=starter;"
+                + "window.addEventListener('message',e=>{if(e.data&&e.data.kind==='cq-log')document.getElementById('out').textContent+=e.data.text+'\\n';});"
+                + "function run(){document.getElementById('out').textContent='';const code=document.getElementById('code').value;"
+                + "const runner=document.getElementById('runner');const payload=JSON.stringify(code);runner.srcdoc='<script>try{const c='+payload+';const old=console.log;console.log=function(){parent.postMessage({kind:"cq-log",text:Array.from(arguments).join(" ")},"*");};eval(c);}catch(e){parent.postMessage({kind:"cq-log",text:"Error: "+e.message},"*");}<\\/script>';}</script>";
+              w.loadDataWithBaseURL(null, html, "text/html", "UTF-8", null);
+              return w;
+            }
+
+            private void showOnlineAcademy() {
+              screen = 4;
+              WebView w = new WebView(this);
+              WebSettings s = w.getSettings();
+              s.setJavaScriptEnabled(true);
+              s.setDomStorageEnabled(true);
+              s.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);
+              w.setWebChromeClient(new WebChromeClient());
+              w.setWebViewClient(new WebViewClient() {
+                @Override public boolean shouldOverrideUrlLoading(WebView v, WebResourceRequest r) { return route(r.getUrl()); }
+                @Override public boolean shouldOverrideUrlLoading(WebView v, String u) { return route(Uri.parse(u)); }
+              });
+              setContentView(w);
+              w.loadUrl(SITE);
+            }
+
+            private boolean route(Uri u) {
+              if (u == null) return true;
+              String scheme=u.getScheme(), host=u.getHost();
+              if ("https".equalsIgnoreCase(scheme) && host != null &&
+                  (HOST.equalsIgnoreCase(host) || host.endsWith("."+HOST))) return false;
+              if ("http".equalsIgnoreCase(scheme) || "https".equalsIgnoreCase(scheme)) {
+                try { startActivity(new Intent(Intent.ACTION_VIEW,u)); } catch(Exception ignored) {}
+              }
+              return true;
+            }
+
+            @Override public void onBackPressed() {
+              if (screen != 0) { showHome(); } else { super.onBackPressed(); }
+            }
           }
           EOF
 
@@ -163,18 +375,18 @@ jobs:
           AAPT="$ANDROID_HOME/build-tools/35.0.0/aapt2"
           SIGNER="$ANDROID_HOME/build-tools/35.0.0/apksigner"
           "$AAPT" dump badging "$APK" | tee /tmp/badging.txt
-          grep -q "package: name='com.codequestkids.learn' versionCode='4' versionName='1.2.1'" /tmp/badging.txt
+          grep -q "package: name='com.codequestkids.app' versionCode='4' versionName='1.2.1'" /tmp/badging.txt
           grep -q "application-label:'CodeQuest Kids'" /tmp/badging.txt
           "$SIGNER" verify --verbose "$APK"
           sha256sum "$APK" | tee CodeQuestKidsBuild/SHA256.txt
-          cp "$APK" CodeQuestKidsBuild/CodeQuest-Kids-1.2.1-release.apk
+          cp "$APK" CodeQuestKidsBuild/CodeQuest-Kids-1.2.1-Uptodown.apk
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: CodeQuest-Kids-1.2.1-release
+          name: CodeQuest-Kids-1.2.1-Uptodown
           path: |
-            CodeQuestKidsBuild/CodeQuest-Kids-1.2.1-release.apk
+            CodeQuestKidsBuild/CodeQuest-Kids-1.2.1-Uptodown.apk
             CodeQuestKidsBuild/SHA256.txt
           if-no-files-found: error
           retention-days: 30
