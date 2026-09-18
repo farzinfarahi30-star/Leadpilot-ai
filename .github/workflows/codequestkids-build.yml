@@ -136,30 +136,27 @@ jobs:
           import android.graphics.Color;
           import android.net.Uri;
           import android.os.Bundle;
-          import android.view.Gravity;
           import android.view.View;
           import android.webkit.WebChromeClient;
           import android.webkit.WebResourceRequest;
           import android.webkit.WebSettings;
           import android.webkit.WebView;
           import android.webkit.WebViewClient;
+          import android.widget.AdapterView;
+          import android.widget.ArrayAdapter;
           import android.widget.Button;
           import android.widget.LinearLayout;
           import android.widget.ProgressBar;
           import android.widget.ScrollView;
           import android.widget.Spinner;
-          import android.widget.ArrayAdapter;
           import android.widget.TextView;
-          import java.util.ArrayList;
           import java.util.Arrays;
-          import java.util.List;
 
           public class MainActivity extends Activity {
             private static final String SITE = "https://codequest-kids.azinahi123.workers.dev";
             private static final String HOST = "codequest-kids.azinahi123.workers.dev";
             private static final int BG = Color.rgb(248,250,252);
             private static final int TEXT = Color.rgb(22,33,62);
-            private static final int BLUE = Color.rgb(34,87,214);
             private final String[] tracks = {"7–9","10–12","13–16"};
             private SharedPreferences prefs;
             private LinearLayout root;
@@ -191,18 +188,16 @@ jobs:
               return b;
             }
 
-            private ScrollView shell(String title, String subtitle) {
+            private void shell(String title, String subtitle) {
               ScrollView scroll = new ScrollView(this);
               root = new LinearLayout(this);
               root.setOrientation(LinearLayout.VERTICAL);
               root.setPadding(32,28,32,32);
               root.setBackgroundColor(BG);
-              TextView h = text(title, 30, true);
-              root.addView(h);
+              root.addView(text(title, 30, true));
               root.addView(text(subtitle, 16, false));
               scroll.addView(root);
               setContentView(scroll);
-              return scroll;
             }
 
             private void showHome() {
@@ -214,9 +209,9 @@ jobs:
               int idx = Arrays.asList(tracks).indexOf(track);
               if (idx < 0) idx = 1;
               sp.setSelection(idx);
-              sp.setOnItemSelectedListener(new android.widget.AdapterView.OnItemSelectedListener() {
-                public void onNothingSelected(android.widget.AdapterView<?> p) {}
-                public void onItemSelected(android.widget.AdapterView<?> p, View v, int pos, long id) {
+              sp.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override public void onNothingSelected(AdapterView<?> p) {}
+                @Override public void onItemSelected(AdapterView<?> p, View v, int pos, long id) {
                   track = tracks[pos];
                   prefs.edit().putString("track", track).apply();
                 }
@@ -228,7 +223,7 @@ jobs:
               root.addView(button("Coding Lab", v -> showCodingLab()));
               root.addView(button("Online Academy", v -> showOnlineAcademy()));
               root.addView(button("Parent / Guardian Progress", v -> showParent()));
-              root.addView(text("Works offline for track selection, missions and progress. Online Academy uses the official CodeQuest Kids site.", 14, false));
+              root.addView(text("Core missions, XP and progress work offline. The official online academy is an optional connected feature.", 14, false));
             }
 
             private View progressCard() {
@@ -248,9 +243,15 @@ jobs:
             }
 
             private String[] missionSet() {
-              if (track.equals("7–9")) return new String[]{"Make a character move","Collect stars","Build a clickable button","Tell a coding story"};
-              if (track.equals("13–16")) return new String[]{"Use arrays and objects","Manage game state","Handle DOM events","Debug a broken program","Build a mini web game"};
-              return new String[]{"Use variables","Master loops","Write functions","Fix a JavaScript bug","Build a mini game"};
+              if (track.equals("7–9")) return new String[]{
+                "Make a character move","Collect stars","Build a clickable button","Tell a coding story"
+              };
+              if (track.equals("13–16")) return new String[]{
+                "Use arrays and objects","Manage game state","Handle DOM events","Debug a broken program","Build a mini web game"
+              };
+              return new String[]{
+                "Use variables","Master loops","Write functions","Fix a JavaScript bug","Build a mini game"
+              };
             }
 
             private void showMissions() {
@@ -258,12 +259,13 @@ jobs:
               shell("Missions • "+track, "Finish missions to earn local XP.");
               String[] missions = missionSet();
               int completed = prefs.getInt("completed_"+track, 0);
-              for (int i=0;i<missions.length;i++) {
+              for (int i=0; i<missions.length; i++) {
                 final int n = i;
                 Button b = button((i < completed ? "✓ " : "") + missions[i] + "  +25 XP", v -> {
-                  if (n < prefs.getInt("completed_"+track,0)) return;
+                  int done = prefs.getInt("completed_"+track, 0);
+                  if (n < done) return;
                   int next = Math.min(missions.length, n+1);
-                  prefs.edit().putInt("completed_"+track,next).putInt("xp_"+track,next*25).apply();
+                  prefs.edit().putInt("completed_"+track, next).putInt("xp_"+track, next*25).apply();
                   showMissions();
                 });
                 root.addView(b);
@@ -275,27 +277,28 @@ jobs:
               screen = 2;
               shell("Parent / Guardian", "Progress stored locally on this device.");
               int total = 0;
-              for (String t : tracks) total += prefs.getInt("completed_"+t,0);
               int xp = 0;
-              for (String t : tracks) xp += prefs.getInt("xp_"+t,0);
+              for (String t : tracks) {
+                total += prefs.getInt("completed_"+t, 0);
+                xp += prefs.getInt("xp_"+t, 0);
+              }
               root.addView(text("Current track: "+track, 18, true));
               root.addView(text("Total XP: "+xp+"\nMissions completed: "+total+"\nNo account or advertising is required.", 17, false));
               root.addView(button("Reset local progress", v -> new AlertDialog.Builder(this)
                 .setTitle("Reset progress?")
                 .setMessage("This removes only CodeQuest Kids progress stored on this device.")
                 .setNegativeButton("Cancel", null)
-                .setPositiveButton("Reset", (d,w) -> { prefs.edit().clear().putString("track","10–12").apply(); track="10–12"; showParent(); })
+                .setPositiveButton("Reset", (d,w) -> {
+                  prefs.edit().clear().putString("track","10–12").apply();
+                  track = "10–12";
+                  showParent();
+                })
                 .show()));
               root.addView(button("Back to Home", v -> showHome()));
             }
 
             private void showCodingLab() {
               screen = 3;
-              WebView w = codingLab();
-              setContentView(w);
-            }
-
-            private WebView codingLab() {
               WebView w = new WebView(this);
               WebSettings s = w.getSettings();
               s.setJavaScriptEnabled(true);
@@ -305,17 +308,50 @@ jobs:
               s.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);
               w.setWebChromeClient(new WebChromeClient());
               w.setBackgroundColor(BG);
-              String starter = "const player = { name: 'Nova', score: 0 };\nplayer.score += 10;\nconsole.log(player.name, player.score);";
-              String html = "<!doctype html><meta name='viewport' content='width=device-width,initial-scale=1'>"
-                + "<style>body{font-family:sans-serif;background:#f8fafc;padding:20px;color:#16213e}textarea{width:100%;height:260px;font:15px monospace;padding:12px;box-sizing:border-box}button{padding:12px 18px;margin:8px 0;font-size:16px}pre{background:#111;color:#eee;padding:12px;min-height:90px;white-space:pre-wrap}iframe{width:1px;height:1px;border:0}</style>"
-                + "<h1>AI Coding Lab</h1><p>Write JavaScript and run it in a sandboxed iframe.</p>"
-                + "<textarea id='code'></textarea><br><button onclick='run()'>Run code</button><button onclick='document.getElementById("code").value=starter'>Starter</button><button onclick='history.back()'>Back</button><pre id='out'>Console output appears here.</pre><iframe id='runner' sandbox='allow-scripts'></iframe>"
-                + "<script>const starter=" + \"const player = { name: 'Nova', score: 0 };\\nplayer.score += 10;\\nconsole.log(player.name, player.score);\" + ";document.getElementById('code').value=starter;"
-                + "window.addEventListener('message',e=>{if(e.data&&e.data.kind==='cq-log')document.getElementById('out').textContent+=e.data.text+'\\n';});"
-                + "function run(){document.getElementById('out').textContent='';const code=document.getElementById('code').value;"
-                + "const runner=document.getElementById('runner');const payload=JSON.stringify(code);runner.srcdoc='<script>try{const c='+payload+';const old=console.log;console.log=function(){parent.postMessage({kind:"cq-log",text:Array.from(arguments).join(" ")},"*");};eval(c);}catch(e){parent.postMessage({kind:"cq-log",text:"Error: "+e.message},"*");}<\\/script>';}</script>";
+              String html = """
+                <!doctype html>
+                <html><head><meta name="viewport" content="width=device-width,initial-scale=1">
+                <style>
+                body{font-family:sans-serif;background:#f8fafc;padding:20px;color:#16213e}
+                textarea{width:100%;height:260px;font:15px monospace;padding:12px;box-sizing:border-box}
+                button{padding:12px 18px;margin:8px 6px 8px 0;font-size:16px}
+                pre{background:#111;color:#eee;padding:12px;min-height:100px;white-space:pre-wrap}
+                iframe{width:1px;height:1px;border:0}
+                </style></head><body>
+                <h1>AI Coding Lab</h1>
+                <p>Write JavaScript and run it inside a sandboxed iframe.</p>
+                <textarea id="code">const player = { name: 'Nova', score: 0 };
+                player.score += 10;
+                console.log(player.name, player.score);</textarea>
+                <br>
+                <button onclick="run()">Run code</button>
+                <button onclick="starter()">Starter</button>
+                <button onclick="history.back()">Back</button>
+                <pre id="out">Console output appears here.</pre>
+                <iframe id="runner" sandbox="allow-scripts"></iframe>
+                <script>
+                function starter(){
+                  document.getElementById('code').value =
+                    "const player = { name: 'Nova', score: 0 };\nplayer.score += 10;\nconsole.log(player.name, player.score);";
+                }
+                window.addEventListener('message',e=>{
+                  if(e.data && e.data.kind==='cq-log'){
+                    document.getElementById('out').textContent += e.data.text + String.fromCharCode(10);
+                  }
+                });
+                function run(){
+                  document.getElementById('out').textContent='';
+                  const code=document.getElementById('code').value;
+                  const payload=JSON.stringify(code);
+                  document.getElementById('runner').srcdoc =
+                    '<script>try{const c='+payload+
+                    ';console.log=function(){parent.postMessage({kind:"cq-log",text:Array.from(arguments).join(" ")},"*");};'+
+                    'eval(c);}catch(e){parent.postMessage({kind:"cq-log",text:"Error: "+e.message},"*");}<\/script>';
+                }
+                </script></body></html>
+                """;
               w.loadDataWithBaseURL(null, html, "text/html", "UTF-8", null);
-              return w;
+              setContentView(w);
             }
 
             private void showOnlineAcademy() {
@@ -325,10 +361,16 @@ jobs:
               s.setJavaScriptEnabled(true);
               s.setDomStorageEnabled(true);
               s.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);
+              s.setAllowFileAccess(false);
+              s.setAllowContentAccess(false);
               w.setWebChromeClient(new WebChromeClient());
               w.setWebViewClient(new WebViewClient() {
-                @Override public boolean shouldOverrideUrlLoading(WebView v, WebResourceRequest r) { return route(r.getUrl()); }
-                @Override public boolean shouldOverrideUrlLoading(WebView v, String u) { return route(Uri.parse(u)); }
+                @Override public boolean shouldOverrideUrlLoading(WebView v, WebResourceRequest r) {
+                  return route(r.getUrl());
+                }
+                @Override public boolean shouldOverrideUrlLoading(WebView v, String u) {
+                  return route(Uri.parse(u));
+                }
               });
               setContentView(w);
               w.loadUrl(SITE);
@@ -336,19 +378,21 @@ jobs:
 
             private boolean route(Uri u) {
               if (u == null) return true;
-              String scheme=u.getScheme(), host=u.getHost();
+              String scheme = u.getScheme();
+              String host = u.getHost();
               if ("https".equalsIgnoreCase(scheme) && host != null &&
                   (HOST.equalsIgnoreCase(host) || host.endsWith("."+HOST))) return false;
               if ("http".equalsIgnoreCase(scheme) || "https".equalsIgnoreCase(scheme)) {
-                try { startActivity(new Intent(Intent.ACTION_VIEW,u)); } catch(Exception ignored) {}
+                try { startActivity(new Intent(Intent.ACTION_VIEW, u)); } catch (Exception ignored) {}
               }
               return true;
             }
 
             @Override public void onBackPressed() {
-              if (screen != 0) { showHome(); } else { super.onBackPressed(); }
+              if (screen != 0) showHome(); else super.onBackPressed();
             }
           }
+EOF
           EOF
 
       - name: Create release signing key
