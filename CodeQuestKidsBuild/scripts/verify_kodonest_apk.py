@@ -13,7 +13,7 @@ EXPECTED_PACKAGE = "com.kodonest.junior"
 EXPECTED_VERSION = "1.0.0"
 EXPECTED_VERSION_CODE = "1"
 EXPECTED_LABEL = "KodoNest Junior"
-EXPECTED_FILENAME = "CodeQuest-Kids-1.0.0-UPTODOWN-VERIFIED-V4.apk"
+EXPECTED_FILENAME = "KodoNest-Junior-1.0.0-UPTODOWN-VERIFIED.apk"
 
 
 def run(*args: str) -> str:
