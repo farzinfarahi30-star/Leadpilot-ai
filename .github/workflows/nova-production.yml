@@ -4,27 +4,21 @@ on:
   push:
     branches: [nova-production]
   workflow_dispatch:
-    inputs:
-      prev_run_id:
-        description: Previous workflow run ID containing the Nova checkpoint artifact
-        required: false
-        default: "0"
 
 permissions:
   contents: read
-  actions: write
+
+env:
+  NOVA_TARGET_TOKENS: "50000000"
+  NOVA_CHUNK_TOKENS: "25000000"
+  NOVA_RESUME: "1"
+  NOVA_ALLOW_SYNTHETIC: "0"
+  TORCH_THREADS: "4"
 
 jobs:
-  nova:
+  pretrain-1:
     runs-on: ubuntu-latest
-    timeout-minutes: 350
-    env:
-      GH_TOKEN: ${{ github.token }}
-      NOVA_TARGET_TOKENS: "50000000"
-      NOVA_CHUNK_TOKENS: "10000000"
-      NOVA_RESUME: "1"
-      NOVA_ALLOW_SYNTHETIC: "0"
-      TORCH_THREADS: "4"
+    timeout-minutes: 345
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -36,40 +30,120 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -r nova/requirements.txt
 
-      - name: Restore previous checkpoint
-        env:
-          PREV_RUN: ${{ inputs.prev_run_id }}
+      - name: Train first 25M tokens
         run: |
-          if [ -n "$PREV_RUN" ] && [ "$PREV_RUN" != "0" ]; then
-            mkdir -p state
-            gh run download "$PREV_RUN" -n nova-checkpoint -D state || true
-          fi
+          python nova/run_pipeline.py --stage auto
+          cat state/pipeline.json
 
-      - name: Run Nova pipeline chunk
-        id: pipeline
-        continue-on-error: true
-        run: |
-          set +e
-          python nova/run_pipeline.py --stage auto | tee nova_run.log
-          rc=${PIPESTATUS[0]}
-          echo "rc=$rc" >> "$GITHUB_OUTPUT"
-          exit 0
-
-      - name: Upload resume checkpoint
+      - name: Upload first checkpoint
         uses: actions/upload-artifact@v4
         with:
-          name: nova-checkpoint
+          name: nova-stage-1
           path: |
             state/model_checkpoint.pt
             state/pipeline.json
-            state/sft.json
-            state/dpo.json
-            state/evaluation.json
-          if-no-files-found: ignore
+            corpus/CORPUS_LICENSE.json
+            corpus/CORPUS_MANIFEST.json
+          if-no-files-found: error
           retention-days: 7
 
-      - name: Upload final production artifacts
-        if: hashFiles('production/final.pt') != ''
+  pretrain-2:
+    needs: pretrain-1
+    runs-on: ubuntu-latest
+    timeout-minutes: 345
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: nova-production
+
+      - name: Prepare Python
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r nova/requirements.txt
+
+      - name: Download first checkpoint
+        uses: actions/download-artifact@v4
+        with:
+          name: nova-stage-1
+          path: .
+
+      - name: Train second 25M tokens
+        run: |
+          python nova/run_pipeline.py --stage auto
+          cat state/pipeline.json
+
+      - name: Upload second checkpoint
+        uses: actions/upload-artifact@v4
+        with:
+          name: nova-stage-2
+          path: |
+            state/model_checkpoint.pt
+            state/pipeline.json
+            corpus/CORPUS_LICENSE.json
+            corpus/CORPUS_MANIFEST.json
+          if-no-files-found: error
+          retention-days: 7
+
+  finalize:
+    needs: pretrain-2
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: nova-production
+
+      - name: Prepare Python
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r nova/requirements.txt
+
+      - name: Download second checkpoint
+        uses: actions/download-artifact@v4
+        with:
+          name: nova-stage-2
+          path: .
+
+      - name: Download corpus metadata
+        uses: actions/download-artifact@v4
+        with:
+          name: nova-stage-1
+          path: .
+
+      - name: Bootstrap corpus
+        run: |
+          if [ ! -f corpus/wiki.train.tokens ]; then
+            python - <<'PY'
+          from pathlib import Path
+          import urllib.request, zipfile, shutil
+          root=Path("corpus"); root.mkdir(parents=True, exist_ok=True)
+          arc=Path("state/wikitext.zip"); arc.parent.mkdir(exist_ok=True)
+          if not arc.exists():
+              urllib.request.urlretrieve(
+                  "https://s3.amazonaws.com/research.metamind.io/wikitext/wikitext-103-v1.zip", arc
+              )
+          with zipfile.ZipFile(arc) as z:
+              name=next(n for n in z.namelist() if n.endswith("wiki.train.tokens"))
+              with z.open(name) as src, (root/"wiki.train.tokens").open("wb") as dst:
+                  shutil.copyfileobj(src, dst, 1024*1024)
+          PY
+          fi
+          test -f corpus/CORPUS_LICENSE.json
+
+      - name: Run SFT DPO evaluation and promotion
+        env:
+          NOVA_CHUNK_TOKENS: "0"
+        run: |
+          python nova/run_pipeline.py --stage auto
+          cat state/sft.json
+          cat state/dpo.json
+          cat state/evaluation.json
+          cat production/final_manifest.json
+          cat production/verification.json
+
+      - name: Publish production artifact
         uses: actions/upload-artifact@v4
         with:
           name: nova-production-final
@@ -77,30 +151,10 @@ jobs:
             production/final.pt
             production/final_manifest.json
             production/verification.json
+            state/evaluation.json
+            state/sft.json
+            state/dpo.json
             corpus/CORPUS_LICENSE.json
             corpus/CORPUS_MANIFEST.json
-            state/evaluation.json
           if-no-files-found: error
           retention-days: 30
-
-      - name: Continue automatically
-        env:
-          PREV_RUN_ID: ${{ github.run_id }}
-        run: |
-          complete=$(python - <<'PY'
-          import json, pathlib
-          p=pathlib.Path('state/pipeline.json')
-          print('1' if p.exists() and json.loads(p.read_text()).get('complete') else '0')
-          PY
-          )
-          if [ "$complete" != "1" ]; then
-            gh workflow run nova-production.yml --ref nova-production -f prev_run_id="$PREV_RUN_ID"
-          fi
-
-      - name: Summary
-        if: always()
-        run: |
-          echo "Nova pipeline state:"
-          cat state/pipeline.json 2>/dev/null || true
-          echo
-          test -f production/final.pt && echo "PRODUCTION_FINAL_PRESENT=1" || true
