@@ -163,11 +163,11 @@ def stage_sft(model: NovaSparseLM) -> None:
     save_json(STATE / "sft.json", {"status": "done", "examples": len(data), "license": "CC0-1.0-original-authored"})
 
 
-def sequence_logprob(model: NovaSparseLM, text: str) -> tuple[torch.Tensor, int]:
+def sequence_logprob(model: NovaSparseLM, text: str, expert: int | None = None) -> tuple[torch.Tensor, int]:
     b = text.encode("utf-8")[:CONTEXT + 1]
     x = torch.tensor(list(b[:-1]), dtype=torch.long).unsqueeze(0)
     y = torch.tensor(list(b[1:]), dtype=torch.long).unsqueeze(0)
-    expert = model.route_text(text)
+    expert = model.route_text(text) if expert is None else int(expert) % EXPERTS
     logits, _ = model(x, expert)
     logp = nn.functional.log_softmax(logits, dim=-1)
     vals = logp.gather(-1, y.unsqueeze(-1)).squeeze(-1)
@@ -188,8 +188,9 @@ def stage_dpo(model: NovaSparseLM) -> None:
     beta = 0.1
     for _ in range(2):
         for prompt, chosen, rejected in prefs:
-            pc, _ = sequence_logprob(model, prompt + "\n" + chosen)
-            pr, _ = sequence_logprob(model, prompt + "\n" + rejected)
+            expert = model.route_text(prompt)
+            pc, _ = sequence_logprob(model, prompt + "\n" + chosen, expert)
+            pr, _ = sequence_logprob(model, prompt + "\n" + rejected, expert)
             loss = -nn.functional.logsigmoid(beta * (pc - pr))
             expert = model.route_text(prompt)
             opts[expert].zero_grad(set_to_none=True)
