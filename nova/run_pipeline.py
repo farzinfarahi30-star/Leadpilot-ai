@@ -41,32 +41,47 @@ def bootstrap_corpus() -> Path:
     target = CORPUS / "wiki.train.tokens"
     license_path = CORPUS / "CORPUS_LICENSE.json"
     manifest_path = CORPUS / "CORPUS_MANIFEST.json"
-    url = "https://research.metamind.io.s3-us-west-2.amazonaws.com/wikitext/wikitext-103-v1.zip"
     minimum_bytes = TARGET + CONTEXT + 1
+
     if not target.exists() or target.stat().st_size < minimum_bytes:
-        archive = ROOT / "state" / "wikitext.zip"
-        if not archive.exists():
-            urllib.request.urlretrieve(url, archive)
-        with zipfile.ZipFile(archive) as z:
-            candidates = [n for n in z.namelist() if n.endswith("wiki.train.tokens")]
-            if not candidates:
-                raise RuntimeError("WikiText train file not found in archive")
-            with z.open(candidates[0]) as src, target.open("wb") as dst:
-                remaining = max(TARGET + 1_000_000, 60_000_000)
-                while remaining > 0:
-                    chunk = src.read(min(1024 * 1024, remaining))
-                    if not chunk:
+        import pyarrow.parquet as pq
+        parquet_url = "https://huggingface.co/datasets/Salesforce/wikitext/resolve/main/wikitext-103-v1/train-00000-of-00002.parquet?download=true"
+        parquet_path = STATE / "wikitext-train-00000-of-00002.parquet"
+        if not parquet_path.exists() or parquet_path.stat().st_size < 100_000_000:
+            tmp = parquet_path.with_suffix(".tmp")
+            urllib.request.urlretrieve(parquet_url, tmp)
+            tmp.replace(parquet_path)
+
+        max_bytes = max(TARGET + 1_000_000, 60_000_000)
+        written = 0
+        with target.open("wb") as dst:
+            pf = pq.ParquetFile(parquet_path)
+            for batch in pf.iter_batches(batch_size=8192, columns=["text"]):
+                for value in batch.column(0).to_pylist():
+                    if not value:
+                        continue
+                    block = (value + "\n").encode("utf-8", "ignore")
+                    if written + len(block) >= max_bytes:
+                        dst.write(block[:max_bytes - written])
+                        written = max_bytes
                         break
-                    dst.write(chunk)
-                    remaining -= len(chunk)
+                    dst.write(block)
+                    written += len(block)
+                if written >= max_bytes:
+                    break
+
+    if target.stat().st_size < minimum_bytes:
+        raise RuntimeError(f"licensed corpus bootstrap produced only {target.stat().st_size} bytes; need at least {minimum_bytes}")
+
     license_doc = {
         "licensed": True,
-        "license": "CC BY-SA 4.0 (dataset-info metadata); current dataset card also lists CC BY-SA 3.0/GFDL",
+        "license_evidence": "CC BY-SA 4.0 (dataset_infos metadata for wikitext-103-v1); current dataset card also lists CC BY-SA 3.0/GFDL",
         "source": "https://huggingface.co/datasets/Salesforce/wikitext",
-        "source_archive": url,
-        "source_metadata": "Hugging Face Salesforce/wikitext dataset; config wikitext-103-v1",
-        "token_definition": "UTF-8 byte tokens for Nova byte-level language model",
+        "config": "wikitext-103-v1",
+        "source_file": "wikitext-103-v1/train-00000-of-00002.parquet",
+        "source_archive": "https://huggingface.co/datasets/Salesforce/wikitext/resolve/main/wikitext-103-v1/train-00000-of-00002.parquet?download=true",
         "training_policy": "public licensed corpus; synthetic data disabled for pretraining",
+        "token_definition": "UTF-8 byte tokens for Nova byte-level language model",
     }
     license_path.write_text(json.dumps(license_doc, indent=2), encoding="utf-8")
     h = hashlib.sha256(target.read_bytes()).hexdigest()
