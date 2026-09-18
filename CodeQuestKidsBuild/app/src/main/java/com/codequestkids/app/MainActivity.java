@@ -114,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
         root.addView(button("Parent / Guardian Progress", v -> showParent()));
 
         root.addView(text(
-                "Native offline learning tools are built into the app. The official online academy is an optional connected feature.",
+                "Native offline learning tools are built into the app. The official online academy is an optional connected feature. Uptodown build 1.2.1.",
                 14,
                 false
         ));
