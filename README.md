@@ -30,3 +30,27 @@ Start with a focused AI workflow rather than a large implementation:
 https://ai-business-factory.hatchable.site/solutions/lead-response
 
 The system is designed to expand only when actual user and commercial evidence supports the next step.
+
+
+## AI Business Factory — public research & build log
+
+The founder is building AI Business Factory as a governed autonomous system for discovering problems, building useful products, finding real buyers, measuring evidence and operating continuously.
+
+**Live:** https://ai-business-factory.hatchable.site  
+**Research:** https://ai-business-factory.hatchable.site/research  
+**Founder:** https://ai-business-factory.hatchable.site/founder  
+**Current live product:** https://ai-business-factory.hatchable.site/launch  
+**Free AI audit:** https://ai-business-factory.hatchable.site/ai-audit.html  
+**Work with us:** https://ai-business-factory.hatchable.site/first-sale.html
+
+### Current public operating principle
+
+Build less. Learn faster. Earn attention through useful work. Measure real visitors, real product actions, real conversations and verified revenue. Do not manufacture traffic, customers, reviews, votes or revenue.
+
+### Research
+
+- AI discovery and distribution pulse: https://ai-business-factory.hatchable.site/research/ai-discovery-distribution-pulse-2026-09-19
+- Machine-readable identity: https://ai-business-factory.hatchable.site/llms.txt
+- Product catalog: https://ai-business-factory.hatchable.site/products.json
+
+The factory publishes evidence-backed research and transparent internal observations so people can inspect the work instead of relying on promotional claims.
