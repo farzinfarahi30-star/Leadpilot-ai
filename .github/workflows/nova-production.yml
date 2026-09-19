@@ -175,7 +175,7 @@ jobs:
       - name: Assemble and finalize Nova
         run: |
           mkdir -p state corpus
-          cp artifacts/nova-corpus/. corpus/
+          cp -a artifacts/nova-corpus/. corpus/
           find artifacts -name 'expert_*.pt' -exec cp {} state/ \\;
           python nova/merge_experts.py
           test -s production/final.pt
