@@ -1,0 +1,217 @@
+name: Nova Continuous Improvement Agent
+
+on:
+  schedule:
+    - cron: "0 3 * * 1"
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: write
+
+concurrency:
+  group: nova-continuous-improvement
+  cancel-in-progress: false
+
+env:
+  TAG: "nova-production-35419874771"
+  RELEASE_URL: "https://nova-ai-production-h63xhk.v2.appdeploy.ai"
+  IMPROVEMENT_TOKENS: "250000"
+  MAX_REGRESSION: "0.0025"
+
+jobs:
+  improve:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - name: Checkout Nova source
+        uses: actions/checkout@v4
+        with:
+          ref: nova-production
+
+      - name: Install training and export dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install --index-url https://download.pytorch.org/whl/cpu "torch==2.5.1"
+          python -m pip install pyarrow "onnx>=1.17,<2"
+
+      - name: Download current production checkpoint
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p input
+          gh release download "$TAG" --pattern nova-final.pt --dir input --clobber
+          test -s input/nova-final.pt
+          sha256sum input/nova-final.pt
+
+      - name: Refresh licensed corpus
+        env:
+          NOVA_TARGET_TOKENS: "50000000"
+        run: |
+          python nova/bootstrap_corpus.py
+          test -s corpus/wiki.train.tokens
+          test -s corpus/CORPUS_MANIFEST.json
+          test -s corpus/CORPUS_LICENSE.json
+
+      - name: Read production telemetry
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json, urllib.request
+          url = "${RELEASE_URL}/api/metrics"
+          try:
+              with urllib.request.urlopen(url, timeout=20) as r:
+                  data = json.loads(r.read().decode('utf-8'))
+          except Exception as exc:
+              data = {"status":"unavailable","error":type(exc).__name__}
+          print(json.dumps(data, separators=(',', ':')))
+          open("telemetry.json", "w", encoding="utf-8").write(json.dumps(data))
+          PY
+
+      - name: Run improvement agent and promotion gate
+        id: improve
+        run: |
+          set -euo pipefail
+          TELEMETRY="$(cat telemetry.json)"
+          set +e
+          python nova/continuous_agent.py             --checkpoint input/nova-final.pt             --corpus corpus/wiki.train.tokens             --output candidate.pt             --tokens "$IMPROVEMENT_TOKENS"             --max-regression "$MAX_REGRESSION"             --telemetry "$TELEMETRY"
+          RC=$?
+          set -e
+          test -s candidate.pt.decision.json
+          python - <<'PY'
+          import json
+          d=json.load(open("candidate.pt.decision.json", encoding="utf-8"))
+          accepted=(d.get("status")=="accepted")
+          with open("decision.env","w",encoding="utf-8") as f:
+              f.write("ACCEPTED="+("true" if accepted else "false")+"\n")
+              f.write("CANDIDATE_TOKENS="+str(d.get("candidate_tokens_seen",0))+"\n")
+              f.write("CANDIDATE_PPL="+str(d.get("candidate",{}).get("perplexity",""))+"\n")
+              f.write("BASELINE_PPL="+str(d.get("baseline",{}).get("perplexity",""))+"\n")
+          print(json.dumps(d, indent=2))
+          if accepted:
+              raise SystemExit(0)
+          if RC == 2:
+              print("CANDIDATE_REJECTED: production remains unchanged")
+              raise SystemExit(0)
+          raise SystemExit("Improvement agent failed unexpectedly")
+          PY
+          cat decision.env >> "$GITHUB_OUTPUT"
+          cat decision.env
+
+      - name: Upload improvement decision
+        uses: actions/upload-artifact@v4
+        with:
+          name: nova-improvement-decision-${{ github.run_id }}
+          path: candidate.pt.decision.json
+          retention-days: 30
+
+      - name: Export accepted candidate to ONNX
+        if: steps.improve.outputs.ACCEPTED == 'true'
+        run: |
+          python - <<'PY'
+          import json, hashlib
+          from pathlib import Path
+          import torch
+          from torch import nn
+          import sys
+          sys.path.insert(0, "nova")
+          from model import NovaSparseLM, EXPERTS, CONTEXT, parameter_count
+
+          class ExpertWrapper(nn.Module):
+              def __init__(self, expert):
+                  super().__init__()
+                  self.expert = expert
+              def forward(self, x, hidden):
+                  z, h = self.expert(x, hidden)
+                  return self.expert.head(z), h
+
+          candidate_path = Path("candidate.pt")
+          payload = torch.load(candidate_path, map_location="cpu", weights_only=False)
+          model = NovaSparseLM()
+          model.load_state_dict(payload["model"], strict=True)
+          model.eval()
+
+          out = Path("onnx")
+          out.mkdir(exist_ok=True)
+          source_hash = hashlib.sha256(candidate_path.read_bytes()).hexdigest()
+
+          meta = {
+              "format":"nova-onnx-v1",
+              "context":CONTEXT,
+              "experts":EXPERTS,
+              "vocab_size":256,
+              "parameters":parameter_count(model),
+              "tokens_seen":int(payload["tokens_seen"]),
+              "source_sha256":source_hash,
+              "token_definition":"UTF-8 byte tokens",
+              "files":[]
+          }
+
+          for i in range(EXPERTS):
+              wrapper = ExpertWrapper(model.experts[i]).eval()
+              target = out / f"nova-expert-{i}.onnx"
+              x = torch.zeros((1,1), dtype=torch.long)
+              h0 = torch.zeros((1,1,700), dtype=torch.float32)
+              torch.onnx.export(
+                  wrapper,
+                  (x,h0),
+                  target,
+                  input_names=["input_ids","hidden"],
+                  output_names=["logits","hidden_out"],
+                  opset_version=17,
+                  dynamic_axes={"input_ids":{1:"sequence"},"logits":{1:"sequence"}},
+                  dynamo=False
+              )
+              meta["files"].append({
+                  "expert":i,
+                  "file":target.name,
+                  "bytes":target.stat().st_size,
+                  "sha256":hashlib.sha256(target.read_bytes()).hexdigest()
+              })
+
+          Path("onnx/nova-onnx-manifest.json").write_text(json.dumps(meta, indent=2), encoding="utf-8")
+          Path("candidate-manifest.json").write_text(
+              json.dumps({
+                  "status":"verified_candidate",
+                  "release_tag":"${TAG}",
+                  "tokens_seen":int(payload["tokens_seen"]),
+                  "parameters":parameter_count(model),
+                  "sha256":source_hash,
+                  "bytes":candidate_path.stat().st_size,
+                  "evaluation":payload.get("improvement",{}).get("candidate",{}),
+                  "improvement":payload.get("improvement",{}),
+                  "browser_inference":"ONNX Runtime Web 1.30.0"
+              }, indent=2),
+              encoding="utf-8"
+          )
+          Path("candidate-verification.json").write_text(
+              json.dumps({
+                  "status":"passed",
+                  "production":True,
+                  "tokens_seen":int(payload["tokens_seen"]),
+                  "parameters":parameter_count(model),
+                  "artifact_sha256":source_hash,
+                  "onnx_experts":EXPERTS
+              }, indent=2),
+              encoding="utf-8"
+          )
+          PY
+          test "$(find onnx -name 'nova-expert-*.onnx' | wc -l)" -eq 14
+
+      - name: Promote accepted candidate to stable release
+        if: steps.improve.outputs.ACCEPTED == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          cp candidate.pt nova-final.pt
+          cp candidate-manifest.json nova-final_manifest.json
+          cp candidate-verification.json nova-verification.json
+          gh release upload "$TAG"             nova-final.pt             nova-final_manifest.json             nova-verification.json             onnx/nova-expert-*.onnx             onnx/nova-onnx-manifest.json             --clobber
+          echo "NOVA_CONTINUOUS_PROMOTION_OK"
+
+      - name: Record rejection without touching production
+        if: steps.improve.outputs.ACCEPTED != 'true'
+        run: |
+          echo "No candidate passed the promotion gate. Existing production release remains unchanged."
