@@ -24,7 +24,7 @@ jobs:
         with:
           repository: farzinfarahi30-star/Leadpilot-ai
           run-id: ${{ env.SOURCE_RUN }}
-          name: nova-production-recovered-${{ env.SOURCE_RUN }}
+          name: nova-production-recovered-35419216348
           path: nova-production
           merge-multiple: true
 
