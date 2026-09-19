@@ -126,7 +126,7 @@ def main() -> int:
 
     model = NovaSparseLM()
     optimizer = torch.optim.AdamW(model.experts[args.expert].parameters(), lr=1e-3)
-    checkpoint = STATE / f"expert_{args.expert:02d}.pt"
+    checkpoint = STATE / f"expert_{args.expert}.pt"
     seen = 0
     if checkpoint.exists():
         seen = load_expert(checkpoint, model, args.expert, optimizer)
