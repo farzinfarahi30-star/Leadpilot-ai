@@ -1,0 +1,55 @@
+name: Nova Production Release
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/nova-production-release.yml"
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: write
+
+env:
+  SOURCE_RUN: "35419874771"
+  TAG: "nova-production-35419874771"
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download verified Nova production artifact
+        uses: actions/download-artifact@v4
+        with:
+          repository: farzinfarahi30-star/Leadpilot-ai
+          run-id: ${{ env.SOURCE_RUN }}
+          name: nova-production-recovered-${{ env.SOURCE_RUN }}
+          path: nova-production
+          merge-multiple: true
+
+      - name: Validate release payload
+        run: |
+          set -euo pipefail
+          test -s nova-production/production/final.pt
+          test -s nova-production/production/final_manifest.json
+          test -s nova-production/production/verification.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          m=json.loads(Path("nova-production/production/final_manifest.json").read_text())
+          v=json.loads(Path("nova-production/production/verification.json").read_text())
+          assert m.get("tokens_seen")==50000000
+          assert m.get("parameters")==46239984
+          assert v.get("status")=="passed"
+          print("RELEASE_PAYLOAD_OK")
+          PY
+
+      - name: Create immutable GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh release view "$TAG" >/dev/null 2>&1 ||             gh release create "$TAG"               --title "Nova AI Production 50M"               --notes "Verified Nova production checkpoint from recovery run $SOURCE_RUN."               --target main
+          gh release upload "$TAG"             nova-production/production/final.pt             nova-production/production/final_manifest.json             nova-production/production/verification.json             --clobber
+          echo "RELEASE_OK"
