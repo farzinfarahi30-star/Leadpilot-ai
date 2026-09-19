@@ -113,7 +113,7 @@ jobs:
       - name: Prepare training inputs
         run: |
           mkdir -p corpus
-          cp -a nova-corpus/corpus/. corpus/
+          cp -a nova-corpus/. corpus/
           test -f corpus/wiki.train.tokens
           test -f corpus/CORPUS_LICENSE.json
           test -f corpus/CORPUS_MANIFEST.json
@@ -175,7 +175,7 @@ jobs:
       - name: Assemble and finalize Nova
         run: |
           mkdir -p state corpus
-          cp artifacts/nova-corpus/corpus/* corpus/
+          cp artifacts/nova-corpus/. corpus/
           find artifacts -name 'expert_*.pt' -exec cp {} state/ \\;
           python nova/merge_experts.py
           test -s production/final.pt
