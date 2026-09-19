@@ -41,6 +41,36 @@ jobs:
           test -s nova-verification.json
           sha256sum nova-final.pt nova-final_manifest.json nova-verification.json
           echo "NOVA_RELEASE_INPUTS_READY"
+      - name: Checkout repository metadata
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Download and stage verified Nova production artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ARTIFACT_ID: "10576926873"
+        run: |
+          set -euo pipefail
+          rm -rf nova-production
+          mkdir -p nova-production
+          gh api "/repos/${GITHUB_REPOSITORY}/actions/artifacts/${ARTIFACT_ID}/zip" > /tmp/nova-artifact.zip
+          unzip -q /tmp/nova-artifact.zip -d nova-production
+          FINAL_PATH="$(find nova-production -type f -name 'final.pt' | head -1)"
+          MANIFEST_PATH="$(find nova-production -type f -name 'final_manifest.json' | head -1)"
+          VERIFY_PATH="$(find nova-production -type f -name 'verification.json' | head -1)"
+          test -n "$FINAL_PATH"
+          test -n "$MANIFEST_PATH"
+          test -n "$VERIFY_PATH"
+          cp "$FINAL_PATH" nova-final.pt
+          cp "$MANIFEST_PATH" nova-final_manifest.json
+          cp "$VERIFY_PATH" nova-verification.json
+          test -s nova-final.pt
+          test -s nova-final_manifest.json
+          test -s nova-verification.json
+          sha256sum nova-final.pt nova-final_manifest.json nova-verification.json
+          echo "NOVA_RELEASE_INPUTS_READY"
+
       - name: Validate release payload
         run: |
           set -euo pipefail
@@ -57,11 +87,6 @@ jobs:
           assert v.get("status")=="passed"
           print("RELEASE_PAYLOAD_OK")
           PY
-
-      - name: Checkout repository metadata
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 1
 
       - name: Create immutable GitHub release
         env:
