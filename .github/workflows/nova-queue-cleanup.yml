@@ -26,7 +26,7 @@ jobs:
             case "$name" in
               "Nova Production")
                 [ "$id" = "$latest_nova" ] && continue
-                gh run cancel "$id" || true
+                gh run cancel "$id" --repo "${{ github.repository }}" || true
                 ;;
               "CodeQuest Kids Open Free Submissions"|"CodeQuest Kids Directory Submission Runner"|"CodeQuest Kids Fast Outbound Check")
                 gh run cancel "$id" || true
