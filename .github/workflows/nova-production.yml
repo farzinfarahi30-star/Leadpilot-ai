@@ -108,13 +108,17 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: nova-corpus
-          path: .
+          path: nova-corpus
 
-      - name: Verify training inputs
+      - name: Prepare training inputs
         run: |
+          mkdir -p corpus
+          cp -a nova-corpus/corpus/. corpus/
           test -f corpus/wiki.train.tokens
           test -f corpus/CORPUS_LICENSE.json
           test -f corpus/CORPUS_MANIFEST.json
+          bytes=$(wc -c < corpus/wiki.train.tokens)
+          test "$bytes" -ge "$((NOVA_TARGET_TOKENS + 129))"
 
       - name: Train expert with checkpoint retries
         run: |
