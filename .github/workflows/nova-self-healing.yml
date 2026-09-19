@@ -1,0 +1,70 @@
+name: Nova Self-Healing Supervisor
+
+on:
+  workflow_run:
+    workflows: ["Nova Production"]
+    types: [completed]
+  workflow_dispatch:
+
+permissions:
+  actions: write
+  contents: read
+
+concurrency:
+  group: nova-self-healing
+  cancel-in-progress: false
+
+jobs:
+  supervise:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Inspect and retry transient failures
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          RUN_ID: ${{ github.event.workflow_run.id }}
+          CONCLUSION: ${{ github.event.workflow_run.conclusion }}
+          ATTEMPT: ${{ github.event.workflow_run.run_attempt }}
+        run: |
+          set -euo pipefail
+          echo "Nova run: $RUN_ID conclusion=$CONCLUSION attempt=$ATTEMPT"
+          [ "$CONCLUSION" = "failure" ] || { echo "No failed run to repair."; exit 0; }
+          if [ "$ATTEMPT" -gt 2 ]; then
+            echo "Maximum automatic retry attempts reached; leaving deterministic failures for review."
+            exit 0
+          fi
+
+          jobs="$(gh api "/repos/$REPO/actions/runs/$RUN_ID/jobs?per_page=100")"
+          failed_ids="$(printf '%s' "$jobs" | jq -r '.jobs[] | select(.conclusion=="failure") | .id')"
+          failed_names="$(printf '%s' "$jobs" | jq -r '.jobs[] | select(.conclusion=="failure") | .name')"
+
+          if [ -z "$failed_ids" ]; then
+            echo "Run failed without exposed failed jobs; no automatic action."
+            exit 0
+          fi
+
+          echo "Failed jobs:"
+          printf '%s\n' "$failed_names"
+
+          # Retry only infrastructure-looking failures. Deterministic application/model
+          # failures must remain visible instead of being hidden by endless retries.
+          retry=0
+          while IFS= read -r id; do
+            [ -n "$id" ] || continue
+            log="$(gh api "/repos/$REPO/actions/jobs/$id/logs" 2>/dev/null || true)"
+            low="$(printf '%s' "$log" | tr '[:upper:]' '[:lower:]')"
+            if printf '%s' "$low" | grep -Eq 'runner lost|connection reset|connection aborted|timed out|503 service unavailable|502 bad gateway|504 gateway|temporary failure|rate limit|eoferror|network is unreachable|temporary name resolution|download failed|blobnotfound'; then
+              echo "Transient failure detected for job $id; scheduling retry."
+              gh api --method POST "/repos/$REPO/actions/jobs/$id/rerun" >/dev/null
+              retry=1
+            else
+              echo "Deterministic/unknown failure for job $id; not masking it with an automatic retry."
+            fi
+          done <<< "$failed_ids"
+
+          if [ "$retry" -eq 1 ]; then
+            echo "Automatic transient retry requested."
+          else
+            echo "No safe automatic retry identified."
+          fi
