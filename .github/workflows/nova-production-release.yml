@@ -55,5 +55,5 @@ jobs:
         run: |
           set -euo pipefail
           gh release view "$TAG" >/dev/null 2>&1 ||             gh release create "$TAG"               --title "Nova AI Production 50M"               --notes "Verified Nova production checkpoint from recovery run $SOURCE_RUN."               --target main
-          gh release upload "$TAG"             nova-production/production/final.pt             nova-production/production/final_manifest.json             nova-production/production/verification.json             --clobber
+          gh release upload "$TAG" "${GITHUB_WORKSPACE}/nova-production/production/final.pt" "${GITHUB_WORKSPACE}/nova-production/production/final_manifest.json" "${GITHUB_WORKSPACE}/nova-production/production/verification.json" --clobber
           echo "RELEASE_OK"
