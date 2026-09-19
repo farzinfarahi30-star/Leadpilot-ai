@@ -3,6 +3,8 @@ name: Nova Production Release
 on:
   push:
     branches: [main]
+    paths:
+      - ".github/workflows/nova-production-release.yml"
   workflow_dispatch:
 
 permissions:
