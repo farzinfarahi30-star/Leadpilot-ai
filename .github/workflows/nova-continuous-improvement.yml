@@ -1,6 +1,10 @@
 name: Nova Continuous Improvement Agent
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/nova-continuous-improvement.yml"
   schedule:
     - cron: "0 3 * * 1"
   workflow_dispatch:
