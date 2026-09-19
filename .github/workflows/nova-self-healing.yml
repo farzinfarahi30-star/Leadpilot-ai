@@ -2,7 +2,7 @@ name: Nova Self-Healing Supervisor
 
 on:
   workflow_run:
-    workflows: ["Nova Production"]
+    workflows: ["Nova Production", "Nova Continuous Improvement"]
     types: [completed]
   workflow_dispatch:
 
