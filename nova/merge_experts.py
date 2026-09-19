@@ -18,7 +18,7 @@ CHECKPOINT = STATE / "model_checkpoint.pt"
 
 
 def main() -> int:
-    expert_files = sorted(Path(".").rglob("expert_*.pt"))
+    expert_files = sorted(STATE.glob("expert_*.pt"))
     if len(expert_files) != EXPERTS:
         raise RuntimeError(f"expected {EXPERTS} expert checkpoints, found {len(expert_files)}")
 
