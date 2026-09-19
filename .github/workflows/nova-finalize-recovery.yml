@@ -1,0 +1,113 @@
+name: Nova Finalize Recovery
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/nova-finalize-recovery.yml"
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: read
+
+env:
+  NOVA_SOURCE_RUN: "35419216348"
+  NOVA_TARGET_TOKENS: "50000000"
+  NOVA_ALLOW_SYNTHETIC: "0"
+  TORCH_THREADS: "4"
+
+jobs:
+  recover-finalize:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - name: Checkout Nova source
+        uses: actions/checkout@v4
+        with:
+          ref: nova-production
+
+      - name: Prepare CPU PyTorch
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install --index-url https://download.pytorch.org/whl/cpu "torch==2.5.1"
+
+      - name: Download completed training artifacts
+        uses: actions/download-artifact@v4
+        with:
+          repository: farzinfarahi30-star/Leadpilot-ai
+          run-id: ${{ env.NOVA_SOURCE_RUN }}
+          path: artifacts
+          merge-multiple: false
+
+      - name: Assemble recovered training state
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p state corpus production
+          cp -a artifacts/nova-corpus/. corpus/
+          shopt -s nullglob
+          files=(artifacts/nova-expert-*/state/expert_*.pt)
+          test "${#files[@]}" -eq 14
+          for f in "${files[@]}"; do cp "$f" state/; done
+          ls -lh state/expert_*.pt
+          python - <<'PY'
+          import torch
+          from pathlib import Path
+          paths=sorted(Path("state").glob("expert_*.pt"))
+          assert len(paths)==14, paths
+          total=0
+          seen=0
+          for p in paths:
+              x=torch.load(p,map_location="cpu",weights_only=False)
+              total += int(x["tokens_seen"])
+              assert int(x["parameters"]) == 3302856
+              seen += int(x["tokens_seen"])
+          assert seen == int(__import__("os").environ["NOVA_TARGET_TOKENS"])
+          print("RECOVERY_INPUTS_OK", len(paths), seen, total)
+          PY
+
+      - name: Merge SFT DPO evaluation and promotion
+        run: |
+          python nova/merge_experts.py
+          test -s production/final.pt
+          test -s production/final_manifest.json
+          test -s production/verification.json
+          test -s state/evaluation.json
+          cat production/final_manifest.json
+          cat production/verification.json
+
+      - name: Verify production checkpoint integrity
+        run: |
+          python - <<'PY'
+          import json, math, torch
+          from pathlib import Path
+          ckpt=Path("production/final.pt")
+          assert ckpt.stat().st_size > 1024
+          x=torch.load(ckpt,map_location="cpu",weights_only=False)
+          params=int(x.get("parameters",0))
+          assert params >= 45000000
+          assert not bool(x.get("synthetic", True))
+          manifest=json.loads(Path("production/final_manifest.json").read_text())
+          verification=json.loads(Path("production/verification.json").read_text())
+          assert manifest.get("tokens_seen") == 50000000
+          assert manifest.get("parameters") == 46239984
+          assert verification.get("production_ready") is True
+          print("PRODUCTION_INTEGRITY_OK", ckpt.stat().st_size, params)
+          PY
+
+      - name: Publish recovered production artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: nova-production-final-recovered
+          path: |
+            production/final.pt
+            production/final_manifest.json
+            production/verification.json
+            state/evaluation.json
+            state/sft.json
+            state/dpo.json
+            corpus/CORPUS_LICENSE.json
+            corpus/CORPUS_MANIFEST.json
+          if-no-files-found: error
+          retention-days: 30
