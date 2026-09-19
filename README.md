@@ -2,6 +2,17 @@
 
 AI-powered business automation platform for lead generation, customer communication, and sales workflows.
 
+## Free home-service revenue tool
+
+A free, no-email-first calculator estimates potential revenue leakage from missed or slow-followed-up leads:
+
+**Calculator:** https://ai-business-factory.hatchable.site/missed-lead-calculator.html
+
+For a deeper workflow review, use the **Free Revenue Leak Audit**:
+https://ai-business-factory.hatchable.site/revenue-rescue
+
+The estimates are planning inputs, not guaranteed results. Actual ROI is established from the customer's own baseline and measured outcome.
+
 ## Live AI Business Factory
 
 The platform is operated with an autonomous AI Business Factory / God control plane that builds, tests, measures and improves digital products around real business problems.
