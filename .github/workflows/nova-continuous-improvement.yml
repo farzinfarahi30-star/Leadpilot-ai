@@ -58,20 +58,43 @@ jobs:
           test -s corpus/CORPUS_MANIFEST.json
           test -s corpus/CORPUS_LICENSE.json
 
-      - name: Read production telemetry
+      - name: Install browser telemetry reader
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Read production telemetry through the live app
         run: |
           set -euo pipefail
-          python - <<'PY'
-          import json, urllib.request
-          url = "${RELEASE_URL}/api/metrics"
-          try:
-              with urllib.request.urlopen(url, timeout=20) as r:
-                  data = json.loads(r.read().decode('utf-8'))
-          except Exception as exc:
-              data = {"status":"unavailable","error":type(exc).__name__}
-          print(json.dumps(data, separators=(',', ':')))
-          open("telemetry.json", "w", encoding="utf-8").write(json.dumps(data))
-          PY
+          RELEASE_URL="$RELEASE_URL" node <<'NODE'
+          const { chromium } = require('playwright');
+
+          (async () => {
+            const browser = await chromium.launch({headless:true});
+            const page = await browser.newPage({viewport:{width:1280,height:800}});
+            try {
+              await page.goto(process.env.RELEASE_URL, {waitUntil:'networkidle', timeout:60000});
+              await page.waitForFunction(() => {
+                const node = document.querySelector('#telemetrySummary');
+                return node && node.dataset.metrics;
+              }, null, {timeout:60000});
+              const raw = await page.locator('#telemetrySummary').getAttribute('data-metrics');
+              const data = JSON.parse(raw || '{"status":"unavailable"}');
+              console.log(JSON.stringify(data));
+              require('fs').writeFileSync('telemetry.json', JSON.stringify(data));
+            } finally {
+              await browser.close();
+            }
+          })().catch(err => {
+            console.error(err);
+            require('fs').writeFileSync('telemetry.json', JSON.stringify({
+              status:'unavailable',
+              error: err?.name || 'BrowserTelemetryError'
+            }));
+            process.exit(0);
+          });
+          NODE
+          test -s telemetry.json
 
       - name: Run improvement agent and promotion gate
         id: improve
