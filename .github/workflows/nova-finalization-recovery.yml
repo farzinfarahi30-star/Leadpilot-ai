@@ -1,0 +1,113 @@
+name: Nova Finalization Recovery
+
+on:
+  workflow_run:
+    workflows: ["Nova Production"]
+    types: [completed]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: read
+
+concurrency:
+  group: nova-finalization-recovery
+  cancel-in-progress: false
+
+jobs:
+  recover:
+    if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'failure' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - name: Select failed Nova Production run
+        id: select
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          EVENT_RUN: ${{ github.event.workflow_run.id }}
+          EVENT_CONCLUSION: ${{ github.event.workflow_run.conclusion }}
+        run: |
+          set -euo pipefail
+          if [ -n "${EVENT_RUN:-}" ] && [ "${EVENT_CONCLUSION:-}" = "failure" ]; then
+            echo "run_id=$EVENT_RUN" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          run_id="$(gh api "/repos/$REPO/actions/runs?branch=nova-production&per_page=20" |
+            jq -r '[.workflow_runs[] | select(.name=="Nova Production" and .conclusion=="failure")] |
+                   sort_by(.id) | reverse | .[0].id // empty')"
+          if [ -z "$run_id" ]; then
+            echo "No failed Nova Production run to recover."
+            echo "run_id=" >> "$GITHUB_OUTPUT"
+          else
+            echo "run_id=$run_id" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Stop when no failed run exists
+        if: steps.select.outputs.run_id == ''
+        run: echo "Nothing to recover."
+
+      - name: Checkout exact failed-run source
+        if: steps.select.outputs.run_id != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          RUN_ID: ${{ steps.select.outputs.run_id }}
+        run: |
+          set -euo pipefail
+          sha="$(gh api "/repos/$REPO/actions/runs/$RUN_ID" --jq '.head_sha')"
+          git init .
+          git remote add origin "https://github.com/$REPO.git"
+          git fetch --depth 1 origin "$sha"
+          git checkout --detach "$sha"
+
+      - name: Prepare CPU PyTorch
+        if: steps.select.outputs.run_id != ''
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install --index-url https://download.pytorch.org/whl/cpu "torch==2.5.1"
+
+      - name: Download exact failed-run artifacts
+        if: steps.select.outputs.run_id != ''
+        uses: actions/download-artifact@v4
+        with:
+          run-id: ${{ steps.select.outputs.run_id }}
+          github-token: ${{ github.token }}
+          path: artifacts
+
+      - name: Finalize recovered expert artifacts
+        if: steps.select.outputs.run_id != ''
+        env:
+          NOVA_TARGET_TOKENS: "50000000"
+          NOVA_ALLOW_SYNTHETIC: "0"
+          TORCH_THREADS: "4"
+        run: |
+          set -euo pipefail
+          mkdir -p state corpus
+          cp -a artifacts/nova-corpus/. corpus/
+          find artifacts -name 'expert_*.pt' -exec cp {} state/ \;
+          test "$(find state -maxdepth 1 -name 'expert_*.pt' | wc -l)" -eq 14
+          python nova/merge_experts.py
+          test -s production/final.pt
+          test -s production/final_manifest.json
+          test -s production/verification.json
+          test -s state/evaluation.json
+
+      - name: Publish recovered production artifact
+        if: steps.select.outputs.run_id != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: nova-production-recovered-${{ steps.select.outputs.run_id }}
+          path: |
+            production/final.pt
+            production/final_manifest.json
+            production/verification.json
+            state/evaluation.json
+            state/sft.json
+            state/dpo.json
+            corpus/CORPUS_LICENSE.json
+            corpus/CORPUS_MANIFEST.json
+          if-no-files-found: error
+          retention-days: 30
