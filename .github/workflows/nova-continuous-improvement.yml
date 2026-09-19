@@ -106,6 +106,10 @@ jobs:
           RC=$?
           set -e
           test -s candidate.pt.decision.json
+          if [ "$RC" -ne 0 ] && [ "$RC" -ne 2 ]; then
+            echo "Improvement agent failed unexpectedly with exit code $RC"
+            exit "$RC"
+          fi
           python - <<'PY'
           import json
           d=json.load(open("candidate.pt.decision.json", encoding="utf-8"))
@@ -116,12 +120,8 @@ jobs:
               f.write("CANDIDATE_PPL="+str(d.get("candidate",{}).get("perplexity",""))+"\n")
               f.write("BASELINE_PPL="+str(d.get("baseline",{}).get("perplexity",""))+"\n")
           print(json.dumps(d, indent=2))
-          if accepted:
-              raise SystemExit(0)
-          if RC == 2:
-              print("CANDIDATE_REJECTED: production remains unchanged")
-              raise SystemExit(0)
-          raise SystemExit("Improvement agent failed unexpectedly")
+          if d.get("status") not in ("accepted", "rejected"):
+              raise SystemExit("Unknown improvement decision")
           PY
           cat decision.env >> "$GITHUB_OUTPUT"
           cat decision.env
