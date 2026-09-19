@@ -49,19 +49,12 @@ jobs:
         if: steps.select.outputs.run_id == ''
         run: echo "Nothing to recover."
 
-      - name: Checkout exact failed-run source
+      - name: Checkout current repaired Nova source
         if: steps.select.outputs.run_id != ''
-        env:
-          GH_TOKEN: ${{ github.token }}
-          REPO: ${{ github.repository }}
-          RUN_ID: ${{ steps.select.outputs.run_id }}
-        run: |
-          set -euo pipefail
-          sha="$(gh api "/repos/$REPO/actions/runs/$RUN_ID" --jq '.head_sha')"
-          git init .
-          git remote add origin "https://github.com/$REPO.git"
-          git fetch --depth 1 origin "$sha"
-          git checkout --detach "$sha"
+        uses: actions/checkout@v4
+        with:
+          ref: nova-production
+          fetch-depth: 1
 
       - name: Prepare CPU PyTorch
         if: steps.select.outputs.run_id != ''
