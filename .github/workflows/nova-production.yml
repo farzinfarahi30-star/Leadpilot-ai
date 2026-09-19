@@ -123,10 +123,10 @@ jobs:
       - name: Train expert with checkpoint retries
         run: |
           for attempt in 1 2 3; do
-            if python nova/train_expert.py --expert \${{ matrix.expert }} --tokens \${{ matrix.tokens }}; then
+            if python nova/train_expert.py --expert ${{ matrix.expert }} --tokens ${{ matrix.tokens }}; then
               exit 0
             fi
-            echo "expert \${{ matrix.expert }} attempt $attempt failed; retrying from local checkpoint"
+            echo "expert ${{ matrix.expert }} attempt $attempt failed; retrying from local checkpoint"
             sleep 5
           done
           exit 1
@@ -136,10 +136,10 @@ jobs:
           python - <<'PY'
           import torch
           from pathlib import Path
-          p=Path("state") / f"expert_\${{ matrix.expert }}.pt"
+          p=Path("state") / f"expert_${{ matrix.expert }}.pt"
           x=torch.load(p,map_location="cpu",weights_only=False)
-          assert int(x["expert_idx"]) == int("\${{ matrix.expert }}")
-          assert int(x["tokens_seen"]) == int("\${{ matrix.tokens }}")
+          assert int(x["expert_idx"]) == int("${{ matrix.expert }}")
+          assert int(x["tokens_seen"]) == int("${{ matrix.tokens }}")
           assert int(x["parameters"]) > 3_000_000
           print("EXPERT_OK", p)
           PY
@@ -147,8 +147,8 @@ jobs:
       - name: Publish expert checkpoint
         uses: actions/upload-artifact@v4
         with:
-          name: nova-expert-\${{ matrix.expert }}
-          path: state/expert_\${{ matrix.expert }}.pt
+          name: nova-expert-${{ matrix.expert }}
+          path: state/expert_${{ matrix.expert }}.pt
           if-no-files-found: error
           retention-days: 7
 
