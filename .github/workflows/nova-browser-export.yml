@@ -1,0 +1,121 @@
+name: Nova Browser Export
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/nova-browser-export.yml"
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: write
+
+env:
+  SOURCE_ARTIFACT_ID: "10576926873"
+  TAG: "nova-production-35419874771"
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout Nova source
+        uses: actions/checkout@v4
+        with:
+          ref: nova-production
+
+      - name: Install export dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install --index-url https://download.pytorch.org/whl/cpu "torch==2.5.1"
+          python -m pip install "onnx>=1.17,<2"
+
+      - name: Download verified checkpoint artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p input
+          gh api "/repos/${GITHUB_REPOSITORY}/actions/artifacts/${SOURCE_ARTIFACT_ID}/zip" > /tmp/nova.zip
+          unzip -q /tmp/nova.zip -d input
+          FINAL="$(find input -type f -name final.pt | head -1)"
+          test -n "$FINAL"
+          cp "$FINAL" input/final.pt
+          ls -lh input/final.pt
+
+      - name: Export 14 experts to ONNX
+        run: |
+          python - <<'PY'
+          import json, hashlib
+          from pathlib import Path
+          import torch
+          from torch import nn
+          import sys
+          sys.path.insert(0, "nova")
+          from model import NovaSparseLM, CONTEXT, EXPERTS
+
+          class ExpertWrapper(nn.Module):
+              def __init__(self, expert):
+                  super().__init__()
+                  self.expert = expert
+              def forward(self, x, h0):
+                  z, h = self.expert(x, h0)
+                  y = self.expert.head(z)
+                  return y, h
+
+          payload = torch.load("input/final.pt", map_location="cpu", weights_only=False)
+          model = NovaSparseLM()
+          model.load_state_dict(payload["model"], strict=True)
+          model.eval()
+
+          out = Path("onnx")
+          out.mkdir(exist_ok=True)
+          meta = {
+              "format":"nova-onnx-v1",
+              "context":CONTEXT,
+              "experts":EXPERTS,
+              "vocab_size":256,
+              "parameters":sum(p.numel() for p in model.parameters()),
+              "tokens_seen":payload["tokens_seen"],
+              "source_sha256":hashlib.sha256(Path("input/final.pt").read_bytes()).hexdigest(),
+              "token_definition":"UTF-8 byte tokens",
+              "files":[]
+          }
+
+          for i in range(EXPERTS):
+              wrapper = ExpertWrapper(model.experts[i]).eval()
+              x = torch.zeros((1, 1), dtype=torch.long)
+              h0 = torch.zeros((1, 1, 700), dtype=torch.float32)
+              target = out / f"nova-expert-{i}.onnx"
+              torch.onnx.export(
+                  wrapper,
+                  (x, h0),
+                  target,
+                  input_names=["input_ids","hidden"],
+                  output_names=["logits","hidden_out"],
+                  opset_version=17,
+                  dynamic_axes={"input_ids":{1:"sequence"}, "logits":{1:"sequence"}},
+                  dynamo=False
+              )
+              meta["files"].append({
+                  "expert":i,
+                  "file":target.name,
+                  "bytes":target.stat().st_size,
+                  "sha256":hashlib.sha256(target.read_bytes()).hexdigest()
+              })
+              print("EXPORTED", i, target.stat().st_size)
+
+          Path("onnx/nova-onnx-manifest.json").write_text(json.dumps(meta, indent=2))
+          print(json.dumps(meta, indent=2))
+          PY
+          test "$(find onnx -name 'nova-expert-*.onnx' | wc -l)" -eq 14
+
+      - name: Publish ONNX assets to release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh release view "$TAG" >/dev/null 2>&1 || gh release create "$TAG" --title "Nova AI Production 50M" --notes "Verified Nova production checkpoint."
+          gh release upload "$TAG" onnx/nova-expert-*.onnx onnx/nova-onnx-manifest.json --clobber
+          echo "NOVA_ONNX_RELEASE_OK"
