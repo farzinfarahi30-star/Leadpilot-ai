@@ -1,0 +1,19 @@
+{
+  "name": "AI Business Factory",
+  "founder": "Azin Ahi",
+  "website": "https://ai-business-factory.hatchable.site/",
+  "research": "https://ai-business-factory.hatchable.site/research",
+  "founder_profile": "https://ai-business-factory.hatchable.site/founder",
+  "launch": "https://ai-business-factory.hatchable.site/launch",
+  "audit": "https://ai-business-factory.hatchable.site/ai-audit.html",
+  "work_with_us": "https://ai-business-factory.hatchable.site/first-sale.html",
+  "principles": [
+    "real evidence only",
+    "useful original work",
+    "earned visibility",
+    "authorized external actions",
+    "verified revenue"
+  ],
+  "catalog": "https://ai-business-factory.hatchable.site/products.json",
+  "llms": "https://ai-business-factory.hatchable.site/llms.txt"
+}
