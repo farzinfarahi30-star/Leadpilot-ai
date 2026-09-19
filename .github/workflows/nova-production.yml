@@ -176,7 +176,7 @@ jobs:
         run: |
           mkdir -p state corpus
           cp -a artifacts/nova-corpus/. corpus/
-          find artifacts -name 'expert_*.pt' -exec cp {} state/ \\;
+          find artifacts -name 'expert_*.pt' -exec cp {} state/ +
           python nova/merge_experts.py
           test -s production/final.pt
           test -s production/final_manifest.json
