@@ -3,6 +3,7 @@ name: CodeQuest Kids Open Free Submissions
 on:
   workflow_dispatch:
   push:
+    branches: [main]
 
 permissions:
   contents: read

@@ -1,3 +1,7 @@
+concurrency:
+  group: nova-production
+  cancel-in-progress: true
+
 name: Nova Production
 
 on:

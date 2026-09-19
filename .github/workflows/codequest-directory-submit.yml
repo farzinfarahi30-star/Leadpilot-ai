@@ -2,6 +2,7 @@ name: CodeQuest Kids Directory Submission Runner
 
 on:
   push:
+    branches: [main]
     paths-ignore:
       - 'launch-results/**'
   workflow_dispatch:
