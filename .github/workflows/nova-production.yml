@@ -7,6 +7,9 @@ name: Nova Production
 on:
   push:
     branches: [nova-production]
+    paths:
+      - "nova/**"
+      - ".github/workflows/nova-production.yml"
   workflow_dispatch:
 
 permissions:
