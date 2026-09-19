@@ -9,7 +9,6 @@ on:
     branches: [nova-production]
     paths:
       - "nova/**"
-      - ".github/workflows/nova-production.yml"
   workflow_dispatch:
 
 permissions:
@@ -179,7 +178,16 @@ jobs:
         run: |
           mkdir -p state corpus
           cp -a artifacts/nova-corpus/. corpus/
-          find artifacts -name 'expert_*.pt' -exec cp {} state/ +
+          python - <<'PY'
+          from pathlib import Path
+          import shutil
+          files = sorted(Path("artifacts").glob("nova-expert-*/state/expert_*.pt"))
+          if len(files) != 14:
+              raise SystemExit(f"expected 14 expert checkpoints, found {len(files)}")
+          for src in files:
+              shutil.copy2(src, Path("state") / src.name)
+          print("EXPERT_CHECKPOINTS_ASSEMBLED", len(files))
+          PY
           python nova/merge_experts.py
           test -s production/final.pt
           test -s production/final_manifest.json
