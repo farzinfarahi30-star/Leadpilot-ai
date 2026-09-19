@@ -20,14 +20,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download verified Nova production artifact
-        uses: actions/download-artifact@v4
-        with:
-          repository: farzinfarahi30-star/Leadpilot-ai
-          run-id: ${{ env.SOURCE_RUN }}
-          name: nova-production-recovered-35419216348
-          path: nova-production
-          merge-multiple: true
-
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ARTIFACT_ID: "10576926873"
+        run: |
+          set -euo pipefail
+          mkdir -p nova-production
+          gh api "/repos/${GITHUB_REPOSITORY}/actions/artifacts/${ARTIFACT_ID}/zip" > /tmp/nova-artifact.zip
+          unzip -q /tmp/nova-artifact.zip -d nova-production
+          find nova-production -maxdepth 3 -type f | sort | head -50
       - name: Validate release payload
         run: |
           set -euo pipefail
