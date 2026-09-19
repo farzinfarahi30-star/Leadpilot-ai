@@ -1,8 +1,6 @@
 name: CodeQuest Kids Media Host
 
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
 
 permissions:

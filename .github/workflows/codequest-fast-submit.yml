@@ -1,7 +1,6 @@
 name: CodeQuest Kids Fast Outbound Check
 
 on:
-  push:
   workflow_dispatch:
 
 permissions:

@@ -1,10 +1,6 @@
 name: Nova Finalize Recovery
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - ".github/workflows/nova-finalize-recovery.yml"
   workflow_dispatch:
 
 permissions:
