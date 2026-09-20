@@ -35,6 +35,19 @@ async function gmail(endpoint,options){
   return data;
 }
 
+async function resend(input){
+  const key=required('RESEND_API_KEY');
+  const sender=input.from||required('RESEND_FROM');
+  const r=await fetch('https://api.resend.com/emails',{
+    method:'POST',
+    headers:{authorization:'Bearer '+key,'content-type':'application/json'},
+    body:JSON.stringify({from:sender,to:String(input.to).split(',').map(function(x){return clean(x);}).filter(Boolean),cc:String(input.cc||'').split(',').map(function(x){return clean(x);}).filter(Boolean),bcc:String(input.bcc||'').split(',').map(function(x){return clean(x);}).filter(Boolean),subject:input.subject,text:input.text})
+  });
+  const text=await r.text(); let data={}; try{data=text?JSON.parse(text):{};}catch{data={raw:text};}
+  if(!r.ok)throw new Error('Resend '+r.status+': '+clean(data.message||data.name||text||'send failed'));
+  return {sent:true,provider:'resend',messageId:data.id||null};
+}
+
 async function outlookAccessToken(){
   if(process.env.OUTLOOK_ACCESS_TOKEN)return process.env.OUTLOOK_ACCESS_TOKEN;
   const refresh=required('OUTLOOK_REFRESH_TOKEN');
@@ -85,6 +98,9 @@ export async function sendEmail(input){
   if(!input.to||!input.subject||!input.text)throw new Error('to, subject and text are required');
   if(String(input.text).length>MAX_BODY)throw new Error('message body too large');
   const provider=input.provider||process.env.NOVA_MAIL_PROVIDER||'gmail';
+  if(provider==='resend'){
+    return await resend(input);
+  }
   if(provider==='gmail'){
     const sender=input.from||process.env.GMAIL_FROM||required('GMAIL_ACCOUNT');
     const out=await gmail('messages/send',{method:'POST',body:{raw:b64url(mime({from:sender,to:input.to,cc:input.cc,bcc:input.bcc,subject:input.subject,text:input.text}))}});
