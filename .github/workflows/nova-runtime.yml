@@ -1,0 +1,48 @@
+name: Nova Runtime
+
+on:
+  push:
+    paths:
+      - 'nova-runtime/**'
+      - '.github/workflows/nova-runtime.yml'
+  schedule:
+    - cron: '7 * * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: nova-runtime
+  cancel-in-progress: false
+
+jobs:
+  runtime:
+    runs-on: ubuntu-latest
+    timeout-minutes: 355
+    permissions:
+      contents: read
+    env:
+      FACTORY_HEARTBEAT_URL: https://ai-business-factory.hatchable.site/api/boss-heartbeat
+      FACTORY_BOSS_TOKEN: ${{ secrets.FACTORY_BOSS_TOKEN }}
+      RUN_MINUTES: 330
+      POLL_MS: 300000
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Node
+        uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: nova-runtime/package.json
+
+      - name: Install runtime
+        working-directory: nova-runtime
+        run: npm install --omit=dev
+
+      - name: Install Chromium
+        working-directory: nova-runtime
+        run: npx playwright install --with-deps chromium
+
+      - name: Run Nova Runtime
+        working-directory: nova-runtime
+        run: npm start
