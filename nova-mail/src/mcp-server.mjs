@@ -17,7 +17,7 @@ server.registerTool('mail_search',{
 server.registerTool('mail_get_thread',{
   title:'Get Email Thread',
   description:'Read a Gmail thread or Outlook message.',
-  inputSchema:{provider:z.enum(['gmail','outlook']).optional(),id:z.string()}
+  inputSchema:{provider:z.enum(['gmail','outlook','resend']).optional(),id:z.string()}
 },async function(input){
   const data=await getThread(input);
   return {content:[{type:'text',text:JSON.stringify(data)}],structuredContent:data};
@@ -40,7 +40,7 @@ server.registerTool('mail_send',{
   title:'Send Email',
   description:'Send an email only when approved is true. The approval gate is enforced server-side.',
   inputSchema:{
-    provider:z.enum(['gmail','outlook']).optional(),
+    provider:z.enum(['gmail','outlook','resend']).optional(),
     to:z.string(),from:z.string().optional(),cc:z.string().default(''),bcc:z.string().default(''),
     subject:z.string(),text:z.string(),approved:z.boolean().default(false)
   }
@@ -53,7 +53,7 @@ server.registerTool('mail_schedule_send',{
   title:'Schedule Email',
   description:'Queue an approved email for future sending.',
   inputSchema:{
-    provider:z.enum(['gmail','outlook']).optional(),
+    provider:z.enum(['gmail','outlook','resend']).optional(),
     to:z.string(),from:z.string().optional(),cc:z.string().default(''),bcc:z.string().default(''),
     subject:z.string(),text:z.string(),sendAt:z.string(),approved:z.boolean().default(false)
   }
