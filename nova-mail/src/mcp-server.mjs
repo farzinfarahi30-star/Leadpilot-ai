@@ -8,7 +8,7 @@ const server=new McpServer({name:'nova-mail',version:'1.0.0'});
 server.registerTool('mail_search',{
   title:'Search Email',
   description:'Search the connected Gmail or Outlook mailbox.',
-  inputSchema:{provider:z.enum(['gmail','outlook']).optional(),query:z.string().default(''),maxResults:z.number().int().min(1).max(50).default(10)}
+  inputSchema:{provider:z.enum(['gmail','outlook','resend']).optional(),query:z.string().default(''),maxResults:z.number().int().min(1).max(50).default(10)}
 },async function(input){
   const data=await searchThreads(input);
   return {content:[{type:'text',text:JSON.stringify(data)}],structuredContent:data};
