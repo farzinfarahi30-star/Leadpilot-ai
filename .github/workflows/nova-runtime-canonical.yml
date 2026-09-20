@@ -27,6 +27,8 @@ jobs:
       RUN_MINUTES: ${{ github.event_name == 'push' && '5' || '50' }}
       POLL_MS: 600000
       NOVA_MAIL_PROVIDER: ${{ secrets.NOVA_MAIL_PROVIDER }}
+      RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+      RESEND_FROM: ${{ secrets.RESEND_FROM }}
       GMAIL_ACCOUNT: ${{ secrets.GMAIL_ACCOUNT }}
       GMAIL_FROM: ${{ secrets.GMAIL_FROM }}
       GMAIL_ACCESS_TOKEN: ${{ secrets.GMAIL_ACCESS_TOKEN }}
