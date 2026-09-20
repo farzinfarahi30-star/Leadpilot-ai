@@ -1,0 +1,55 @@
+name: Nova Runtime Canonical
+
+on:
+  push:
+    paths:
+      - 'nova-runtime/package.json'
+      - 'nova-runtime/src/**'
+      - '.github/workflows/nova-runtime-canonical.yml'
+  schedule:
+    - cron: '7 * * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: nova-runtime-canonical
+  cancel-in-progress: true
+
+jobs:
+  runtime:
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    permissions:
+      contents: write
+    env:
+      GITHUB_TOKEN: ${{ github.token }}
+      RUN_MINUTES: ${{ github.event_name == 'push' && '5' || '50' }}
+      POLL_MS: 600000
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Node
+        uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: nova-runtime/package.json
+
+      - name: Install runtime
+        working-directory: nova-runtime
+        run: npm install --omit=dev
+
+      - name: Install Chromium
+        working-directory: nova-runtime
+        run: npx playwright install --with-deps chromium
+
+      - name: Validate runtime syntax
+        working-directory: nova-runtime
+        run: |
+          node --check src/worker.mjs
+          node --check src/agent-runtime.mjs
+          node --check src/smoke.mjs
+
+      - name: Run Nova Runtime
+        working-directory: nova-runtime
+        run: npm start
