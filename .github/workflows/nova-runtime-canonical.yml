@@ -24,6 +24,9 @@ jobs:
       GITHUB_TOKEN: ${{ github.token }}
       RUN_MINUTES: ${{ github.event_name == 'push' && '5' || '50' }}
       POLL_MS: 600000
+      RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+      RESEND_FROM: ${{ secrets.RESEND_FROM }}
+      EMAIL_TEST_TO: ${{ secrets.NOVA_TEST_EMAIL }}
     steps:
       - name: Checkout
         uses: actions/checkout@v5
