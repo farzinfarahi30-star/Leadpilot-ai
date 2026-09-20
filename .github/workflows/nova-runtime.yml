@@ -11,14 +11,14 @@ on:
 
 concurrency:
   group: nova-runtime
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   runtime:
     runs-on: ubuntu-latest
     timeout-minutes: 355
     permissions:
-      contents: read
+      contents: write
     env:
       FACTORY_HEARTBEAT_URL: https://ai-business-factory.hatchable.site/api/boss-heartbeat
       FACTORY_BOSS_TOKEN: ${{ secrets.FACTORY_BOSS_TOKEN }}
