@@ -85,8 +85,9 @@ jobs:
         run: |
           node --check src/worker.mjs
           node --check src/agent-runtime.mjs
+          node --check src/xx-runner.mjs
           node --check src/smoke.mjs
 
-      - name: Run Nova Runtime
+      - name: Run xx Takeover Runtime
         working-directory: nova-runtime
-        run: npm start
+        run: node src/xx-runner.mjs
