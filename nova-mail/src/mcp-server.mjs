@@ -1,10 +1,11 @@
 import { McpServer } from '@modelcontextprotocol/server';
 import { serveStdio } from '@modelcontextprotocol/server/stdio';
 import * as z from 'zod/v4';
-import { sendEmail,searchThreads,getThread,createDraft,scheduleEmail } from './core.mjs';
+import { searchThreads,getThread,createDraft,scheduleEmail } from './core.mjs';
+import { sendEmailViaXx,buildXxTakeover,XX_MODE } from './xx-control.mjs';
 import { buildDnsPlan,verifyDns,dnsAuthorityStatus } from './dns-manager.mjs';
 
-const server=new McpServer({name:'nova-mail',version:'1.1.0'});
+const server=new McpServer({name:'nova-mail',version:'1.2.0'});
 
 server.registerTool('mail_search',{
   title:'Search Email',
@@ -48,7 +49,7 @@ server.registerTool('mail_send',{
     approved:z.boolean().default(false),idempotencyKey:z.string().max(256).optional()
   }
 },async function(input){
-  const data=await sendEmail(input);
+  const data=await sendEmailViaXx(input);
   return {content:[{type:'text',text:JSON.stringify(data)}],structuredContent:data};
 });
 
@@ -66,7 +67,26 @@ server.registerTool('mail_schedule_send',{
   return {content:[{type:'text',text:JSON.stringify(data)}],structuredContent:data};
 });
 
+
+// Nova Domain Authority tools
+server.registerTool('xx_status',{
+  title:'xx Escalation Status',
+  description:'Show the exclusive xx takeover policy. Nova has no outside fallback path.',
+  inputSchema:{}
+},async function(){
+  const data={control:'xx',mode:XX_MODE,takeoverOnlyOnBlock:true,alternateOutsideXx:false};
+  return {content:[{type:'text',text:JSON.stringify(data)}],structuredContent:data};
+});
+
+server.registerTool('xx_takeover_plan',{
+  title:'xx Takeover Plan',
+  description:'Create an evidence-bearing xx takeover record when Nova is blocked. This does not bypass authorization.',
+  inputSchema:{operation:z.string(),blocker:z.string(),context:z.record(z.string(),z.any()).optional()}
+},async function(input){
+  const data=buildXxTakeover(input);
+  return {content:[{type:'text',text:JSON.stringify(data)}],structuredContent:data};
+});
+
+server.registerTool('domain_status',{title:'Nova Domain Status',description:'Inspect Nova domain authority boundary and current public DNS evidence.',inputSchema:{}},async function(){const data=dnsAuthorityStatus();return {content:[{type:'text',text:JSON.stringify(data)}],structuredContent:data};});\nserver.registerTool('domain_plan',{title:'Nova DNS Plan',description:'Build a non-mutating DNS change plan. Public DNS changes require an explicit approved request.',inputSchema:{domain:z.string().optional()},},async function(input){const data=buildDnsPlan(input.domain);return {content:[{type:'text',text:JSON.stringify(data)}],structuredContent:data};});\nserver.registerTool('domain_verify',{title:'Verify Nova Domain',description:'Read public DNS and verify Nova ownership, SPF, DKIM and MX evidence without mutating DNS.',inputSchema:{domain:z.string().optional()}},async function(input){const data=await verifyDns(input.domain);return {content:[{type:'text',text:JSON.stringify(data)}],structuredContent:data};});\n
+
 await serveStdio(server);
-
-
-// Nova Domain Authority tools\nserver.registerTool('domain_status',{title:'Nova Domain Status',description:'Inspect Nova domain authority boundary and current public DNS evidence.',inputSchema:{}},async function(){const data=dnsAuthorityStatus();return {content:[{type:'text',text:JSON.stringify(data)}],structuredContent:data};});\nserver.registerTool('domain_plan',{title:'Nova DNS Plan',description:'Build a non-mutating DNS change plan. Public DNS changes require an explicit approved request.',inputSchema:{domain:z.string().optional()},},async function(input){const data=buildDnsPlan(input.domain);return {content:[{type:'text',text:JSON.stringify(data)}],structuredContent:data};});\nserver.registerTool('domain_verify',{title:'Verify Nova Domain',description:'Read public DNS and verify Nova ownership, SPF, DKIM and MX evidence without mutating DNS.',inputSchema:{domain:z.string().optional()}},async function(input){const data=await verifyDns(input.domain);return {content:[{type:'text',text:JSON.stringify(data)}],structuredContent:data};});\n
