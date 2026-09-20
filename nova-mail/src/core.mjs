@@ -2,7 +2,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 
 const MAX_BODY=200000;
-const clean=function(v){return String(v==null?'':v).replace(/[\\u0000-\\u001f]+/g,' ').trim();};
+const clean=function(v){return String(v==null?'':v).replace(/[\u0000-\u001f]+/g,' ').trim();};
 const b64url=function(s){return Buffer.from(String(s),'utf8').toString('base64url');};
 const required=function(name){const v=process.env[name];if(!v)throw new Error(name+' missing');return v;};
 
@@ -11,11 +11,7 @@ async function gmailAccessToken(){
   const refresh=required('GMAIL_REFRESH_TOKEN');
   const clientId=required('GMAIL_CLIENT_ID');
   const clientSecret=required('GMAIL_CLIENT_SECRET');
-  const r=await fetch('https://oauth2.googleapis.com/token',{
-    method:'POST',
-    headers:{'content-type':'application/x-www-form-urlencoded'},
-    body:new URLSearchParams({client_id:clientId,client_secret:clientSecret,refresh_token:refresh,grant_type:'refresh_token'})
-  });
+  const r=await fetch('https://oauth2.googleapis.com/token',{method:'POST',headers:{'content-type':'application/x-www-form-urlencoded'},body:new URLSearchParams({client_id:clientId,client_secret:clientSecret,refresh_token:refresh,grant_type:'refresh_token'})});
   const body=await r.json().catch(function(){return {};});
   if(!r.ok)throw new Error('Gmail token '+r.status+': '+clean(body.error_description||body.error||'token refresh failed'));
   return body.access_token;
@@ -24,11 +20,7 @@ async function gmailAccessToken(){
 async function gmail(endpoint,options){
   options=options||{};
   const token=await gmailAccessToken();
-  const r=await fetch('https://gmail.googleapis.com/gmail/v1/users/me/'+endpoint,{
-    method:options.method||'GET',
-    headers:{authorization:'Bearer '+token,'content-type':'application/json'},
-    body:options.body===undefined?undefined:JSON.stringify(options.body)
-  });
+  const r=await fetch('https://gmail.googleapis.com/gmail/v1/users/me/'+endpoint,{method:options.method||'GET',headers:{authorization:'Bearer '+token,'content-type':'application/json'},body:options.body===undefined?undefined:JSON.stringify(options.body)});
   const text=await r.text();
   let data={};try{data=text?JSON.parse(text):{};}catch{data={raw:text};}
   if(!r.ok)throw new Error('Gmail '+r.status+': '+clean(data.error&&data.error.message||text));
@@ -38,12 +30,26 @@ async function gmail(endpoint,options){
 async function resend(input){
   const key=required('RESEND_API_KEY');
   const sender=input.from||required('RESEND_FROM');
-  const r=await fetch('https://api.resend.com/emails',{
-    method:'POST',
-    headers:{authorization:'Bearer '+key,'content-type':'application/json'},
-    body:JSON.stringify({from:sender,to:String(input.to).split(',').map(function(x){return clean(x);}).filter(Boolean),cc:String(input.cc||'').split(',').map(function(x){return clean(x);}).filter(Boolean),bcc:String(input.bcc||'').split(',').map(function(x){return clean(x);}).filter(Boolean),subject:input.subject,text:input.text})
-  });
-  const text=await r.text(); let data={}; try{data=text?JSON.parse(text):{};}catch{data={raw:text};}
+  const payload={
+    from:sender,
+    to:String(input.to).split(',').map(function(x){return clean(x);}).filter(Boolean),
+    cc:String(input.cc||'').split(',').map(function(x){return clean(x);}).filter(Boolean),
+    bcc:String(input.bcc||'').split(',').map(function(x){return clean(x);}).filter(Boolean),
+    subject:input.subject,
+    text:input.text
+  };
+  if(input.replyTo){
+    payload.reply_to=Array.isArray(input.replyTo)
+      ? input.replyTo.map(function(x){return clean(x);}).filter(Boolean)
+      : String(input.replyTo).split(',').map(function(x){return clean(x);}).filter(Boolean);
+  }
+  if(input.html)payload.html=input.html;
+  if(input.tags)payload.tags=input.tags;
+  if(input.headers)payload.headers=input.headers;
+  if(input.idempotencyKey)payload.idempotency_key=input.idempotencyKey;
+  const r=await fetch('https://api.resend.com/emails',{method:'POST',headers:{authorization:'Bearer '+key,'content-type':'application/json'},body:JSON.stringify(payload)});
+  const text=await r.text();
+  let data={};try{data=text?JSON.parse(text):{};}catch{data={raw:text};}
   if(!r.ok)throw new Error('Resend '+r.status+': '+clean(data.message||data.name||text||'send failed'));
   return {sent:true,provider:'resend',messageId:data.id||null};
 }
@@ -53,11 +59,7 @@ async function outlookAccessToken(){
   const refresh=required('OUTLOOK_REFRESH_TOKEN');
   const clientId=required('OUTLOOK_CLIENT_ID');
   const clientSecret=required('OUTLOOK_CLIENT_SECRET');
-  const r=await fetch('https://login.microsoftonline.com/common/oauth2/v2.0/token',{
-    method:'POST',
-    headers:{'content-type':'application/x-www-form-urlencoded'},
-    body:new URLSearchParams({client_id:clientId,client_secret:clientSecret,refresh_token:refresh,grant_type:'refresh_token',scope:'https://graph.microsoft.com/.default offline_access'})
-  });
+  const r=await fetch('https://login.microsoftonline.com/common/oauth2/v2.0/token',{method:'POST',headers:{'content-type':'application/x-www-form-urlencoded'},body:new URLSearchParams({client_id:clientId,client_secret:clientSecret,refresh_token:refresh,grant_type:'refresh_token',scope:'https://graph.microsoft.com/.default offline_access'})});
   const body=await r.json().catch(function(){return {};});
   if(!r.ok)throw new Error('Outlook token '+r.status+': '+clean(body.error_description||body.error||'token refresh failed'));
   return body.access_token;
@@ -66,11 +68,7 @@ async function outlookAccessToken(){
 async function outlook(endpoint,options){
   options=options||{};
   const token=await outlookAccessToken();
-  const r=await fetch('https://graph.microsoft.com/v1.0/'+endpoint,{
-    method:options.method||'GET',
-    headers:{authorization:'Bearer '+token,'content-type':'application/json'},
-    body:options.body===undefined?undefined:JSON.stringify(options.body)
-  });
+  const r=await fetch('https://graph.microsoft.com/v1.0/'+endpoint,{method:options.method||'GET',headers:{authorization:'Bearer '+token,'content-type':'application/json'},body:options.body===undefined?undefined:JSON.stringify(options.body)});
   const text=await r.text();
   let data={};try{data=text?JSON.parse(text):{};}catch{data={raw:text};}
   if(!r.ok)throw new Error('Outlook '+r.status+': '+clean(data.error&&data.error.message||text));
@@ -78,17 +76,7 @@ async function outlook(endpoint,options){
 }
 
 function mime(input){
-  const lines=[
-    'From: '+input.from,
-    'To: '+input.to,
-    input.cc?'Cc: '+input.cc:null,
-    input.bcc?'Bcc: '+input.bcc:null,
-    'Subject: '+input.subject,
-    'MIME-Version: 1.0',
-    'Content-Type: text/plain; charset=UTF-8',
-    '',
-    input.text
-  ].filter(Boolean);
+  const lines=['From: '+input.from,'To: '+input.to,input.cc?'Cc: '+input.cc:null,input.bcc?'Bcc: '+input.bcc:null,'Subject: '+input.subject,'MIME-Version: 1.0','Content-Type: text/plain; charset=UTF-8','',input.text].filter(Boolean);
   return lines.join('\r\n');
 }
 
@@ -98,9 +86,7 @@ export async function sendEmail(input){
   if(!input.to||!input.subject||!input.text)throw new Error('to, subject and text are required');
   if(String(input.text).length>MAX_BODY)throw new Error('message body too large');
   const provider=input.provider||process.env.NOVA_MAIL_PROVIDER||'gmail';
-  if(provider==='resend'){
-    return await resend(input);
-  }
+  if(provider==='resend')return await resend(input);
   if(provider==='gmail'){
     const sender=input.from||process.env.GMAIL_FROM||required('GMAIL_ACCOUNT');
     const out=await gmail('messages/send',{method:'POST',body:{raw:b64url(mime({from:sender,to:input.to,cc:input.cc,bcc:input.bcc,subject:input.subject,text:input.text}))}});
@@ -145,9 +131,7 @@ export async function getThread(input){
     const out=await gmail('threads/'+encodeURIComponent(input.id)+'?format=full');
     return {provider:provider,threadId:out.id,messages:(out.messages||[]).map(function(m){return {id:m.id,threadId:m.threadId,labels:m.labelIds,internalDate:m.internalDate,payload:m.payload};})};
   }
-  if(provider==='outlook'){
-    return {provider:provider,message:await outlook('me/messages/'+encodeURIComponent(input.id))};
-  }
+  if(provider==='outlook')return {provider:provider,message:await outlook('me/messages/'+encodeURIComponent(input.id))};
   throw new Error('Unsupported mail provider: '+provider);
 }
 
