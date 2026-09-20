@@ -109,9 +109,9 @@ async function runAgent(key,domain,capability,shared){
 }
 
 export async function runAgentCycle(cycle=1){
-  const staticChecks=staticChecks();
+  const checks=staticChecks();
   const browser=await browserChecks().catch(error=>({ok:false,error:String(error)}));
-  const shared={cycle,staticChecks,browser};
+  const shared={cycle,staticChecks:checks,browser};
   const results=[];
   for(const [key,domain,capability] of AGENTS) results.push(await runAgent(key,domain,capability,shared));
   return {
@@ -122,7 +122,7 @@ export async function runAgentCycle(cycle=1){
     completed:results.filter(x=>x.status==='completed').length,
     failed:results.filter(x=>x.status==='failed').length,
     browser,
-    staticChecks,
+    staticChecks:checks,
     agents:results
   };
 }
