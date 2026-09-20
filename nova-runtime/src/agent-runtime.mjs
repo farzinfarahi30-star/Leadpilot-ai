@@ -65,7 +65,7 @@ function staticChecks(){
     'src/worker.mjs',
     'src/agent-runtime.mjs',
     'src/smoke.mjs',
-    '../.github/workflows/nova-runtime.yml'
+    '../../.github/workflows/nova-runtime.yml'
   ];
   const checks=[];
   for(const rel of files){
