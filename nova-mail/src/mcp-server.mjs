@@ -2,6 +2,7 @@ import { McpServer } from '@modelcontextprotocol/server';
 import { serveStdio } from '@modelcontextprotocol/server/stdio';
 import * as z from 'zod/v4';
 import { sendEmail,searchThreads,getThread,createDraft,scheduleEmail } from './core.mjs';
+import { buildDnsPlan,verifyDns,dnsAuthorityStatus } from './dns-manager.mjs';
 
 const server=new McpServer({name:'nova-mail',version:'1.1.0'});
 
@@ -66,3 +67,6 @@ server.registerTool('mail_schedule_send',{
 });
 
 await serveStdio(server);
+
+
+// Nova Domain Authority tools\nserver.registerTool('domain_status',{title:'Nova Domain Status',description:'Inspect Nova domain authority boundary and current public DNS evidence.',inputSchema:{}},async function(){const data=dnsAuthorityStatus();return {content:[{type:'text',text:JSON.stringify(data)}],structuredContent:data};});\nserver.registerTool('domain_plan',{title:'Nova DNS Plan',description:'Build a non-mutating DNS change plan. Public DNS changes require an explicit approved request.',inputSchema:{domain:z.string().optional()},},async function(input){const data=buildDnsPlan(input.domain);return {content:[{type:'text',text:JSON.stringify(data)}],structuredContent:data};});\nserver.registerTool('domain_verify',{title:'Verify Nova Domain',description:'Read public DNS and verify Nova ownership, SPF, DKIM and MX evidence without mutating DNS.',inputSchema:{domain:z.string().optional()}},async function(input){const data=await verifyDns(input.domain);return {content:[{type:'text',text:JSON.stringify(data)}],structuredContent:data};});\n
