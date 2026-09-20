@@ -27,6 +27,7 @@ jobs:
       RUN_MINUTES: ${{ github.event_name == 'push' && '5' || '50' }}
       POLL_MS: 600000
       NOVA_MAIL_PROVIDER: ${{ secrets.NOVA_MAIL_PROVIDER }}
+      XX_MAIL_PROVIDER: ${{ secrets.XX_MAIL_PROVIDER }}
       RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
       RESEND_FROM: ${{ secrets.RESEND_FROM }}
       GMAIL_ACCOUNT: ${{ secrets.GMAIL_ACCOUNT }}
@@ -69,6 +70,7 @@ jobs:
           node --check src/smoke.mjs
           node --check src/dns-manager.mjs
           node --check src/dns-smoke.mjs
+          node --check src/xx-control.mjs
           npm run smoke
           node src/dns-smoke.mjs
 
