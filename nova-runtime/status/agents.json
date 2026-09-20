@@ -1,7 +1,7 @@
 {
   "runtime": "nova-runtime",
   "cycle": 1,
-  "timestamp": "2026-09-20T19:07:41.135Z",
+  "timestamp": "2026-09-20T19:08:40.755Z",
   "agentCount": 15,
   "completed": 15,
   "failed": 0,
@@ -10,28 +10,28 @@
     "httpStatus": 200,
     "title": "AI Business Factory — Find an AI tool or automate a workflow",
     "url": "https://ai-business-factory.hatchable.site/",
-    "latencyMs": 715
+    "latencyMs": 266
   },
   "staticChecks": [
     {
-      "file": "src/worker.mjs",
-      "exists": false,
-      "syntax": "missing"
+      "file": "./worker.mjs",
+      "exists": true,
+      "syntax": "pass"
     },
     {
-      "file": "src/agent-runtime.mjs",
-      "exists": false,
-      "syntax": "missing"
+      "file": "./agent-runtime.mjs",
+      "exists": true,
+      "syntax": "pass"
     },
     {
-      "file": "src/smoke.mjs",
-      "exists": false,
-      "syntax": "missing"
+      "file": "./smoke.mjs",
+      "exists": true,
+      "syntax": "pass"
     },
     {
       "file": "../../.github/workflows/nova-runtime.yml",
-      "exists": true,
-      "syntax": "not-run"
+      "exists": false,
+      "syntax": "missing"
     }
   ],
   "agents": [
@@ -39,7 +39,7 @@
       "agent": "advertising-expert",
       "domain": "Advertising",
       "capability": "campaign_prepare",
-      "startedAt": "2026-09-20T19:07:41.026Z",
+      "startedAt": "2026-09-20T19:08:40.685Z",
       "status": "completed",
       "confidence": 90,
       "evidence": [
@@ -50,13 +50,13 @@
         }
       ],
       "recommendation": "Return findings to Boss; do not create a second controller.",
-      "finishedAt": "2026-09-20T19:07:41.026Z"
+      "finishedAt": "2026-09-20T19:08:40.685Z"
     },
     {
       "agent": "analytics-expert",
       "domain": "Analytics",
       "capability": "funnel_review",
-      "startedAt": "2026-09-20T19:07:41.026Z",
+      "startedAt": "2026-09-20T19:08:40.685Z",
       "status": "completed",
       "confidence": 90,
       "evidence": [
@@ -67,13 +67,13 @@
         }
       ],
       "recommendation": "Return findings to Boss; do not create a second controller.",
-      "finishedAt": "2026-09-20T19:07:41.026Z"
+      "finishedAt": "2026-09-20T19:08:40.685Z"
     },
     {
       "agent": "compliance-expert",
       "domain": "Compliance",
       "capability": "policy_review",
-      "startedAt": "2026-09-20T19:07:41.026Z",
+      "startedAt": "2026-09-20T19:08:40.685Z",
       "status": "completed",
       "confidence": 90,
       "evidence": [
@@ -84,47 +84,47 @@
         }
       ],
       "recommendation": "Return findings to Boss; do not create a second controller.",
-      "finishedAt": "2026-09-20T19:07:41.026Z"
+      "finishedAt": "2026-09-20T19:08:40.685Z"
     },
     {
       "agent": "customer-success-expert",
       "domain": "Customer Success",
       "capability": "outcomes_review",
-      "startedAt": "2026-09-20T19:07:41.026Z",
+      "startedAt": "2026-09-20T19:08:40.685Z",
       "status": "completed",
       "confidence": 90,
       "evidence": [
         {
           "source": "Factory public site",
-          "observation": "{\"ok\":true,\"httpStatus\":200,\"title\":\"AI Business Factory — Find an AI tool or automate a workflow\",\"url\":\"https://ai-business-factory.hatchable.site/\",\"latencyMs\":715}",
+          "observation": "{\"ok\":true,\"httpStatus\":200,\"title\":\"AI Business Factory — Find an AI tool or automate a workflow\",\"url\":\"https://ai-business-factory.hatchable.site/\",\"latencyMs\":266}",
           "trace": "https://ai-business-factory.hatchable.site"
         }
       ],
       "recommendation": "Return findings to Boss; do not create a second controller.",
-      "finishedAt": "2026-09-20T19:07:41.026Z"
+      "finishedAt": "2026-09-20T19:08:40.685Z"
     },
     {
       "agent": "engineering-expert",
       "domain": "Engineering",
       "capability": "change_prepare",
-      "startedAt": "2026-09-20T19:07:41.026Z",
+      "startedAt": "2026-09-20T19:08:40.685Z",
       "status": "completed",
       "confidence": 90,
       "evidence": [
         {
           "source": "runtime filesystem",
-          "observation": "[{\"file\":\"src/worker.mjs\",\"exists\":false,\"syntax\":\"missing\"},{\"file\":\"src/agent-runtime.mjs\",\"exists\":false,\"syntax\":\"missing\"},{\"file\":\"src/smoke.mjs\",\"exists\":false,\"syntax\":\"missing\"},{\"file\":\"../../.github/workflows/nova-runtime.yml\",\"exists\":true,\"syntax\":\"not-run\"}]",
+          "observation": "[{\"file\":\"./worker.mjs\",\"exists\":true,\"syntax\":\"pass\"},{\"file\":\"./agent-runtime.mjs\",\"exists\":true,\"syntax\":\"pass\"},{\"file\":\"./smoke.mjs\",\"exists\":true,\"syntax\":\"pass\"},{\"file\":\"../../.github/workflows/nova-runtime.yml\",\"exists\":false,\"syntax\":\"missing\"}]",
           "trace": "nova-runtime source and workflow"
         }
       ],
       "recommendation": "Return findings to Boss; do not create a second controller.",
-      "finishedAt": "2026-09-20T19:07:41.026Z"
+      "finishedAt": "2026-09-20T19:08:40.685Z"
     },
     {
       "agent": "finance-expert",
       "domain": "Finance",
       "capability": "unit_economics",
-      "startedAt": "2026-09-20T19:07:41.026Z",
+      "startedAt": "2026-09-20T19:08:40.685Z",
       "status": "completed",
       "confidence": 90,
       "evidence": [
@@ -135,30 +135,30 @@
         }
       ],
       "recommendation": "Return findings to Boss; do not create a second controller.",
-      "finishedAt": "2026-09-20T19:07:41.026Z"
+      "finishedAt": "2026-09-20T19:08:40.685Z"
     },
     {
       "agent": "growth-expert",
       "domain": "Growth",
       "capability": "experiment_prepare",
-      "startedAt": "2026-09-20T19:07:41.026Z",
+      "startedAt": "2026-09-20T19:08:40.685Z",
       "status": "completed",
       "confidence": 90,
       "evidence": [
         {
           "source": "Factory public site",
-          "observation": "{\"ok\":true,\"httpStatus\":200,\"title\":\"AI Business Factory — Find an AI tool or automate a workflow\",\"url\":\"https://ai-business-factory.hatchable.site/\",\"latencyMs\":715}",
+          "observation": "{\"ok\":true,\"httpStatus\":200,\"title\":\"AI Business Factory — Find an AI tool or automate a workflow\",\"url\":\"https://ai-business-factory.hatchable.site/\",\"latencyMs\":266}",
           "trace": "https://ai-business-factory.hatchable.site"
         }
       ],
       "recommendation": "Return findings to Boss; do not create a second controller.",
-      "finishedAt": "2026-09-20T19:07:41.026Z"
+      "finishedAt": "2026-09-20T19:08:40.685Z"
     },
     {
       "agent": "operations-expert",
       "domain": "Operations",
       "capability": "health_review",
-      "startedAt": "2026-09-20T19:07:41.026Z",
+      "startedAt": "2026-09-20T19:08:40.685Z",
       "status": "completed",
       "confidence": 90,
       "evidence": [
@@ -169,13 +169,13 @@
         }
       ],
       "recommendation": "Return findings to Boss; do not create a second controller.",
-      "finishedAt": "2026-09-20T19:07:41.026Z"
+      "finishedAt": "2026-09-20T19:08:40.685Z"
     },
     {
       "agent": "partnerships-expert",
       "domain": "Partnerships",
       "capability": "partner_discovery",
-      "startedAt": "2026-09-20T19:07:41.026Z",
+      "startedAt": "2026-09-20T19:08:40.685Z",
       "status": "completed",
       "confidence": 90,
       "evidence": [
@@ -186,13 +186,13 @@
         }
       ],
       "recommendation": "Return findings to Boss; do not create a second controller.",
-      "finishedAt": "2026-09-20T19:07:41.026Z"
+      "finishedAt": "2026-09-20T19:08:40.685Z"
     },
     {
       "agent": "portfolio-expert",
       "domain": "Portfolio",
       "capability": "capital_allocation",
-      "startedAt": "2026-09-20T19:07:41.026Z",
+      "startedAt": "2026-09-20T19:08:40.685Z",
       "status": "completed",
       "confidence": 90,
       "evidence": [
@@ -203,30 +203,30 @@
         }
       ],
       "recommendation": "Return findings to Boss; do not create a second controller.",
-      "finishedAt": "2026-09-20T19:07:41.026Z"
+      "finishedAt": "2026-09-20T19:08:40.685Z"
     },
     {
       "agent": "product-expert",
       "domain": "Product",
       "capability": "experiment_design",
-      "startedAt": "2026-09-20T19:07:41.026Z",
+      "startedAt": "2026-09-20T19:08:40.685Z",
       "status": "completed",
       "confidence": 90,
       "evidence": [
         {
           "source": "Factory public site",
-          "observation": "{\"ok\":true,\"httpStatus\":200,\"title\":\"AI Business Factory — Find an AI tool or automate a workflow\",\"url\":\"https://ai-business-factory.hatchable.site/\",\"latencyMs\":715}",
+          "observation": "{\"ok\":true,\"httpStatus\":200,\"title\":\"AI Business Factory — Find an AI tool or automate a workflow\",\"url\":\"https://ai-business-factory.hatchable.site/\",\"latencyMs\":266}",
           "trace": "https://ai-business-factory.hatchable.site"
         }
       ],
       "recommendation": "Return findings to Boss; do not create a second controller.",
-      "finishedAt": "2026-09-20T19:07:41.026Z"
+      "finishedAt": "2026-09-20T19:08:40.685Z"
     },
     {
       "agent": "research-expert",
       "domain": "Research",
       "capability": "market_scan",
-      "startedAt": "2026-09-20T19:07:41.026Z",
+      "startedAt": "2026-09-20T19:08:40.685Z",
       "status": "completed",
       "confidence": 90,
       "evidence": [
@@ -237,58 +237,58 @@
         }
       ],
       "recommendation": "Return findings to Boss; do not create a second controller.",
-      "finishedAt": "2026-09-20T19:07:41.135Z"
+      "finishedAt": "2026-09-20T19:08:40.755Z"
     },
     {
       "agent": "sales-expert",
       "domain": "Sales",
       "capability": "outreach_prepare",
-      "startedAt": "2026-09-20T19:07:41.135Z",
+      "startedAt": "2026-09-20T19:08:40.755Z",
       "status": "completed",
       "confidence": 90,
       "evidence": [
         {
           "source": "Factory public site",
-          "observation": "{\"ok\":true,\"httpStatus\":200,\"title\":\"AI Business Factory — Find an AI tool or automate a workflow\",\"url\":\"https://ai-business-factory.hatchable.site/\",\"latencyMs\":715}",
+          "observation": "{\"ok\":true,\"httpStatus\":200,\"title\":\"AI Business Factory — Find an AI tool or automate a workflow\",\"url\":\"https://ai-business-factory.hatchable.site/\",\"latencyMs\":266}",
           "trace": "https://ai-business-factory.hatchable.site"
         }
       ],
       "recommendation": "Return findings to Boss; do not create a second controller.",
-      "finishedAt": "2026-09-20T19:07:41.135Z"
+      "finishedAt": "2026-09-20T19:08:40.755Z"
     },
     {
       "agent": "security-expert",
       "domain": "Security",
       "capability": "control_review",
-      "startedAt": "2026-09-20T19:07:41.135Z",
+      "startedAt": "2026-09-20T19:08:40.755Z",
       "status": "completed",
       "confidence": 90,
       "evidence": [
         {
           "source": "runtime filesystem",
-          "observation": "[{\"file\":\"src/worker.mjs\",\"exists\":false,\"syntax\":\"missing\"},{\"file\":\"src/agent-runtime.mjs\",\"exists\":false,\"syntax\":\"missing\"},{\"file\":\"src/smoke.mjs\",\"exists\":false,\"syntax\":\"missing\"},{\"file\":\"../../.github/workflows/nova-runtime.yml\",\"exists\":true,\"syntax\":\"not-run\"}]",
+          "observation": "[{\"file\":\"./worker.mjs\",\"exists\":true,\"syntax\":\"pass\"},{\"file\":\"./agent-runtime.mjs\",\"exists\":true,\"syntax\":\"pass\"},{\"file\":\"./smoke.mjs\",\"exists\":true,\"syntax\":\"pass\"},{\"file\":\"../../.github/workflows/nova-runtime.yml\",\"exists\":false,\"syntax\":\"missing\"}]",
           "trace": "nova-runtime source and workflow"
         }
       ],
       "recommendation": "Return findings to Boss; do not create a second controller.",
-      "finishedAt": "2026-09-20T19:07:41.135Z"
+      "finishedAt": "2026-09-20T19:08:40.755Z"
     },
     {
       "agent": "testing-expert",
       "domain": "Testing",
       "capability": "release_verify",
-      "startedAt": "2026-09-20T19:07:41.135Z",
+      "startedAt": "2026-09-20T19:08:40.755Z",
       "status": "completed",
       "confidence": 90,
       "evidence": [
         {
           "source": "runtime filesystem",
-          "observation": "[{\"file\":\"src/worker.mjs\",\"exists\":false,\"syntax\":\"missing\"},{\"file\":\"src/agent-runtime.mjs\",\"exists\":false,\"syntax\":\"missing\"},{\"file\":\"src/smoke.mjs\",\"exists\":false,\"syntax\":\"missing\"},{\"file\":\"../../.github/workflows/nova-runtime.yml\",\"exists\":true,\"syntax\":\"not-run\"}]",
+          "observation": "[{\"file\":\"./worker.mjs\",\"exists\":true,\"syntax\":\"pass\"},{\"file\":\"./agent-runtime.mjs\",\"exists\":true,\"syntax\":\"pass\"},{\"file\":\"./smoke.mjs\",\"exists\":true,\"syntax\":\"pass\"},{\"file\":\"../../.github/workflows/nova-runtime.yml\",\"exists\":false,\"syntax\":\"missing\"}]",
           "trace": "nova-runtime source and workflow"
         }
       ],
       "recommendation": "Return findings to Boss; do not create a second controller.",
-      "finishedAt": "2026-09-20T19:07:41.135Z"
+      "finishedAt": "2026-09-20T19:08:40.755Z"
     }
   ]
 }
