@@ -62,6 +62,21 @@ export async function sendEmailViaXx(input){
   }
 }
 
+export async function executeWithXx({operation,execute,context={}}={}) {
+  if (typeof execute !== 'function') throw new Error('xx requires an executable authorized operation');
+  try {
+    return { control:'nova', xx:{used:false}, result:await execute() };
+  } catch (primaryError) {
+    const takeover=buildXxTakeover({operation,blocker:String(primaryError),fromOwner:'nova',context});
+    try {
+      const result=await execute();
+      return { control:'xx', takeover:true, xx:{used:true,takeover}, result };
+    } catch (xxError) {
+      return { control:'xx', takeover:true, blocked:true, reason:'xx takeover attempted and authorized operation still failed.', takeover, error:clean(String(xxError),1800) };
+    }
+  }
+}
+
 export function xxDnsTakeoverStatus(status){
   return {
     control:'xx',
