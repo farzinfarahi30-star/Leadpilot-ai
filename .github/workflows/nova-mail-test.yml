@@ -1,0 +1,54 @@
+name: Nova Mail Agent Test
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: nova-mail-agent-test
+  cancel-in-progress: true
+
+jobs:
+  send-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      GMAIL_ACCOUNT: ${{ secrets.GMAIL_ACCOUNT }}
+      GMAIL_FROM: ${{ secrets.GMAIL_FROM }}
+      GMAIL_ACCESS_TOKEN: ${{ secrets.GMAIL_ACCESS_TOKEN }}
+      GMAIL_CLIENT_ID: ${{ secrets.GMAIL_CLIENT_ID }}
+      GMAIL_CLIENT_SECRET: ${{ secrets.GMAIL_CLIENT_SECRET }}
+      GMAIL_REFRESH_TOKEN: ${{ secrets.GMAIL_REFRESH_TOKEN }}
+      OUTLOOK_ACCESS_TOKEN: ${{ secrets.OUTLOOK_ACCESS_TOKEN }}
+      OUTLOOK_CLIENT_ID: ${{ secrets.OUTLOOK_CLIENT_ID }}
+      OUTLOOK_CLIENT_SECRET: ${{ secrets.OUTLOOK_CLIENT_SECRET }}
+      OUTLOOK_REFRESH_TOKEN: ${{ secrets.OUTLOOK_REFRESH_TOKEN }}
+      NOVA_MAIL_PROVIDER: ${{ secrets.NOVA_MAIL_PROVIDER }}
+      NOVA_MAIL_TEST_TO: ${{ secrets.NOVA_TEST_EMAIL }}
+      NOVA_MAIL_TEST_FROM: ${{ secrets.NOVA_MAIL_TEST_FROM }}
+      NOVA_MAIL_TEST_APPROVED: ${{ secrets.NOVA_MAIL_TEST_APPROVED }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+      - name: Setup Node
+        uses: actions/setup-node@v5
+        with:
+          node-version: 22
+      - name: Install Nova Mail
+        working-directory: nova-mail
+        run: npm install --omit=dev
+      - name: Install Nova Runtime
+        working-directory: nova-runtime
+        run: npm install --omit=dev
+      - name: Install Chromium
+        working-directory: nova-runtime
+        run: npx playwright install --with-deps chromium
+      - name: Validate Nova Mail
+        working-directory: nova-mail
+        run: |
+          node --check src/core.mjs
+          node --check src/mcp-server.mjs
+          node --check src/smoke.mjs
+          npm run smoke
+      - name: Run Sales Agent Mail Test
+        working-directory: nova-runtime
+        run: node src/mail-test.mjs
