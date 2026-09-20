@@ -71,6 +71,8 @@ jobs:
           node --check src/dns-manager.mjs
           node --check src/dns-smoke.mjs
           node --check src/xx-control.mjs
+          node --check src/xx-smoke.mjs
+          node src/xx-smoke.mjs
           npm run smoke
           node src/dns-smoke.mjs
 
