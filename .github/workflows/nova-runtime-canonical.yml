@@ -67,7 +67,10 @@ jobs:
           node --check src/core.mjs
           node --check src/mcp-server.mjs
           node --check src/smoke.mjs
+          node --check src/dns-manager.mjs
+          node --check src/dns-smoke.mjs
           npm run smoke
+          node src/dns-smoke.mjs
 
       - name: Install Chromium
         working-directory: nova-runtime
