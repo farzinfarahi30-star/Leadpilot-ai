@@ -112,8 +112,12 @@ export async function runAgentCycle(cycle=1){
   const checks=staticChecks();
   const browser=await browserChecks().catch(error=>({ok:false,error:String(error)}));
   const shared={cycle,staticChecks:checks,browser};
+  const queue=AGENTS.map(([key,domain,capability])=>({key,domain,capability}));
   const results=[];
-  for(const [key,domain,capability] of AGENTS) results.push(await runAgent(key,domain,capability,shared));
+  while(queue.length){
+    const job=queue.shift();
+    results.push(await runAgent(job.key,job.domain,job.capability,shared));
+  }
   return {
     runtime:'nova-runtime',
     cycle,
