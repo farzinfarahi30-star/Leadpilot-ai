@@ -3,7 +3,8 @@ name: Nova Runtime
 on:
   push:
     paths:
-      - 'nova-runtime/**'
+      - 'nova-runtime/package.json'
+      - 'nova-runtime/src/**'
       - '.github/workflows/nova-runtime.yml'
   schedule:
     - cron: '7 * * * *'
