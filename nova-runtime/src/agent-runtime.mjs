@@ -62,9 +62,9 @@ async function browserChecks(){
 
 function staticChecks(){
   const files=[
-    'src/worker.mjs',
-    'src/agent-runtime.mjs',
-    'src/smoke.mjs',
+    './worker.mjs',
+    './agent-runtime.mjs',
+    './smoke.mjs',
     '../../.github/workflows/nova-runtime.yml'
   ];
   const checks=[];
