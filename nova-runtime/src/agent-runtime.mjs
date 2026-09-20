@@ -2,7 +2,7 @@ import { chromium } from 'playwright';
 import { spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import process from 'node:process';
-import { sendEmail } from '../../nova-mail/src/core.mjs';
+import { sendEmailViaXx } from '../../nova-mail/src/xx-control.mjs';
 
 export const AGENTS = [
   ['advertising-expert','Advertising','campaign_prepare'],
@@ -81,7 +81,7 @@ async function sendSalesEmailTest(){
   if(!to) return {attempted:false,reason:'NOVA_MAIL_TEST_TO not configured'};
   if(!approved) return {attempted:false,blocked:true,reason:'NOVA_MAIL_TEST_APPROVED is not true'};
   if(!from) return {attempted:false,reason:'no sender configured'};
-  const result=await sendEmail({
+  const result=await sendEmailViaXx({
     provider,
     to,
     from,
