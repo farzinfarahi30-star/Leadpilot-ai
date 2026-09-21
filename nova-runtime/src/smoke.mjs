@@ -13,7 +13,7 @@ const required=[
   'novaSepoliaPreflight',
   'deployNovaTokenSepoliaOnChain',
   'verifyNovaTokenSepoliaOnChain',
-  'alchemySepoliaNetwork',
+  'alchemySepoliaNetwork',\n  'coinbaseCdpRequestSepoliaEth',
   'alchemySepoliaRpcCall',
   'alchemySepoliaGetChainId',
   'alchemySepoliaGetBlockNumber',
@@ -41,7 +41,7 @@ const remote=await listDesktopCommanderTools();
 if(desktopCommanderConfigured()!==Boolean(process.env.DESKTOP_COMMANDER_OAUTH_TOKEN))
   throw new Error('Desktop Commander configuration state mismatch.');
 
-const alchemy=alchemySepoliaNetwork();
+const cdp=coinbaseCdpDoctor();\nif(cdp.network!=='ethereum-sepolia' || cdp.chainId!==11155111) throw new Error('Coinbase CDP Sepolia capability mismatch.');\n\nconst alchemy=alchemySepoliaNetwork();
 const capabilities=alchemyCapabilityManifest();
 if(alchemy.chainId!==11155111) throw new Error('Alchemy Sepolia chain ID mismatch.');
 if(!alchemy.faucetUrl.includes('alchemy.com/faucets/ethereum-sepolia'))
@@ -63,7 +63,7 @@ try{
     novaTokenDeploymentTool:true,
     novaSepoliaControllerTools:true,
     alchemySepoliaIntegration:true,
-    alchemyCapabilityGateway:true,
+    alchemyCapabilityGateway:true,\n    coinbaseCdpSepoliaFaucet:true,
     desktopCommander:{configured:remote.configured,connected:Boolean(remote.connected),toolCount:remote.toolCount??0}
   }));
 }finally{await browser.close()}
