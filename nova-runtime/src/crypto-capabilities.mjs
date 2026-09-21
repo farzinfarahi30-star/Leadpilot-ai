@@ -18,6 +18,8 @@ import {
 } from './chainstack-mcp.mjs';
 
 const SEPOLIA_CHAIN_ID = 11155111;
+const COINBASE_ETH_PER_CLAIM_WEI = 100000000000000n; // 0.0001 ETH; current CDP faucet limit.
+const DEFAULT_MAX_CDP_CLAIMS = 20;
 
 function env(name) {
   return String(process.env[name] || '').trim();
@@ -113,43 +115,89 @@ export async function requestSepoliaEth(address, { provider = 'auto' } = {}) {
 
 export async function requestAndConfirmSepoliaEth(
   address,
-  { provider = 'auto', minBalanceWei = 1000000000000000n, pollMs = 5000, timeoutMs = 120000 } = {}
+  {
+    provider = 'auto',
+    minBalanceWei = 1000000000000000n,
+    pollMs = 5000,
+    timeoutMs = 120000,
+    maxCdpClaims = DEFAULT_MAX_CDP_CLAIMS
+  } = {}
 ) {
   assertAddress(address);
+  if (minBalanceWei < 0n) throw new Error('minBalanceWei cannot be negative');
+  if (!Number.isInteger(maxCdpClaims) || maxCdpClaims < 1 || maxCdpClaims > 100) {
+    throw new Error('maxCdpClaims must be an integer between 1 and 100');
+  }
+
   const providers = provider === 'auto' ? ['coinbase', 'chainstack'] : [provider];
   const errors = [];
   let before = BigInt(await novaCryptoBalance(address));
+
+  if (before >= minBalanceWei) {
+    return {
+      fundingProvider: 'none',
+      address,
+      balanceBeforeWei: before.toString(),
+      balanceAfterWei: before.toString(),
+      funded: true,
+      fundingClaims: 0,
+      transactionHashes: []
+    };
+  }
 
   for (const candidate of providers) {
     if (candidate === 'coinbase' && !coinbaseCdpConfigured()) continue;
     if (candidate === 'chainstack' && !chainstackMcpConfigured()) continue;
 
-    try {
-      const request = await requestSepoliaEth(address, { provider: candidate });
-      const deadline = Date.now() + timeoutMs;
+    const deadline = Date.now() + timeoutMs;
+    const remaining = minBalanceWei > before ? minBalanceWei - before : 0n;
+    const requiredClaims = (remaining + COINBASE_ETH_PER_CLAIM_WEI - 1n) / COINBASE_ETH_PER_CLAIM_WEI;
+    const maxClaims = candidate === 'coinbase'
+      ? Math.min(maxCdpClaims, Number(requiredClaims + 2n))
+      : 1;
+    const transactionHashes = [];
+    let claims = 0;
 
-      while (Date.now() <= deadline) {
-        const current = BigInt(await novaCryptoBalance(address));
-        if (current >= minBalanceWei && current > before) {
-          return {
-            ...request,
-            fundingProvider: candidate,
-            balanceBeforeWei: before.toString(),
-            balanceAfterWei: current.toString(),
-            funded: true
-          };
+    try {
+      while (claims < maxClaims && Date.now() <= deadline) {
+        const request = await requestSepoliaEth(address, { provider: candidate });
+        claims += 1;
+        if (request?.transactionHash) transactionHashes.push(request.transactionHash);
+
+        while (Date.now() <= deadline) {
+          const current = BigInt(await novaCryptoBalance(address));
+          if (current >= minBalanceWei) {
+            return {
+              ...request,
+              fundingProvider: candidate,
+              balanceBeforeWei: before.toString(),
+              balanceAfterWei: current.toString(),
+              funded: true,
+              fundingClaims: claims,
+              transactionHashes
+            };
+          }
+
+          if (current > before) before = current;
+          await new Promise((resolve) => setTimeout(resolve, pollMs));
         }
-        await new Promise((resolve) => setTimeout(resolve, pollMs));
       }
 
       const after = BigInt(await novaCryptoBalance(address));
       errors.push({
         provider: candidate,
+        claims,
+        transactionHashes,
         error: `balance target not reached (before=${before} after=${after} target=${minBalanceWei})`
       });
       before = after;
     } catch (error) {
-      errors.push({ provider: candidate, error: String(error.message || error) });
+      errors.push({
+        provider: candidate,
+        claims,
+        transactionHashes,
+        error: String(error.message || error)
+      });
     }
   }
 
