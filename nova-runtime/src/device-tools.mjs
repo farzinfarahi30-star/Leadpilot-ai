@@ -4,6 +4,7 @@ import {
   desktopCommanderHealth,
   executeDesktopCommanderTool
 } from './desktop-commander-mcp.mjs';
+import { dispatchNovaTokenTestnet } from './chain-ops.mjs';
 
 export async function listDesktopCommanderTools(){
   if(!desktopCommanderConfigured()){
@@ -17,10 +18,20 @@ export async function callDesktopCommanderTool(name,args={}){
   return await executeDesktopCommanderTool(name,args,Date.now());
 }
 
+/**
+ * Nova-owned NOVA token testnet deployment control.
+ * Governor-style hard checks remain inside chain-ops.mjs; this tool only
+ * dispatches the already-reviewed GitHub Actions deployment workflow.
+ */
+export async function deployNovaTokenTestnet(owner, maxSupplyTokens=1000000){
+  return await dispatchNovaTokenTestnet({owner, maxSupplyTokens});
+}
+
 export const NOVA_DEVICE_TOOLS={
   ...device.TOOL_REGISTRY,
   listDesktopCommanderTools,
-  callDesktopCommanderTool
+  callDesktopCommanderTool,
+  deployNovaTokenTestnet
 };
 
 export async function executeDeviceTool(name,args=[]){
