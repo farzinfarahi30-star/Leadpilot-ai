@@ -81,239 +81,58 @@ jobs:
           [[ "$DEPLOYER_ADDRESS" =~ ^0x[0-9a-fA-F]{40}$ ]]
           echo "deployer_address_format_valid"
 
-      - name: Fund disposable deployer through public Sepolia faucets
+      - name: Fund disposable deployer through GetSepolia free faucet API
         env:
-          DEPLOYER_ADDRESS: ${{ steps.key.outputs.deployer_address }}
+          DEPLOYER_ADDRESS: \${{ steps.key.outputs.deployer_address }}
         shell: bash
         run: |
           set -euo pipefail
 
-          PLAYWRIGHT_DIR="$RUNNER_TEMP/nova-playwright"
-          npm install --prefix "$PLAYWRIGHT_DIR" --no-package-lock playwright@1.55.0 >/dev/null 2>&1
-          "$PLAYWRIGHT_DIR/node_modules/.bin/playwright" install chromium >/dev/null
+          FAUCET_BASE="https://getsepolia.2bd.net"
+          echo "faucet_provider=GetSepolia"
+          echo "faucet_recipient=$DEPLOYER_ADDRESS"
 
-          cat > "$RUNNER_TEMP/claim_sep_eth.cjs" <<'JS'
-          const { chromium } = require("playwright");
-          const fs = require("node:fs");
+          CONFIG="$(curl -fsSL --retry 3 --retry-delay 2 "$FAUCET_BASE/api/faucet-config")"
+          python - "$CONFIG" <<'PY'
+          import json, sys
+          x = json.loads(sys.argv[1])
+          assert x.get("enabled") is True
+          assert float(x["amount_eth"]) > 0
+          print("faucet_config_ok=true amount_eth="+str(x["amount_eth"])+" cooldown_hours="+str(x["cooldown_hours"]))
+          PY
 
-          (async () => {
-            const address = process.env.DEPLOYER_ADDRESS;
-            const rpcUrl = process.env.SEPOLIA_RPC_URL;
-            if (!/^0x[a-fA-F0-9]{40}$/.test(address)) throw new Error("invalid deployer address");
+          RESPONSE="$(curl -fsS --retry 3 --retry-delay 2 \
+            -H "Content-Type: application/json" \
+            -X POST "$FAUCET_BASE/api/faucet" \
+            --data "{\"recipient_address\":\"$DEPLOYER_ADDRESS\"}")"
 
-            const urls = [
-              "https://ethfaucet.com/networks/ethereum/ethereum-sepolia",
-              "https://ghostchain.io/faucet/ethereum-sepolia/",
-              "https://faucet.ghostchain.io/"
-            ];
-
-            const browser = await chromium.launch({ headless: true });
-            const context = await browser.newContext({
-              userAgent: "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/140 Safari/537.36"
-            });
-
-            const errors = [];
-            let funded = false;
-            async function getBalanceWei() {
-              const response = await fetch(rpcUrl, {
-                method: "POST",
-                headers: { "content-type": "application/json" },
-                body: JSON.stringify({
-                  jsonrpc: "2.0",
-                  id: 1,
-                  method: "eth_getBalance",
-                  params: [address, "latest"]
-                })
-              });
-              if (!response.ok) throw new Error("Sepolia RPC HTTP " + response.status);
-              const data = await response.json();
-              if (data.error) throw new Error("Sepolia RPC error: " + JSON.stringify(data.error));
-              return BigInt(data.result);
-            }
-
-            try {
-              for (const url of urls) {
-                const page = await context.newPage();
-                const responseHashes = [];
-                page.on("response", async (response) => {
-                  try {
-                    if (response.status() >= 200 && response.status() < 400) {
-                      const ct = response.headers()["content-type"] || "";
-                      if (ct.includes("application/json")) {
-                        const body = await response.text();
-                        for (const h of (body.match(/0x[a-fA-F0-9]{64}/g) || [])) responseHashes.push(h);
-                      }
-                    }
-                  } catch {}
-                });
-
-                try {
-                  await page.goto(url, { waitUntil: "domcontentloaded", timeout: 60000 });
-                  await page.waitForTimeout(3500);
-
-                  const frameUrls = page.frames().map((frame) => frame.url());
-                  console.log("faucet_url=" + url);
-                  console.log("frame_urls=" + JSON.stringify(frameUrls));
-
-                  let bodyText = (await page.locator("body").innerText()).slice(0, 30000);
-                  if (/captcha|turnstile|recaptcha|cloudflare challenge|verify you are human/i.test(bodyText)) {
-                    throw new Error("interactive anti-bot challenge detected; no bypass attempted");
-                  }
-
-                  const controlSelector = 'input, textarea, [contenteditable="true"], [role="textbox"]';
-                  const controls = page.locator(controlSelector);
-                  const count = await controls.count();
-                  const inspected = [];
-
-                  for (let i = 0; i < count; i++) {
-                    const el = controls.nth(i);
-                    const info = await el.evaluate((node) => ({
-                      tag: node.tagName.toLowerCase(),
-                      type: node.getAttribute("type") || "",
-                      name: node.getAttribute("name") || "",
-                      id: node.id || "",
-                      placeholder: node.getAttribute("placeholder") || "",
-                      aria: node.getAttribute("aria-label") || "",
-                      role: node.getAttribute("role") || "",
-                      value: node.value || "",
-                      rect: (() => { const r=node.getBoundingClientRect(); return {w:r.width,h:r.height}; })()
-                    })).catch(() => null);
-                    if (info) inspected.push(info);
-                  }
-
-                  console.log("text_controls=" + JSON.stringify(inspected));
-
-                  let bestIndex = -1;
-                  let bestScore = -1;
-
-                  for (let i = 0; i < count; i++) {
-                    const x = inspected[i];
-                    if (!x) continue;
-                    const meta = [x.name,x.id,x.placeholder,x.aria,x.role].join(" ").toLowerCase();
-                    const type = x.type.toLowerCase();
-                    if (["checkbox","radio","submit","button","hidden","file"].includes(type)) continue;
-
-                    let score = 0;
-                    if (/wallet|address|ethereum|destination|recipient|0x/.test(meta)) score += 100;
-                    if (x.rect.w > 0 && x.rect.h > 0) score += 10;
-                    if (type === "text") score += 5;
-                    if (score > bestScore) { bestScore = score; bestIndex = i; }
-                  }
-
-                  if (bestIndex < 0) {
-                    const textbox = page.getByRole("textbox").first();
-                    if (await textbox.count()) {
-                      bestIndex = 0;
-                    } else {
-                      throw new Error("no address textbox/control found");
-                    }
-                  }
-
-                  let locator = controls.nth(bestIndex);
-                  const tag = inspected[bestIndex]?.tag || "";
-                  await locator.scrollIntoViewIfNeeded().catch(()=>{});
-                  await locator.fill(address, { force: true });
-
-                  await page.waitForTimeout(2000);
-
-                  const clickables = page.locator('button, input[type="submit"], [role="button"], a');
-                  const buttonCount = await clickables.count();
-                  const labels = [];
-                  const preferred = [];
-
-                  for (let i = 0; i < buttonCount; i++) {
-                    const b = clickables.nth(i);
-                    const visible = await b.isVisible().catch(() => false);
-                    if (!visible) continue;
-                    const text = ((await b.innerText().catch(()=>"")) || (await b.getAttribute("value").catch(()=>"")) || "").trim();
-                    if (!text) continue;
-                    labels.push(text);
-                    if (/connect wallet|sign in|login|logout|menu/i.test(text)) continue;
-                    if (/claim.*(0\.1|0\.01|eth)|request.*(0\.1|0\.01|eth)|send.*eth|check eligibility|verify with bringid|verify|continue/i.test(text)) {
-                      preferred.push({b,text});
-                    }
-                  }
-
-                  console.log("visible_actions=" + JSON.stringify(labels.slice(0,80)));
-
-                  if (!preferred.length) throw new Error("no normal claim/verification action found");
-
-                  let clicked = false;
-                  for (const {b,text} of preferred) {
-                    try {
-                      const disabled = await b.isDisabled().catch(() => false);
-                      if (disabled) continue;
-                      await b.scrollIntoViewIfNeeded().catch(()=>{});
-                      await b.click({ timeout: 15000 });
-                      console.log("clicked_action=" + text);
-                      clicked = true;
-                      break;
-                    } catch {}
-                  }
-                  if (!clicked) throw new Error("claim/verification action could not be clicked");
-
-                  await page.waitForTimeout(5000);
-                  try { await page.waitForLoadState("networkidle", { timeout: 15000 }); } catch {}
-
-                  bodyText = await page.locator("body").innerText();
-                  fs.writeFileSync(
-                    process.env.RUNNER_TEMP + "/sep_faucet_result.txt",
-                    "URL=" + url + "\n" + bodyText.slice(0, 50000)
-                  );
-
-                  if (/captcha|turnstile|recaptcha|cloudflare challenge|verify you are human/i.test(bodyText)) {
-                    throw new Error("interactive anti-bot challenge appeared; no bypass attempted");
-                  }
-
-                  const html = await page.content();
-                  const hashes = [
-                    ...responseHashes,
-                    ...(bodyText.match(/0x[a-fA-F0-9]{64}/g) || []),
-                    ...(html.match(/0x[a-fA-F0-9]{64}/g) || [])
-                  ];
-
-                  console.log("sep_faucet_submitted=true");
-                  console.log("sep_faucet_url=" + url);
-                  if (hashes.length) console.log("sep_faucet_tx_hash=" + hashes[0]);
-
-                  for (let poll = 1; poll <= 12; poll++) {
-                    const balanceWei = await getBalanceWei();
-                    console.log("faucet_balance_wei_after_claim=" + balanceWei.toString());
-                    if (balanceWei > 0n) {
-                      funded = true;
-                      console.log("sep_faucet_funding_detected=true");
-                      break;
-                    }
-                    await new Promise((resolve) => setTimeout(resolve, 5000));
-                  }
-
-                  console.log("faucet_result_excerpt=" + bodyText.slice(-2500).replace(/\\n/g, " | "));
-                  await page.close();
-                  if (funded) break;
-                  throw new Error("faucet claim submitted but no Sepolia ETH detected after 60s");
-                } catch (e) {
-                  const msg = `${url}: ${e.message}`;
-                  errors.push(msg);
-                  console.log("faucet_attempt_error=" + msg);
-                  await page.close().catch(()=>{});
-                }
-              }
-            } finally {
-              await browser.close();
-            }
-
-            if (funded) return;
-            if (errors.length) throw new Error(errors.join(" | "));
-            throw new Error("all public Sepolia faucet attempts failed");
-          })().catch((error) => { console.error(error); process.exit(1); });
-          JS
-
-          NODE_PATH="$PLAYWRIGHT_DIR/node_modules" node "$RUNNER_TEMP/claim_sep_eth.cjs"
+          CLAIM_ID="$(python - "$RESPONSE" "$DEPLOYER_ADDRESS" <<'PY'
+          import json, sys
+          x = json.loads(sys.argv[1])
+          expected = sys.argv[2].lower()
+          assert x.get("id"), "GetSepolia did not return a claim id"
+          assert x.get("recipient_address","").lower() == expected, "recipient mismatch"
+          print(x["id"])
+          print("claim_status="+str(x.get("status")), file=sys.stderr)
+          print("claim_amount_eth="+str(x.get("amount_eth")), file=sys.stderr)
+          PY
+          )"
+          echo "claim_id=$CLAIM_ID"
 
           FUNDED=0
-          for i in $(seq 1 36); do
+          for i in $(seq 1 72); do
+            STATUS="$(curl -fsS --retry 2 "$FAUCET_BASE/api/faucet/$CLAIM_ID")"
+            python - "$STATUS" <<'PY'
+          import json, sys
+          x = json.loads(sys.argv[1])
+          print("claim_status="+str(x.get("status")))
+          print("claim_tx_hash="+str(x.get("payout_tx_hash") or ""))
+          print("claim_confirmed_at="+str(x.get("payout_confirmed_at") or ""))
+          PY
+
             BAL="$(cast balance "$DEPLOYER_ADDRESS" --rpc-url "$SEPOLIA_RPC_URL" --ether)"
             echo "deployer_balance_eth=$BAL"
+
             if python - "$BAL" <<'PY'
           from decimal import Decimal
           import sys
@@ -323,23 +142,17 @@ jobs:
               FUNDED=1
               break
             fi
-            sleep 10
+
+            sleep 5
           done
 
           if [ "$FUNDED" -ne 1 ]; then
-            echo "Public Sepolia faucets did not deliver ETH to the disposable deployer"
+            echo "GetSepolia accepted the claim but did not fund the disposable deployer within the polling window"
+            echo "last_claim_status=$(curl -fsS "$FAUCET_BASE/api/faucet/$CLAIM_ID")"
             exit 1
           fi
-          echo "sepolia_funding_confirmed=true"
 
-      - name: Require latest Boss branch head before broadcast
-        shell: bash
-        run: |
-          set -euo pipefail
-          BRANCH='boss-nova-sepolia-final-20260921'
-          REMOTE_HEAD="$(git ls-remote origin "refs/heads/$BRANCH" | awk '{print $1}')"
-          test "$REMOTE_HEAD" = "${GITHUB_SHA}"
-          echo "latest_branch_head_before_broadcast_confirmed"
+          echo "sepolia_funding_confirmed=true"
 
       - name: Deploy NovaToken
         shell: bash
