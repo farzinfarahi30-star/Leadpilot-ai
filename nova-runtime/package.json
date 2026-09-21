@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node src/worker.mjs",
     "smoke": "node src/smoke.mjs",
-    "device:smoke": "node src/device-bridge-smoke.mjs"
+    "device:smoke": "node ../nova-device/src/smoke.mjs"
   },
   "dependencies": {
     "playwright": "^1.55.0"
