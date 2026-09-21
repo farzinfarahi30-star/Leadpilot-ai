@@ -158,9 +158,20 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          NOVA_DEPLOYER_PRIVATE_KEY="0x$(cat "$RUNNER_TEMP/nova_deployer_key")" NOVA_OWNER="$NOVA_OWNER" NOVA_MAX_SUPPLY_TOKENS="$NOVA_MAX_SUPPLY_TOKENS" \
+          trap 'rm -f "$RUNNER_TEMP/nova_deployer_key"' EXIT
+
+          KEY_HEX="0x$(cat "$RUNNER_TEMP/nova_deployer_key")"
+          KEY_UINT="$(python - "$KEY_HEX" <<'PY'
+          import sys
+          key = sys.argv[1]
+          if not key.startswith("0x"):
+              raise SystemExit("deployer key must be hexadecimal")
+          print(int(key, 16))
+          PY
+          )"
+
+          NOVA_DEPLOYER_PRIVATE_KEY="$KEY_UINT" NOVA_OWNER="$NOVA_OWNER" NOVA_MAX_SUPPLY_TOKENS="$NOVA_MAX_SUPPLY_TOKENS" \
             forge script nova-economy/script/DeployNovaToken.s.sol:DeployNovaToken --rpc-url "$SEPOLIA_RPC_URL" --broadcast
-          rm -f "$RUNNER_TEMP/nova_deployer_key"
 
       - name: Extract and verify on-chain deployment
         shell: bash
