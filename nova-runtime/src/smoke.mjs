@@ -1,5 +1,9 @@
 import { chromium } from 'playwright';
-import { NOVA_DEVICE_TOOLS, listDesktopCommanderTools } from './device-tools.mjs';
+import {
+  NOVA_DEVICE_TOOLS,
+  listDesktopCommanderTools,
+  alchemySepoliaNetwork
+} from './device-tools.mjs';
 import { desktopCommanderConfigured } from './desktop-commander-mcp.mjs';
 
 const required=[
@@ -9,6 +13,12 @@ const required=[
   'novaSepoliaPreflight',
   'deployNovaTokenSepoliaOnChain',
   'verifyNovaTokenSepoliaOnChain',
+  'alchemySepoliaNetwork',
+  'alchemySepoliaRpcCall',
+  'alchemySepoliaGetChainId',
+  'alchemySepoliaGetBlockNumber',
+  'alchemySepoliaGetBalance',
+  'alchemySepoliaGetTransactionReceipt',
   'readFile',
   'writeFile',
   'startProcess',
@@ -21,6 +31,12 @@ const remote=await listDesktopCommanderTools();
 if(desktopCommanderConfigured()!==Boolean(process.env.DESKTOP_COMMANDER_OAUTH_TOKEN))
   throw new Error('Desktop Commander configuration state mismatch.');
 
+const alchemy=alchemySepoliaNetwork();
+if(alchemy.chainId!==11155111) throw new Error('Alchemy Sepolia chain ID mismatch.');
+if(!alchemy.faucetUrl.includes('alchemy.com/faucets/ethereum-sepolia'))
+  throw new Error('Alchemy Sepolia faucet integration mismatch.');
+if(!alchemy.rpcUrl) throw new Error('Alchemy Sepolia RPC URL missing.');
+
 const browser=await chromium.launch({headless:true});
 try{
   const page=await browser.newPage();
@@ -32,6 +48,7 @@ try{
     deviceToolCount:Object.keys(NOVA_DEVICE_TOOLS).length,
     novaTokenDeploymentTool:true,
     novaSepoliaControllerTools:true,
+    alchemySepoliaIntegration:true,
     desktopCommander:{configured:remote.configured,connected:Boolean(remote.connected),toolCount:remote.toolCount??0}
   }));
 }finally{await browser.close()}
