@@ -6,6 +6,9 @@ const required=[
   'listDesktopCommanderTools',
   'callDesktopCommanderTool',
   'deployNovaTokenTestnet',
+  'novaSepoliaPreflight',
+  'deployNovaTokenSepoliaOnChain',
+  'verifyNovaTokenSepoliaOnChain',
   'readFile',
   'writeFile',
   'startProcess',
@@ -28,6 +31,7 @@ try{
     url:page.url(),
     deviceToolCount:Object.keys(NOVA_DEVICE_TOOLS).length,
     novaTokenDeploymentTool:true,
+    novaSepoliaControllerTools:true,
     desktopCommander:{configured:remote.configured,connected:Boolean(remote.connected),toolCount:remote.toolCount??0}
   }));
 }finally{await browser.close()}
