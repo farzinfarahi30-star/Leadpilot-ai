@@ -1,7 +1,7 @@
 import process from 'node:process';
 
 const SEPOLIA_CHAIN_ID = 11155111;
-const DEFAULT_PUBLIC_RPC = 'https://ethereum-sepolia-rpc.publicnode.com';
+const ALCHEMY_SEPOLIA_PUBLIC_RPC = 'https://eth-sepolia.g.alchemy.com/v2/demo';
 const ALCHEMY_SEPOLIA_RPC = 'https://eth-sepolia.g.alchemy.com/v2/';
 const ALCHEMY_SEPOLIA_WS = 'wss://eth-sepolia.g.alchemy.com/v2/';
 const ALCHEMY_SEPOLIA_FAUCET = 'https://www.alchemy.com/faucets/ethereum-sepolia';
@@ -11,7 +11,7 @@ function env(name) {
 }
 
 export function alchemySepoliaRpcUrl(apiKey = env('NOVA_ALCHEMY_API_KEY') || env('ALCHEMY_API_KEY')) {
-  return apiKey ? ALCHEMY_SEPOLIA_RPC + encodeURIComponent(apiKey) : DEFAULT_PUBLIC_RPC;
+  return apiKey ? ALCHEMY_SEPOLIA_RPC + encodeURIComponent(apiKey) : ALCHEMY_SEPOLIA_PUBLIC_RPC;
 }
 
 export function alchemySepoliaWsUrl(apiKey = env('NOVA_ALCHEMY_API_KEY') || env('ALCHEMY_API_KEY')) {
@@ -20,10 +20,12 @@ export function alchemySepoliaWsUrl(apiKey = env('NOVA_ALCHEMY_API_KEY') || env(
 }
 
 export function alchemySepoliaResources() {
+  const apiKeyConfigured = Boolean(env('NOVA_ALCHEMY_API_KEY') || env('ALCHEMY_API_KEY'));
   return {
+    provider: 'alchemy',
     network: 'ethereum-sepolia',
     chainId: SEPOLIA_CHAIN_ID,
-    rpcUrlConfigured: Boolean(env('NOVA_ALCHEMY_API_KEY') || env('ALCHEMY_API_KEY')),
+    rpcUrlConfigured: apiKeyConfigured,
     rpcUrl: alchemySepoliaRpcUrl(),
     wsUrl: alchemySepoliaWsUrl(),
     faucetUrl: ALCHEMY_SEPOLIA_FAUCET
