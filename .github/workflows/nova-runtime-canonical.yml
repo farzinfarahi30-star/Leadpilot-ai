@@ -5,6 +5,7 @@ on:
     paths:
       - 'nova-runtime/package.json'
       - 'nova-runtime/src/**'
+      - 'nova-device/**'
       - 'nova-mail/package.json'
       - 'nova-mail/src/**'
       - '.github/workflows/nova-runtime-canonical.yml'
@@ -61,6 +62,18 @@ jobs:
       - name: Install Nova Mail
         working-directory: nova-mail
         run: npm install --omit=dev
+
+      - name: Install Nova Device
+        working-directory: nova-device
+        run: npm install --omit=dev
+
+      - name: Validate Nova Device
+        working-directory: nova-device
+        run: |
+          node --check src/core.mjs
+          node --check src/server.mjs
+          node --check src/smoke.mjs
+          node src/smoke.mjs
 
       - name: Validate Nova Mail
         working-directory: nova-mail
