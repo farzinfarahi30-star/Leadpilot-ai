@@ -111,8 +111,7 @@ jobs:
               userAgent: "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/140 Safari/537.36"
             });
 
-            let lastError = "all public Sepolia faucet attempts failed";
-
+            const errors = [];
             try {
               for (const url of urls) {
                 const page = await context.newPage();
@@ -131,68 +130,111 @@ jobs:
 
                 try {
                   await page.goto(url, { waitUntil: "domcontentloaded", timeout: 60000 });
-                  await page.waitForTimeout(2500);
+                  await page.waitForTimeout(3500);
+
+                  const frameUrls = page.frames().map((frame) => frame.url());
+                  console.log("faucet_url=" + url);
+                  console.log("frame_urls=" + JSON.stringify(frameUrls));
 
                   let bodyText = (await page.locator("body").innerText()).slice(0, 30000);
                   if (/captcha|turnstile|recaptcha|cloudflare challenge|verify you are human/i.test(bodyText)) {
                     throw new Error("interactive anti-bot challenge detected; no bypass attempted");
                   }
 
-                  const visibleInputs = await page.locator("input:visible").evaluateAll((els) =>
-                    els.map((el) => ({
-                      type: el.getAttribute("type") || "text",
-                      name: el.getAttribute("name") || "",
-                      id: el.id || "",
-                      placeholder: el.getAttribute("placeholder") || "",
-                      aria: el.getAttribute("aria-label") || ""
-                    }))
-                  );
+                  const controlSelector = 'input, textarea, [contenteditable="true"], [role="textbox"]';
+                  const controls = page.locator(controlSelector);
+                  const count = await controls.count();
+                  const inspected = [];
 
-                  const candidate = visibleInputs.find((x) =>
-                    !["checkbox","radio","submit","button"].includes(x.type) &&
-                    /wallet|address|ethereum|0x/i.test([x.name,x.id,x.placeholder,x.aria].join(" "))
-                  ) || visibleInputs.find((x) =>
-                    !["checkbox","radio","submit","button"].includes(x.type)
-                  );
-
-                  if (!candidate) throw new Error("no visible wallet-address input found");
-
-                  let locator;
-                  if (candidate.id) locator = page.locator("#" + CSS.escape(candidate.id));
-                  else if (candidate.name) locator = page.locator(`input[name="${candidate.name}"]`);
-                  else locator = page.locator("input:visible").first();
-
-                  await locator.fill(address);
-                  await page.waitForTimeout(1500);
-
-                  const buttons = page.locator("button:visible, input[type=submit]:visible");
-                  const buttonCount = await buttons.count();
-                  const preferred = [];
-                  const fallback = [];
-
-                  for (let i = 0; i < buttonCount; i++) {
-                    const b = buttons.nth(i);
-                    const txt = ((await b.innerText().catch(()=>"")) || (await b.getAttribute("value").catch(()=>"")) || "").trim();
-                    if (/connect wallet|sign in|login|logout|menu/i.test(txt)) continue;
-                    if (/claim.*(0\.1|0\.01|eth)|request|send|check eligibility|continue|verify/i.test(txt)) preferred.push(b);
-                    else if (/claim/i.test(txt)) fallback.push(b);
+                  for (let i = 0; i < count; i++) {
+                    const el = controls.nth(i);
+                    const info = await el.evaluate((node) => ({
+                      tag: node.tagName.toLowerCase(),
+                      type: node.getAttribute("type") || "",
+                      name: node.getAttribute("name") || "",
+                      id: node.id || "",
+                      placeholder: node.getAttribute("placeholder") || "",
+                      aria: node.getAttribute("aria-label") || "",
+                      role: node.getAttribute("role") || "",
+                      value: node.value || "",
+                      rect: (() => { const r=node.getBoundingClientRect(); return {w:r.width,h:r.height}; })()
+                    })).catch(() => null);
+                    if (info) inspected.push(info);
                   }
 
-                  const candidates = [...preferred, ...fallback];
-                  if (!candidates.length) throw new Error("no normal claim or verification button found");
+                  console.log("text_controls=" + JSON.stringify(inspected));
+
+                  let bestIndex = -1;
+                  let bestScore = -1;
+
+                  for (let i = 0; i < count; i++) {
+                    const x = inspected[i];
+                    if (!x) continue;
+                    const meta = [x.name,x.id,x.placeholder,x.aria,x.role].join(" ").toLowerCase();
+                    const type = x.type.toLowerCase();
+                    if (["checkbox","radio","submit","button","hidden","file"].includes(type)) continue;
+
+                    let score = 0;
+                    if (/wallet|address|ethereum|destination|recipient|0x/.test(meta)) score += 100;
+                    if (x.rect.w > 0 && x.rect.h > 0) score += 10;
+                    if (type === "text") score += 5;
+                    if (score > bestScore) { bestScore = score; bestIndex = i; }
+                  }
+
+                  if (bestIndex < 0) {
+                    const textbox = page.getByRole("textbox").first();
+                    if (await textbox.count()) {
+                      bestIndex = 0;
+                    } else {
+                      throw new Error("no address textbox/control found");
+                    }
+                  }
+
+                  let locator = controls.nth(bestIndex);
+                  const tag = inspected[bestIndex]?.tag || "";
+                  await locator.scrollIntoViewIfNeeded().catch(()=>{});
+                  await locator.fill(address, { force: true });
+
+                  await page.waitForTimeout(2000);
+
+                  const clickables = page.locator('button, input[type="submit"], [role="button"], a');
+                  const buttonCount = await clickables.count();
+                  const labels = [];
+                  const preferred = [];
+
+                  for (let i = 0; i < buttonCount; i++) {
+                    const b = clickables.nth(i);
+                    const visible = await b.isVisible().catch(() => false);
+                    if (!visible) continue;
+                    const text = ((await b.innerText().catch(()=>"")) || (await b.getAttribute("value").catch(()=>"")) || "").trim();
+                    if (!text) continue;
+                    labels.push(text);
+                    if (/connect wallet|sign in|login|logout|menu/i.test(text)) continue;
+                    if (/claim.*(0\.1|0\.01|eth)|request.*(0\.1|0\.01|eth)|send.*eth|check eligibility|verify with bringid|verify|continue/i.test(text)) {
+                      preferred.push({b,text});
+                    }
+                  }
+
+                  console.log("visible_actions=" + JSON.stringify(labels.slice(0,80)));
+
+                  if (!preferred.length) throw new Error("no normal claim/verification action found");
 
                   let clicked = false;
-                  for (const b of candidates) {
+                  for (const {b,text} of preferred) {
                     try {
+                      const disabled = await b.isDisabled().catch(() => false);
+                      if (disabled) continue;
+                      await b.scrollIntoViewIfNeeded().catch(()=>{});
                       await b.click({ timeout: 15000 });
+                      console.log("clicked_action=" + text);
                       clicked = true;
                       break;
                     } catch {}
                   }
-                  if (!clicked) throw new Error("claim or verification button could not be clicked");
+                  if (!clicked) throw new Error("claim/verification action could not be clicked");
 
-                  await page.waitForTimeout(8000);
-                  try { await page.waitForLoadState("networkidle", { timeout: 10000 }); } catch {}
+                  await page.waitForTimeout(10000);
+                  try { await page.waitForLoadState("networkidle", { timeout: 15000 }); } catch {}
 
                   bodyText = await page.locator("body").innerText();
                   fs.writeFileSync(
@@ -216,10 +258,11 @@ jobs:
                   if (hashes.length) console.log("sep_faucet_tx_hash=" + hashes[0]);
 
                   await page.close();
-                  lastError = "";
                   break;
                 } catch (e) {
-                  lastError = `${url}: ${e.message}`;
+                  const msg = `${url}: ${e.message}`;
+                  errors.push(msg);
+                  console.log("faucet_attempt_error=" + msg);
                   await page.close().catch(()=>{});
                 }
               }
@@ -227,11 +270,12 @@ jobs:
               await browser.close();
             }
 
-            if (lastError) throw new Error(lastError);
+            if (errors.length) throw new Error(errors.join(" | "));
+            throw new Error("all public Sepolia faucet attempts failed");
           })().catch((error) => { console.error(error); process.exit(1); });
           JS
 
-          NODE_PATH="$RUNNER_TEMP/nova-playwright/node_modules" node "$RUNNER_TEMP/claim_sep_eth.cjs"
+          NODE_PATH="$PLAYWRIGHT_DIR/node_modules" node "$RUNNER_TEMP/claim_sep_eth.cjs"
 
           FUNDED=0
           for i in $(seq 1 36); do
