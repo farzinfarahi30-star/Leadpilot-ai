@@ -1,0 +1,22 @@
+import assert from 'node:assert/strict';
+import { buildCompanyTakeoverPlan, loadCompanyTakeoverManifest, validateCompanyTakeoverManifest } from '../src/company-takeover.mjs';
+
+const manifest=loadCompanyTakeoverManifest();
+const validation=validateCompanyTakeoverManifest(manifest);
+assert.equal(validation.ok,true,validation.errors.join('; '));
+assert.equal(manifest.takeover.sourceCompany,'AI Business Factory');
+assert.equal(manifest.takeover.sourceVersion,517);
+assert.equal(manifest.inventory.totalFiles,515);
+assert.equal(manifest.inventory.apiSourceFiles,239);
+assert.equal(manifest.inventory.libraryFiles,30);
+assert.equal(manifest.inventory.deployedFunctions,279);
+assert.equal(manifest.inventory.databaseTables,221);
+assert.equal(manifest.programs.control_plane.length>0,true);
+assert.equal(manifest.programs.infrastructure_and_tools.length>0,true);
+assert.equal(manifest.securityBoundary.secretsPolicy.includes('never private keys'),true);
+const plan=buildCompanyTakeoverPlan();
+assert.equal(plan.takeover,true);
+assert.equal(plan.owner,'nova');
+assert.equal(plan.mode,'company-replication-takeover');
+assert.equal(plan.validation.ok,true);
+console.log(JSON.stringify({ok:true,mode:plan.mode,source:plan.source,inventory:plan.inventory,toolCount:plan.tools.total,programGroups:Object.keys(plan.programGroups).length},null,2));
