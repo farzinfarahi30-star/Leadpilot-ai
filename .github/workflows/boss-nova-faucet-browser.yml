@@ -28,7 +28,7 @@ jobs:
           TARGET_ADDR: "0x63970A951bd69975eF2aDAD27bf73584D2DCeF9B"
         run: |
           set -euo pipefail
-          cat > /tmp/faucet.mjs <<'JS'
+          cat > faucet.mjs <<'JS'
           import { chromium } from 'playwright';
           const address=process.env.TARGET_ADDR;
           const browser=await chromium.launch({headless:true,args:['--disable-dev-shm-usage']});
@@ -51,4 +51,4 @@ jobs:
           await page.screenshot({path:'/tmp/faucet.png',fullPage:true});
           await browser.close();
           JS
-          node /tmp/faucet.mjs
+          node faucet.mjs
