@@ -1,6 +1,6 @@
 #!/data/data/com.termux/files/usr/bin/bash
 set -eu
-ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+ROOT="$(cd "$(dirname "$0")" && pwd)"
 PROFILE="${NOVA_TERMUX_PROFILE:-developer}"
 export NOVA_DEVICE_ALLOWED_ROOTS="${NOVA_DEVICE_ALLOWED_ROOTS:-$HOME/Leadpilot-ai:$ROOT}"
 printf '%s\n' "Nova Termux bootstrap: profile=$PROFILE"
@@ -13,6 +13,8 @@ case "$PROFILE" in
   *) echo "Unknown NOVA_TERMUX_PROFILE: $PROFILE" >&2; exit 2 ;;
 esac
 pkg install -y $PKGS
+cd "$ROOT"
+npm install --omit=dev
 mkdir -p "$ROOT/.nova-device"
 node "$ROOT/src/smoke.mjs"
 printf '%s\n' "Nova Termux bootstrap complete."
