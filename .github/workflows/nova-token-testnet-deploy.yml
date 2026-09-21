@@ -1,6 +1,10 @@
 name: Nova Token Testnet Deploy
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - '.nova/deploy-sepolia.once'
   workflow_dispatch:
     inputs:
       owner:
@@ -21,8 +25,8 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     env:
-      NOVA_OWNER: ${{ inputs.owner }}
-      NOVA_MAX_SUPPLY_TOKENS: ${{ inputs.max_supply_tokens }}
+      NOVA_OWNER: ${{ inputs.owner || '0x63970A951bd69975eF2aDAD27bf73584D2DCeF9B' }}
+      NOVA_MAX_SUPPLY_TOKENS: ${{ inputs.max_supply_tokens || '1000000' }}
       NOVA_DEPLOYER_PRIVATE_KEY: ${{ secrets.NOVA_DEPLOYER_PRIVATE_KEY }}
       SEPOLIA_RPC_URL: ${{ secrets.SEPOLIA_RPC_URL }}
     steps:
@@ -104,7 +108,7 @@ jobs:
       - name: Verify deployment on-chain
         shell: bash
         env:
-          EXPECTED_OWNER: ${{ inputs.owner }}
+          EXPECTED_OWNER: ${{ inputs.owner || '0x63970A951bd69975eF2aDAD27bf73584D2DCeF9B' }}
         run: |
           set -euo pipefail
           ADDR="$(python - <<'PY'
