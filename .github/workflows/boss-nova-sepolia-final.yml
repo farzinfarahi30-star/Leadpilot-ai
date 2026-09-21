@@ -160,7 +160,7 @@ jobs:
           set -euo pipefail
           trap 'rm -f "$RUNNER_TEMP/nova_deployer_key"' EXIT
 
-          KEY_HEX="0x$(cat "$RUNNER_TEMP/nova_deployer_key")"
+          KEY_HEX="$(cat "$RUNNER_TEMP/nova_deployer_key")"
           KEY_UINT="$(python - "$KEY_HEX" <<'PY'
           import sys
           key = sys.argv[1]
