@@ -22,7 +22,7 @@ export const AGENTS = [
   ['testing-expert','Testing','release_verify']
 ];
 
-const FACTORY='https://ai-business-factory.hatchable.site';
+const FACTORY='https://pczigr.hatchable.site';
 const REPO=process.env.GITHUB_REPOSITORY||'farzinfarahi30-star/Leadpilot-ai';
 const TOKEN=process.env.GITHUB_TOKEN||'';
 const clean=(v)=>String(v??'').replace(/[\u0000-\u001f]+/g,' ').trim().slice(0,1000);
