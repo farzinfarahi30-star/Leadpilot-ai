@@ -1,6 +1,7 @@
 import { setTimeout as sleep } from 'node:timers/promises';
 import process from 'node:process';
 import { runAgentCycle, persistStatus } from './agent-runtime.mjs';
+import { buildCompanyTakeoverPlan } from './company-takeover.mjs';
 import { execFile } from 'node:child_process';
 import { deviceBootstrapAndDoctor } from './device-tools.mjs';
 import { deviceInfo, desktopCommanderDoctor, startDesktopCommanderRemote } from './device-bridge.mjs';
@@ -24,7 +25,25 @@ function runChainCommand(){
   });
 }
 
-log('runtime_started',{runMinutes:LOCAL_DAEMON?'infinite':RUN_MINUTES,pollMs:POLL_MS,agentCount:16,controlPlane:'nova-independent',localDaemon:LOCAL_DAEMON,deviceControl:process.env.NOVA_DEVICE_CONTROL==='true',escalation:'xx-only'});
+const companyTakeover=buildCompanyTakeoverPlan();
+if(!companyTakeover.validation.ok){
+  log('company_takeover_manifest_invalid',companyTakeover.validation);
+  process.exit(1);
+}
+
+log('runtime_started',{
+  runMinutes:LOCAL_DAEMON?'infinite':RUN_MINUTES,
+  pollMs:POLL_MS,
+  agentCount:16,
+  controlPlane:'nova-independent',
+  companyTakeover:companyTakeover.mode,
+  targetCompany:companyTakeover.source.company,
+  sourceProjectId:companyTakeover.source.projectId,
+  sourceVersion:companyTakeover.source.version,
+  localDaemon:LOCAL_DAEMON,
+  deviceControl:process.env.NOVA_DEVICE_CONTROL==='true',
+  escalation:'xx-only'
+});
 
 if(process.env.NOVA_DEVICE_COMMAND==='doctor'||process.env.NOVA_DEVICE_COMMAND==='bootstrap'){
   const report=await deviceBootstrapAndDoctor();
@@ -65,5 +84,6 @@ log('runtime_checkpoint_exit',{
   restartBySchedule:true,
   cycles:cycle,
   completed:lastResult?.completed??0,
-  failed:lastResult?.failed??0
+  failed:lastResult?.failed??0,
+  companyTakeover:{mode:companyTakeover.mode,targetCompany:companyTakeover.source.company,sourceVersion:companyTakeover.source.version}
 });
