@@ -61,7 +61,7 @@ jobs:
       - name: Fund disposable deployer from public Sepolia faucet
         shell: bash
         env:
-          DEPLOYER_ADDRESS: \${{ steps.key.outputs.deployer_address }}
+          DEPLOYER_ADDRESS: ${{ steps.key.outputs.deployer_address }}
         run: |
           set -euo pipefail
           npm install -g faucet-terminal
