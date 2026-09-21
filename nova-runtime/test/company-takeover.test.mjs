@@ -19,4 +19,4 @@ assert.equal(plan.takeover,true);
 assert.equal(plan.owner,'nova');
 assert.equal(plan.mode,'company-replication-takeover');
 assert.equal(plan.validation.ok,true);
-console.log(JSON.stringify({ok:true,mode:plan.mode,source:plan.source,inventory:plan.inventory,toolCount:plan.tools.total,programGroups:Object.keys(plan.programGroups).length},null,2));
+console.log(JSON.stringify({triggeredBy:'final-takeover-verification',ok:true,mode:plan.mode,source:plan.source,inventory:plan.inventory,toolCount:plan.tools.total,programGroups:Object.keys(plan.programGroups).length},null,2));
