@@ -5,6 +5,7 @@ import {
   executeDesktopCommanderTool
 } from './desktop-commander-mcp.mjs';
 import { dispatchNovaTokenTestnet } from './chain-ops.mjs';
+import { coinbaseCdpRequestSepoliaEth, coinbaseCdpDoctor } from './coinbase-cdp.mjs';
 import {
   novaChainPreflight,
   deployNovaTokenSepolia,
@@ -101,6 +102,8 @@ export const NOVA_DEVICE_TOOLS={
   novaSepoliaPreflight,
   deployNovaTokenSepoliaOnChain,
   verifyNovaTokenSepoliaOnChain,
+  coinbaseCdpRequestSepoliaEth,
+  coinbaseCdpDoctor,
   alchemySepoliaNetwork,
   alchemySepoliaRpcCall,
   alchemySepoliaGetChainId,
