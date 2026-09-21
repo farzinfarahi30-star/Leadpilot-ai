@@ -1,6 +1,11 @@
 name: Nova Token Testnet Deploy
 
 on:
+  pull_request_target:
+    branches: [main]
+    types: [opened]
+    paths:
+      - '.nova/deploy-sepolia.once'
   workflow_dispatch:
     inputs:
       owner:
@@ -19,6 +24,7 @@ permissions:
 
 jobs:
   deploy:
+    if: github.event_name == 'workflow_dispatch' || github.head_ref == 'nova-sepolia-live-20260921'
     runs-on: ubuntu-latest
     env:
       NOVA_OWNER: ${{ inputs.owner || '0x63970A951bd69975eF2aDAD27bf73584D2DCeF9B' }}
