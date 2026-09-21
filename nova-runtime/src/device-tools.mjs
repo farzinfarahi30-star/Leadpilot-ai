@@ -18,6 +18,18 @@ import {
   alchemySepoliaBalance,
   alchemySepoliaTransactionReceipt
 } from './alchemy.mjs';
+import {
+  alchemyPlatformRequest,
+  alchemyPortfolioTokensByAddress,
+  alchemyPricesBySymbol,
+  alchemyPricesByAddress,
+  alchemyPortfolioHistory,
+  alchemyNftRequest,
+  alchemyTransferHistory,
+  alchemyRpcGateway,
+  alchemyBundlerRpc,
+  alchemyCapabilityManifest
+} from './alchemy-capabilities.mjs';
 
 export async function listDesktopCommanderTools(){
   if(!desktopCommanderConfigured()){
@@ -94,7 +106,17 @@ export const NOVA_DEVICE_TOOLS={
   alchemySepoliaGetChainId,
   alchemySepoliaGetBlockNumber,
   alchemySepoliaGetBalance,
-  alchemySepoliaGetTransactionReceipt
+  alchemySepoliaGetTransactionReceipt,
+  alchemyPlatformRequest,
+  alchemyPortfolioTokensByAddress,
+  alchemyPricesBySymbol,
+  alchemyPricesByAddress,
+  alchemyPortfolioHistory,
+  alchemyNftRequest,
+  alchemyTransferHistory,
+  alchemyRpcGateway,
+  alchemyBundlerRpc,
+  alchemyCapabilityManifest
 };
 
 export async function executeDeviceTool(name,args=[]){
