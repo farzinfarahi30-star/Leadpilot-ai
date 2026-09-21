@@ -113,31 +113,47 @@ export async function requestSepoliaEth(address, { provider = 'auto' } = {}) {
 
 export async function requestAndConfirmSepoliaEth(
   address,
-  { provider = 'auto', minBalanceWei = 1n, pollMs = 5000, timeoutMs = 120000 } = {}
+  { provider = 'auto', minBalanceWei = 1000000000000000n, pollMs = 5000, timeoutMs = 120000 } = {}
 ) {
   assertAddress(address);
-  const before = BigInt(await novaCryptoBalance(address));
-  const request = await requestSepoliaEth(address, { provider });
-  const deadline = Date.now() + timeoutMs;
+  const providers = provider === 'auto' ? ['coinbase', 'chainstack'] : [provider];
+  const errors = [];
+  let before = BigInt(await novaCryptoBalance(address));
 
-  while (Date.now() <= deadline) {
-    const current = BigInt(await novaCryptoBalance(address));
-    if (current >= minBalanceWei && current > before) {
-      return {
-        ...request,
-        balanceBeforeWei: before.toString(),
-        balanceAfterWei: current.toString(),
-        funded: true
-      };
+  for (const candidate of providers) {
+    if (candidate === 'coinbase' && !coinbaseCdpConfigured()) continue;
+    if (candidate === 'chainstack' && !chainstackMcpConfigured()) continue;
+
+    try {
+      const request = await requestSepoliaEth(address, { provider: candidate });
+      const deadline = Date.now() + timeoutMs;
+
+      while (Date.now() <= deadline) {
+        const current = BigInt(await novaCryptoBalance(address));
+        if (current >= minBalanceWei && current > before) {
+          return {
+            ...request,
+            fundingProvider: candidate,
+            balanceBeforeWei: before.toString(),
+            balanceAfterWei: current.toString(),
+            funded: true
+          };
+        }
+        await new Promise((resolve) => setTimeout(resolve, pollMs));
+      }
+
+      const after = BigInt(await novaCryptoBalance(address));
+      errors.push({
+        provider: candidate,
+        error: `balance target not reached (before=${before} after=${after} target=${minBalanceWei})`
+      });
+      before = after;
+    } catch (error) {
+      errors.push({ provider: candidate, error: String(error.message || error) });
     }
-    await new Promise((resolve) => setTimeout(resolve, pollMs));
   }
 
-  const finalBalance = BigInt(await novaCryptoBalance(address));
-  throw new Error(
-    `Sepolia funding request returned but balance did not increase before timeout; ` +
-    `before=${before} after=${finalBalance} request=${JSON.stringify(request)}`
-  );
+  throw new Error('No authorized Sepolia funding provider reached the required balance: ' + JSON.stringify(errors));
 }
 
 export const COINBASE_SEPOLIA_NETWORK = COINBASE_CDP_SEPOLIA;
