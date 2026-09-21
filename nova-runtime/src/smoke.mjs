@@ -2,7 +2,8 @@ import { chromium } from 'playwright';
 import {
   NOVA_DEVICE_TOOLS,
   listDesktopCommanderTools,
-  alchemySepoliaNetwork
+  alchemySepoliaNetwork,
+  coinbaseCdpDoctor
 } from './device-tools.mjs';
 import { desktopCommanderConfigured } from './desktop-commander-mcp.mjs';
 
