@@ -1,6 +1,9 @@
 name: Nova Token Testnet Deploy
 
 on:
+  push:
+    branches:
+      - main
   workflow_dispatch:
     inputs:
       owner:
@@ -72,6 +75,7 @@ jobs:
           test -f nova-economy/broadcast/DeployNovaToken.s.sol/11155111/run-latest.json
           python - <<'PY'
           import json
+          import os
           from pathlib import Path
           p=Path("nova-economy/broadcast/DeployNovaToken.s.sol/11155111/run-latest.json")
           d=json.loads(p.read_text())
