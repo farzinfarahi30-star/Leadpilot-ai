@@ -1,5 +1,7 @@
 # Nova deployment runbook
 
+Nova is the deployment orchestrator. Remix is not required.
+
 ## Current owner address
 
 The intended owner/treasury address supplied by the user is:
@@ -10,13 +12,13 @@ This is a public address. No private key or recovery phrase belongs in this repo
 
 ## Testnet
 
-Ethereum currently lists Sepolia as the recommended default public testnet for application/contract development. Use Sepolia for the first deployment and validation.
+Ethereum currently lists Sepolia as the recommended default public testnet for application/contract development. Use Sepolia for the first deployment and validation. Nova can dispatch the deployment workflow through GitHub Actions.
 
-Required local secrets/config:
+Required repository secrets/config:
 - `NOVA_DEPLOYER_PRIVATE_KEY`
 - `SEPOLIA_RPC_URL`
 - `NOVA_OWNER`
-- `NOVA_MAX_SUPPLY`
+- `NOVA_MAX_SUPPLY_TOKENS`
 
 Deploy with Foundry:
 
