@@ -26,10 +26,10 @@ jobs:
       GITHUB_TOKEN: ${{ github.token }}
       RUN_MINUTES: ${{ github.event_name == 'push' && '5' || '50' }}
       POLL_MS: 600000
-      NOVA_MAIL_PROVIDER: ${{ secrets.NOVA_MAIL_PROVIDER }}
+      NOVA_MAIL_PROVIDER: ${{ secrets.NOVA_MAIL_PROVIDER || 'resend' }}
       XX_MAIL_PROVIDER: ${{ secrets.XX_MAIL_PROVIDER }}
       RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
-      RESEND_FROM: ${{ secrets.RESEND_FROM }}
+      RESEND_FROM: ${{ secrets.RESEND_FROM || 'Nova Business Factory <sales@novabusinessfactory.com>' }}
       GMAIL_ACCOUNT: ${{ secrets.GMAIL_ACCOUNT }}
       GMAIL_FROM: ${{ secrets.GMAIL_FROM }}
       GMAIL_ACCESS_TOKEN: ${{ secrets.GMAIL_ACCESS_TOKEN }}
@@ -41,7 +41,7 @@ jobs:
       OUTLOOK_CLIENT_SECRET: ${{ secrets.OUTLOOK_CLIENT_SECRET }}
       OUTLOOK_REFRESH_TOKEN: ${{ secrets.OUTLOOK_REFRESH_TOKEN }}
       NOVA_MAIL_TEST_TO: ${{ secrets.NOVA_TEST_EMAIL }}
-      NOVA_MAIL_TEST_FROM: ${{ secrets.NOVA_MAIL_TEST_FROM }}
+      NOVA_MAIL_TEST_FROM: ${{ secrets.NOVA_MAIL_TEST_FROM || 'Nova Business Factory <sales@novabusinessfactory.com>' }}
       NOVA_MAIL_TEST_APPROVED: ${{ secrets.NOVA_MAIL_TEST_APPROVED }}
     steps:
       - name: Checkout
