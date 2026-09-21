@@ -1,0 +1,50 @@
+name: Nova Runtime Validation
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'nova-runtime/**'
+      - '.github/workflows/nova-runtime-validate.yml'
+  pull_request:
+    paths:
+      - 'nova-runtime/**'
+      - '.github/workflows/nova-runtime-validate.yml'
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Validate JavaScript modules
+        run: |
+          node --check nova-runtime/src/alchemy.mjs
+          node --check nova-runtime/src/nova-chain-controller.mjs
+          node --check nova-runtime/src/device-tools.mjs
+          node --check nova-runtime/src/smoke.mjs
+      - name: Validate package metadata
+        run: node -e "JSON.parse(require('fs').readFileSync('nova-runtime/package.json','utf8')); console.log('package-json-ok')"
+      - name: Validate Alchemy Sepolia RPC
+        run: |
+          node --input-type=module - <<'NODE'
+          const response = await fetch('https://eth-sepolia.g.alchemy.com/v2/demo', {
+            method: 'POST',
+            headers: {'content-type': 'application/json'},
+            body: JSON.stringify({
+              jsonrpc: '2.0',
+              id: 1,
+              method: 'eth_chainId',
+              params: []
+            })
+          });
+          if (!response.ok) throw new Error('Alchemy HTTP ' + response.status);
+          const payload = await response.json();
+          if (payload.error) throw new Error(payload.error.message || 'Alchemy RPC error');
+          const chainId = Number.parseInt(payload.result, 16);
+          if (chainId !== 11155111) throw new Error('Unexpected chain ID: ' + chainId);
+          console.log(JSON.stringify({ok:true, provider:'alchemy', network:'ethereum-sepolia', chainId}));
+          NODE
