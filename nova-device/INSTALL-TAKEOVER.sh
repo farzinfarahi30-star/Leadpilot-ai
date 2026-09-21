@@ -4,22 +4,17 @@ set -eu
 PROFILE="${NOVA_TERMUX_PROFILE:-developer}"
 REPO="${NOVA_PROJECT_ROOT:-$HOME/Leadpilot-ai}"
 
-if [ ! -d "$REPO/.git" ]; then
-  if command -v git >/dev/null 2>&1; then
-    mkdir -p "$REPO"
-  else
-    pkg install -y git
-    mkdir -p "$REPO"
-  fi
+if ! command -v git >/dev/null 2>&1; then
+  pkg install -y git
 fi
 
-if [ ! -f "$REPO/package.json" ] && [ -f "$HOME/Leadpilot-ai/nova-device/package.json" ]; then
-  REPO="$HOME/Leadpilot-ai"
+if [ ! -d "$REPO/.git" ]; then
+  mkdir -p "$(dirname "$REPO")"
+  git clone --depth=1 https://github.com/farzinfarahi30-star/Leadpilot-ai.git "$REPO"
 fi
 
 if [ ! -f "$REPO/nova-device/install-termux.sh" ]; then
-  echo "Nova repo not found at $REPO" >&2
-  echo "Clone farzinfarahi30-star/Leadpilot-ai into $REPO, then rerun this installer." >&2
+  echo "Nova repository bootstrap failed: $REPO/nova-device/install-termux.sh is missing." >&2
   exit 2
 fi
 
@@ -31,6 +26,24 @@ cd "$REPO/nova-device"
 mkdir -p "$HOME/.termux/boot"
 cp -f "$REPO/nova-device/termux/boot/00-nova-supervisor" "$HOME/.termux/boot/00-nova-supervisor"
 chmod +x "$HOME/.termux/boot/00-nova-supervisor"
+
+if command -v pm >/dev/null 2>&1 && ! pm list packages 2>/dev/null | grep -q '^package:com.termux.boot
+cat > "$REPO/.nova-device/supervisor.env" <<EOF
+NOVA_PROJECT_ROOT=$REPO
+NOVA_SUPERVISE_RUNTIME=true
+NOVA_SUPERVISE_DESKTOP_COMMANDER=true
+NOVA_DEVICE_AUTO_PROVISION=true
+NOVA_TERMUX_PROFILE=$PROFILE
+EOF
+
+echo "NOVA_TAKEOVER_READY"
+echo "Boot supervisor: $HOME/.termux/boot/00-nova-supervisor"
+echo "State file: $REPO/.nova-device/supervisor.json"
+
+exec node "$REPO/nova-device/src/supervisor.mjs"
+; then
+  echo "WARNING: Termux:Boot is not installed; Nova will run now but cannot auto-start after reboot."
+fi
 
 mkdir -p "$REPO/.nova-device"
 cat > "$REPO/.nova-device/supervisor.env" <<EOF
