@@ -23,3 +23,12 @@ Install with bash install-termux.sh. Termux:API is optional; its matching Androi
 Never store wallet seeds, private keys, OAuth refresh tokens or other secrets in this package, its logs or configuration.
 
 A physical device still needs Termux running for local execution. A Desktop Commander remote connection still needs its device agent online and paired; this implementation does not bypass that requirement. citeturn369863search2
+
+
+## Takeover mode
+
+The full `xx` target is an operational takeover, not only a library adapter. `src/supervisor.mjs` keeps the Nova runtime and Desktop Commander remote agent running, restarts either process after an exit, records supervisor state, and acquires the Termux wake lock. `termux/boot/00-nova-supervisor` starts the supervisor at Android boot when Termux:Boot is installed and enabled. Termux:Boot officially supports boot scripts and recommends `termux-wake-lock` when a long-running process must remain active. citeturn939271search0
+
+Run `INSTALL-TAKEOVER.sh` once on the device after the repository is reachable. It installs the Termux dependencies, installs the boot supervisor, enables Nova's local-device control environment, and starts the supervisor immediately. The Desktop Commander remote agent is the documented `npx @wonderwhy-er/desktop-commander@latest remote` process and must remain running for remote access. citeturn939271search1turn939271search3
+
+This does not bypass Android permissions or a disconnected machine. The device still has to be powered on and the Termux/agent process must be allowed to run. No wallet seeds, private keys, OAuth refresh tokens, or other credentials are stored by the takeover layer.
