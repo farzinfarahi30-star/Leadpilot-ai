@@ -81,133 +81,154 @@ jobs:
           [[ "$DEPLOYER_ADDRESS" =~ ^0x[0-9a-fA-F]{40}$ ]]
           echo "deployer_address_format_valid"
 
-      - name: Fund disposable deployer through QuickNode Sepolia faucet
+      - name: Fund disposable deployer through GHOST Sepolia faucet
         env:
           DEPLOYER_ADDRESS: ${{ steps.key.outputs.deployer_address }}
+        shell: bash
         run: |
           set -euo pipefail
-          COOKIE_JAR="$RUNNER_TEMP/nova_quicknode_cookies"
-          STEP_ONE="$RUNNER_TEMP/nova_quicknode_step_one.html"
-          STEP_TWO="$RUNNER_TEMP/nova_quicknode_step_two.html"
 
-          curl -fsS -c "$COOKIE_JAR" -b "$COOKIE_JAR" -L \
-            -H 'User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/140 Safari/537.36' \
-            -H 'Content-Type: application/x-www-form-urlencoded' \
-            -H 'Referer: https://faucet.quicknode.com/ethereum/sepolia' \
-            --data-urlencode "wallet=$DEPLOYER_ADDRESS" \
-            --data-urlencode 'chain=ethereum' \
-            --data-urlencode 'network=sepolia' \
-            --data-urlencode '_action=step-one' \
-            'https://faucet.quicknode.com/ethereum/sepolia' > "$STEP_ONE"
+          npm install --no-save --no-package-lock playwright@1.55.0 >/dev/null 2>&1
+          npx playwright install chromium >/dev/null
 
-          python - "$STEP_ONE" "$STEP_TWO" "$DEPLOYER_ADDRESS" <<'PY'
-          from html.parser import HTMLParser
-          from pathlib import Path
-          from urllib.parse import urlencode
-          import sys
+          cat > "$RUNNER_TEMP/claim_ghost_sep_eth.mjs" <<'JS'
+          import { chromium } from "playwright";
+          import fs from "node:fs";
 
-          src=Path(sys.argv[1]).read_text(errors='replace')
-          out=Path(sys.argv[2])
-          address=sys.argv[3]
+          const address = process.env.DEPLOYER_ADDRESS;
+          if (!/^0x[a-fA-F0-9]{40}$/.test(address)) throw new Error("invalid deployer address");
 
-          class FormParser(HTMLParser):
-              def __init__(self):
-                  super().__init__()
-                  self.forms=[]; self.form=None; self.select=None; self.button=None
-              def handle_starttag(self, tag, attrs):
-                  a=dict(attrs)
-                  if tag=='form':
-                      self.form={'action':a.get('action') or '/ethereum/sepolia','inputs':[],'buttons':[],'selects':[]}
-                      self.forms.append(self.form)
-                  elif self.form and tag=='input':
-                      self.form['inputs'].append(a)
-                  elif self.form and tag=='select':
-                      self.select={'attrs':a,'options':[]}; self.form['selects'].append(self.select)
-                  elif self.form and tag=='option' and self.select is not None:
-                      self.select['options'].append(a)
-                  elif self.form and tag=='button' and a.get('type','submit')=='submit':
-                      self.form['buttons'].append(a)
-              def handle_endtag(self, tag):
-                  if tag=='select': self.select=None
-                  elif tag=='form': self.form=None; self.select=None
+          const urls = [
+            "https://ghostchain.io/faucet/ethereum-sepolia/",
+            "https://faucet.ghostchain.io/"
+          ];
 
-          p=FormParser(); p.feed(src)
-          if not p.forms:
-              raise SystemExit('QuickNode step-one returned no form')
-          f=max(p.forms, key=lambda x: len(x['inputs'])+len(x['selects'])+len(x['buttons']))
-          params={}
-          blockers=[]
-          for a in f['inputs']:
-              name=a.get('name')
-              if not name: continue
-              typ=a.get('type','text').lower()
-              value=a.get('value','')
-              if typ in {'checkbox','radio'} and 'checked' not in a: continue
-              if name in {'wallet','address'}: value=address
-              if not value and any(k in name.lower() for k in ('captcha','turnstile','recaptcha')): blockers.append(name)
-              params[name]=value
-          for s in f['selects']:
-              name=s['attrs'].get('name')
-              if not name or not s['options']: continue
-              opts=[o for o in s['options'] if 'disabled' not in o and o.get('value')]
+          const browser = await chromium.launch({ headless: true });
+          const context = await browser.newContext({
+            userAgent: "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/140 Safari/537.36"
+          });
 
-              if not opts: continue
+          let lastError = "faucet request failed";
+          try {
+            for (const url of urls) {
+              const page = await context.newPage();
+              const responses = [];
+              page.on("response", async (response) => {
+                try {
+                  if (response.status() >= 200 && response.status() < 400) {
+                    const ct = response.headers()["content-type"] || "";
+                    if (ct.includes("application/json")) {
+                      const text = await response.text();
+                      const hashes = text.match(/0x[a-fA-F0-9]{64}/g) || [];
+                      for (const h of hashes) responses.push(h);
+                    }
+                  }
+                } catch {}
+              });
 
-              chosen=opts[0].get('value','')
+              try {
+                await page.goto(url, { waitUntil: "domcontentloaded", timeout: 60000 });
+                await page.waitForTimeout(1500);
 
-              if 'amount' in name.lower():
+                const bodyText = (await page.locator("body").innerText()).slice(0, 20000);
+                if (/captcha|turnstile|recaptcha|verify you are human|cloudflare challenge/i.test(bodyText)) {
+                  throw new Error("faucet presented an anti-bot challenge; no bypass attempted");
+                }
 
-                  numeric=[]
+                const visibleInputs = await page.locator("input:visible").evaluateAll((els) =>
+                  els.map((el) => ({
+                    type: el.getAttribute("type") || "text",
+                    name: el.getAttribute("name") || "",
+                    id: el.id || "",
+                    placeholder: el.getAttribute("placeholder") || "",
+                    aria: el.getAttribute("aria-label") || ""
+                  }))
+                );
 
-                  for o in opts:
+                const candidate = visibleInputs.find((x) =>
+                  x.type !== "checkbox" &&
+                  x.type !== "radio" &&
+                  /wallet|address|ethereum|0x/i.test(
+                    [x.name, x.id, x.placeholder, x.aria].join(" ")
+                  )
+                ) || visibleInputs.find((x) =>
+                  !["checkbox","radio","submit","button"].includes(x.type)
+                );
 
-                      try: numeric.append((float(o.get('value')),o.get('value')))
+                if (!candidate) throw new Error("no visible wallet address input found");
 
-                      except: pass
+                let locator;
+                if (candidate.id) locator = page.locator("#" + CSS.escape(candidate.id));
+                else if (candidate.name) locator = page.locator(`input[name="${candidate.name}"]`);
+                else locator = page.locator("input:visible").first();
 
-                  if numeric: chosen=min(numeric)[1]
+                await locator.fill(address);
 
-              params[name]=chosen
-          for b in f['buttons']:
+                const buttons = page.locator("button:visible, input[type=submit]:visible");
+                const buttonCount = await buttons.count();
+                let clicked = false;
+                for (let i=0; i<buttonCount; i++) {
+                  const b = buttons.nth(i);
+                  const txt = ((await b.innerText().catch(()=>'')) || (await b.getAttribute("value").catch(()=>'')) || "").trim();
+                  if (/claim.*(0\.01|sepeth|sepolia eth|eth)/i.test(txt)) {
+                    await b.click({ timeout: 15000 });
+                    clicked = true;
+                    break;
+                  }
+                }
+                if (!clicked) {
+                  for (let i=0; i<buttonCount; i++) {
+                    const b = buttons.nth(i);
+                    const txt = ((await b.innerText().catch(()=>'')) || (await b.getAttribute("value").catch(()=>'')) || "").trim();
+                    if (/claim|request|send/i.test(txt)) {
+                      await b.click({ timeout: 15000 });
+                      clicked = true;
+                      break;
+                    }
+                  }
+                }
+                if (!clicked) throw new Error("no visible faucet claim button found");
 
-              name=b.get('name'); value=b.get('value','')
+                await page.waitForTimeout(5000);
+                const text = await page.locator("body").innerText();
+                fs.writeFileSync(process.env.RUNNER_TEMP + "/ghost_faucet_result.txt", text);
 
-              if name and name not in params and value: params[name]=value; break
-          if not any(k in params for k in ('_action','action')) and f['buttons']:
+                if (/captcha|turnstile|recaptcha|verify you are human|cloudflare challenge/i.test(text)) {
+                  throw new Error("anti-bot challenge appeared after submission; no bypass attempted");
+                }
 
-              b=f['buttons'][0];
+                const html = await page.content();
+                const hashes = [
+                  ...responses,
+                  ...(text.match(/0x[a-fA-F0-9]{64}/g) || []),
+                  ...(html.match(/0x[a-fA-F0-9]{64}/g) || [])
+                ];
 
-              if b.get('name') and b.get('value'): params[b['name']]=b['value']
+                console.log("ghost_faucet_submitted=true");
+                if (hashes.length) console.log("ghost_faucet_tx_hash=" + hashes[0]);
+                console.log("ghost_faucet_url=" + url);
+                await page.close();
+                process.exit(0);
+              } catch (e) {
+                lastError = `${url}: ${e.message}`;
+                await page.close().catch(()=>{});
+              }
+            }
+          } finally {
+            await browser.close();
+          }
 
-          Path(out).write_text(urlencode(params))
-          print('quicknode_form_action='+f['action'])
-          print('quicknode_form_fields='+','.join(sorted(params)))
-          if blockers:
+          throw new Error(lastError);
+          JS
 
-              raise SystemExit('QuickNode form requires interactive bot verification: '+','.join(blockers))
-          if not any(k in params for k in ('_action','action')):
-
-              raise SystemExit('QuickNode form exposes no submit action')
-          PY
-
-          curl -fsS -c "$COOKIE_JAR" -b "$COOKIE_JAR" -L \
-            -H 'User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/140 Safari/537.36' \
-            -H 'Content-Type: application/x-www-form-urlencoded' \
-            -H 'Referer: https://faucet.quicknode.com/ethereum/sepolia' \
-            --data-binary "$(cat "$STEP_TWO")" \
-            'https://faucet.quicknode.com/ethereum/sepolia' > "$STEP_TWO.response"
-
-          if grep -Eqi 'captcha|turnstile|recaptcha|bot verification|invalid request|error' "$STEP_TWO.response"; then
-            echo "QuickNode returned a verification/error response; no bypass attempted."
-            grep -Eio 'captcha[^<]{0,120}|turnstile[^<]{0,120}|recaptcha[^<]{0,120}|invalid request|bot verification|error[^<]{0,120}' "$STEP_TWO.response" | head -30 || true
-          fi
+          node "$RUNNER_TEMP/claim_ghost_sep_eth.mjs"
 
           for i in $(seq 1 36); do
             BAL="$(cast balance "$DEPLOYER_ADDRESS" --rpc-url "$SEPOLIA_RPC_URL" --ether)"
             echo "deployer_balance_eth=$BAL"
             python - "$BAL" <<'PY'
-          import sys
           from decimal import Decimal
+          import sys
           if Decimal(sys.argv[1]) > 0:
               raise SystemExit(0)
           raise SystemExit(1)
@@ -215,7 +236,7 @@ jobs:
             sleep 10
           done
 
-          echo "QuickNode Sepolia faucet did not deliver ETH to the disposable deployer"
+          echo "GHOST Sepolia faucet did not deliver ETH to the disposable deployer"
           exit 1
       - name: Deploy NovaToken
         shell: bash
