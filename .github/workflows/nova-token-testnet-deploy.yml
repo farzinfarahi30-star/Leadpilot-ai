@@ -1,10 +1,6 @@
 name: Nova Token Testnet Deploy
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - '.nova/deploy-sepolia.once'
   workflow_dispatch:
     inputs:
       owner:
