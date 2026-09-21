@@ -226,21 +226,27 @@ jobs:
 
           NODE_PATH="$RUNNER_TEMP/nova-playwright/node_modules" node "$RUNNER_TEMP/claim_ghost_sep_eth.cjs"
 
+          FUNDED=0
           for i in $(seq 1 36); do
             BAL="$(cast balance "$DEPLOYER_ADDRESS" --rpc-url "$SEPOLIA_RPC_URL" --ether)"
             echo "deployer_balance_eth=$BAL"
-            python - "$BAL" <<'PY'
+            if python - "$BAL" <<'PY'
           from decimal import Decimal
           import sys
-          if Decimal(sys.argv[1]) > 0:
-              raise SystemExit(0)
-          raise SystemExit(1)
+          raise SystemExit(0 if Decimal(sys.argv[1]) > 0 else 1)
           PY
+            then
+              FUNDED=1
+              break
+            fi
             sleep 10
           done
 
-          echo "GHOST Sepolia faucet did not deliver ETH to the disposable deployer"
-          exit 1
+          if [ "$FUNDED" -ne 1 ]; then
+            echo "GHOST Sepolia faucet did not deliver ETH to the disposable deployer"
+            exit 1
+          fi
+          echo "sepolia_funding_confirmed=true"
       - name: Deploy NovaToken
         shell: bash
         run: |
