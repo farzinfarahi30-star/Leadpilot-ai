@@ -1,0 +1,190 @@
+name: Nova Token Sepolia Auto-Fund + Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      owner:
+        description: Public NOVA owner/treasury address
+        required: true
+        default: "0x63970A951bd69975eF2aDAD27bf73584D2DCeF9B"
+        type: string
+      max_supply_tokens:
+        description: Maximum NOVA supply in whole tokens
+        required: true
+        default: "1000000"
+        type: string
+      min_deployer_balance_eth:
+        description: Minimum Sepolia ETH required before deployment
+        required: true
+        default: "0.001"
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      NOVA_OWNER: ${{ inputs.owner || '0x63970A951bd69975eF2aDAD27bf73584D2DCeF9B' }}
+      NOVA_MAX_SUPPLY_TOKENS: ${{ inputs.max_supply_tokens || '1000000' }}
+      SEPOLIA_RPC_URL: ${{ secrets.SEPOLIA_RPC_URL || 'https://ethereum-sepolia-rpc.publicnode.com' }}
+      NOVA_ALCHEMY_API_KEY: ${{ secrets.NOVA_ALCHEMY_API_KEY }}
+      ALCHEMY_API_KEY: ${{ secrets.ALCHEMY_API_KEY }}
+      CDP_API_KEY_ID: ${{ secrets.CDP_API_KEY_ID }}
+      CDP_API_KEY_SECRET: ${{ secrets.CDP_API_KEY_SECRET }}
+      CDP_WALLET_SECRET: ${{ secrets.CDP_WALLET_SECRET }}
+      CHAINSTACK_API_KEY: ${{ secrets.CHAINSTACK_API_KEY }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+
+      - name: Install runtime dependencies
+        run: npm --prefix nova-runtime install --no-audit --no-fund
+
+      - name: Validate source and configuration
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$NOVA_OWNER" =~ ^0x[0-9a-fA-F]{40}$ ]]
+          python - <<'PY'
+          import os
+          cap = int(os.environ["NOVA_MAX_SUPPLY_TOKENS"])
+          if cap <= 0:
+              raise SystemExit("NOVA_MAX_SUPPLY_TOKENS must be positive")
+          print("configuration_valid")
+          PY
+          node --input-type=module -e "import('./nova-runtime/src/crypto-capabilities.mjs').then(m=>console.log(JSON.stringify(m.novaCryptoDoctor(),null,2)))"
+
+      - name: Install Solidity dependencies
+        run: |
+          forge install OpenZeppelin/openzeppelin-contracts --no-commit
+          forge install foundry-rs/forge-std --no-commit
+
+      - name: Format check
+        run: forge fmt --check
+
+      - name: Contract tests
+        run: forge test -vv
+
+      - name: Build
+        run: forge build
+
+      - name: Generate disposable deployer
+        shell: bash
+        run: |
+          set -euo pipefail
+          KEY="0x$(openssl rand -hex 32)"
+          echo "::add-mask::$KEY"
+          ADDRESS="$(cast wallet address --private-key "$KEY")"
+          echo "NOVA_DEPLOYER_PRIVATE_KEY=$KEY" >> "$GITHUB_ENV"
+          echo "NOVA_DEPLOYER_ADDRESS=$ADDRESS" >> "$GITHUB_ENV"
+          echo "NOVA_DEPLOYER_ADDRESS=$ADDRESS"
+
+      - name: Verify Sepolia RPC
+        shell: bash
+        run: |
+          set -euo pipefail
+          CHAIN_ID="$(cast chain-id --rpc-url "$SEPOLIA_RPC_URL")"
+          test "$CHAIN_ID" = "11155111"
+          echo "Sepolia chain verified: $CHAIN_ID"
+
+      - name: Fund disposable deployer through Nova crypto provider mesh
+        shell: bash
+        run: |
+          set -euo pipefail
+          export NOVA_MIN_DEPLOYER_BALANCE_WEI="$(python - <<'PY'
+          from decimal import Decimal
+          import os
+          eth = Decimal(os.environ["INPUT_MIN_DEPLOYER_BALANCE_ETH"])
+          print(int(eth * Decimal(10**18)))
+          PY
+          )"
+          node --input-type=module <<'NODE'
+          import { requestAndConfirmSepoliaEth } from './nova-runtime/src/crypto-capabilities.mjs';
+          const minBalanceWei = BigInt(process.env.NOVA_MIN_DEPLOYER_BALANCE_WEI);
+          const result = await requestAndConfirmSepoliaEth(process.env.NOVA_DEPLOYER_ADDRESS, {
+            minBalanceWei,
+            pollMs: 5000,
+            timeoutMs: 120000
+          });
+          console.log(JSON.stringify({
+            funded: result.funded,
+            provider: result.fundingProvider,
+            network: result.network,
+            address: result.address,
+            balanceAfterWei: result.balanceAfterWei,
+            transactionHash: result.transactionHash ?? null
+          }, null, 2));
+          NODE
+        env:
+          INPUT_MIN_DEPLOYER_BALANCE_ETH: ${{ inputs.min_deployer_balance_eth || '0.001' }}
+
+      - name: Deploy and verify NovaToken on Sepolia
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --input-type=module <<'NODE'
+          import { deployNovaTokenSepolia } from './nova-runtime/src/nova-chain-controller.mjs';
+          const record = await deployNovaTokenSepolia({
+            owner: process.env.NOVA_OWNER,
+            maxSupplyTokens: Number(process.env.NOVA_MAX_SUPPLY_TOKENS),
+            verify: true
+          });
+          console.log(JSON.stringify({
+            network: record.network,
+            chainId: record.chainId,
+            owner: record.owner,
+            maxSupplyTokens: record.maxSupplyTokens,
+            contractAddress: record.contractAddress,
+            transactionHash: record.transactionHash,
+            blockNumber: record.blockNumber,
+            verification: record.verification
+          }, null, 2));
+          NODE
+
+      - name: Publish deployment outputs
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s nova-economy/deployment-sepolia.json
+          test -s nova-economy/broadcast/DeployNovaToken.s.sol/11155111/run-latest.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path("nova-economy/deployment-sepolia.json").read_text())
+          summary = f"""## NOVA Sepolia deployment
+
+- Network: {d["network"]}
+- Chain ID: {d["chainId"]}
+- Owner: {d["owner"]}
+- Max supply: {d["maxSupplyTokens"]:,} NOVA
+- Contract: `{d["contractAddress"]}`
+- Transaction: `{d["transactionHash"]}`
+- Block: `{d["blockNumber"]}`
+- Verified: {bool(d.get("verification", {}).get("verified"))}
+"""
+          Path("/tmp/nova-summary.md").write_text(summary)
+          Path("nova-economy/deployment-address.txt").write_text(d["contractAddress"] + "\n")
+          print(summary)
+          PY
+          cat /tmp/nova-summary.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload public deployment metadata
+        uses: actions/upload-artifact@v4
+        with:
+          name: nova-token-sepolia-auto-deployment
+          path: |
+            nova-economy/deployment-address.txt
+            nova-economy/deployment-sepolia.json
+            nova-economy/broadcast/DeployNovaToken.s.sol/11155111/run-latest.json
+          if-no-files-found: error
