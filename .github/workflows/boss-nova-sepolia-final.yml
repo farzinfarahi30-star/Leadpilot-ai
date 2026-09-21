@@ -19,11 +19,15 @@ jobs:
       NOVA_OWNER: "0x63970A951bd69975eF2aDAD27bf73584D2DCeF9B"
       NOVA_MAX_SUPPLY_TOKENS: "1000000"
       SEPOLIA_RPC_URL: "https://ethereum-sepolia-rpc.publicnode.com"
-      CDP_API_KEY_ID: ${{ secrets.CDP_API_KEY_ID }}
-      CDP_API_KEY_SECRET: ${{ secrets.CDP_API_KEY_SECRET }}
-      CDP_WALLET_SECRET: ${{ secrets.CDP_WALLET_SECRET }}
+
+
+
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
       - uses: foundry-rs/foundry-toolchain@v1
 
       - name: Validate source
@@ -61,25 +65,30 @@ jobs:
           chmod 600 "$RUNNER_TEMP/nova_deployer_key"
           unset KEY
 
-      - name: Fund disposable deployer through existing XX Coinbase CDP capability
+      - name: Fund disposable deployer through Nova faucet tool
         env:
-          DEPLOYER_ADDRESS: ${{ steps.key.outputs.deployer_address }}
+          DEPLOYER_ADDRESS: ${{ steps.key.outputs.deployer_address }}}
         run: |
           set -euo pipefail
-          : "${CDP_API_KEY_ID:?CDP_API_KEY_ID secret is required}"
-          : "${CDP_API_KEY_SECRET:?CDP_API_KEY_SECRET secret is required}"
-          : "${CDP_WALLET_SECRET:?CDP_WALLET_SECRET secret is required}"
 
-          npm --prefix nova-runtime install --ignore-scripts --no-audit --no-fund
+          # Pinned public faucet client using its normal anti-abuse PoW flow.
+          # No Coinbase credentials or deployer funding secret is required.
+          FAUCET_OUTPUT="$RUNNER_TEMP/nova_sepolia_faucet.json"
+          npx --yes faucet-terminal@2.0.4 request "$DEPLOYER_ADDRESS" --network ethereum --json | tee "$FAUCET_OUTPUT"
 
-          DEPLOYER_ADDRESS="$DEPLOYER_ADDRESS" node --input-type=module <<'JS'
-          import { coinbaseCdpRequestSepoliaEth } from './nova-runtime/src/coinbase-cdp.mjs';
-          const address = process.env.DEPLOYER_ADDRESS;
-          const result = await coinbaseCdpRequestSepoliaEth(address);
-          console.log(JSON.stringify(result));
-          JS
+          python - "$FAUCET_OUTPUT" <<'PY'
+          import json, sys
+          from pathlib import Path
+          d=json.loads(Path(sys.argv[1]).read_text())
+          if not d.get("success"):
+              raise SystemExit(f"faucet request failed: {d}")
+          tx=d.get("tx_hash") or d.get("transactionHash")
+          if not tx:
+              raise SystemExit(f"faucet returned no transaction hash: {d}")
+          print(f"faucet_tx={tx}")
+          PY
 
-          for i in $(seq 1 30); do
+          for i in $(seq 1 36); do
             BAL="$(cast balance "$DEPLOYER_ADDRESS" --rpc-url "$SEPOLIA_RPC_URL" --ether)"
             echo "deployer_balance_eth=$BAL"
             python - "$BAL" <<'PY'
@@ -92,7 +101,7 @@ jobs:
             sleep 10
           done
 
-          echo "Coinbase CDP faucet did not deliver Sepolia ETH to the disposable deployer"
+          echo "Nova faucet tool did not deliver Sepolia ETH to the disposable deployer"
           exit 1
 
       - name: Deploy NovaToken
