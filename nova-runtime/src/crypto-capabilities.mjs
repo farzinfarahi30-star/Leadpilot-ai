@@ -120,13 +120,17 @@ export async function requestAndConfirmSepoliaEth(
     minBalanceWei = 1000000000000000n,
     pollMs = 5000,
     timeoutMs = 120000,
-    maxCdpClaims = DEFAULT_MAX_CDP_CLAIMS
+    maxCdpClaims = DEFAULT_MAX_CDP_CLAIMS,
+    claimTimeoutMs = 30000
   } = {}
 ) {
   assertAddress(address);
   if (minBalanceWei < 0n) throw new Error('minBalanceWei cannot be negative');
   if (!Number.isInteger(maxCdpClaims) || maxCdpClaims < 1 || maxCdpClaims > 100) {
     throw new Error('maxCdpClaims must be an integer between 1 and 100');
+  }
+  if (!Number.isInteger(claimTimeoutMs) || claimTimeoutMs < 1000 || claimTimeoutMs > timeoutMs) {
+    throw new Error('claimTimeoutMs must be an integer between 1000 and timeoutMs');
   }
 
   const providers = provider === 'auto' ? ['coinbase', 'chainstack'] : [provider];
@@ -164,7 +168,8 @@ export async function requestAndConfirmSepoliaEth(
         claims += 1;
         if (request?.transactionHash) transactionHashes.push(request.transactionHash);
 
-        while (Date.now() <= deadline) {
+        const claimDeadline = Math.min(deadline, Date.now() + claimTimeoutMs);
+        while (Date.now() <= claimDeadline) {
           const current = BigInt(await novaCryptoBalance(address));
           if (current >= minBalanceWei) {
             return {
