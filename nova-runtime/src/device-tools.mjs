@@ -5,6 +5,11 @@ import {
   executeDesktopCommanderTool
 } from './desktop-commander-mcp.mjs';
 import { dispatchNovaTokenTestnet } from './chain-ops.mjs';
+import {
+  novaChainPreflight,
+  deployNovaTokenSepolia,
+  verifyNovaTokenSepolia
+} from './nova-chain-controller.mjs';
 
 export async function listDesktopCommanderTools(){
   if(!desktopCommanderConfigured()){
@@ -27,11 +32,26 @@ export async function deployNovaTokenTestnet(owner, maxSupplyTokens=1000000){
   return await dispatchNovaTokenTestnet({owner, maxSupplyTokens});
 }
 
+export async function novaSepoliaPreflight(options={}){
+  return await novaChainPreflight(options);
+}
+
+export async function deployNovaTokenSepoliaOnChain(options={}){
+  return await deployNovaTokenSepolia(options);
+}
+
+export async function verifyNovaTokenSepoliaOnChain(options={}){
+  return await verifyNovaTokenSepolia(options);
+}
+
 export const NOVA_DEVICE_TOOLS={
   ...device.TOOL_REGISTRY,
   listDesktopCommanderTools,
   callDesktopCommanderTool,
-  deployNovaTokenTestnet
+  deployNovaTokenTestnet,
+  novaSepoliaPreflight,
+  deployNovaTokenSepoliaOnChain,
+  verifyNovaTokenSepoliaOnChain
 };
 
 export async function executeDeviceTool(name,args=[]){
