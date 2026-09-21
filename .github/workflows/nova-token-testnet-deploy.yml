@@ -86,6 +86,47 @@ jobs:
           print("NOVA_CONTRACT_ADDRESS="+addr)
           PY
 
+      - name: Verify deployment on-chain
+        shell: bash
+        env:
+          EXPECTED_OWNER: ${{ inputs.owner }}
+        run: |
+          set -euo pipefail
+          ADDR="$(python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path("nova-economy/broadcast/DeployNovaToken.s.sol/11155111/run-latest.json")
+          d=json.loads(p.read_text())
+          deployed=[x for x in d.get("transactions",[]) if x.get("transactionType")=="CREATE" and x.get("contractName")=="NovaToken"]
+          if not deployed:
+              raise SystemExit("NovaToken CREATE transaction not found")
+          addr=deployed[-1].get("contractAddress")
+          if not addr:
+              raise SystemExit("contractAddress missing")
+          print(addr)
+          Path("nova-economy/deployment-address.txt").write_text(addr+"\n")
+          PY
+          )"
+          ONCHAIN_OWNER="$(cast call "$ADDR" "owner()(address)" --rpc-url "$SEPOLIA_RPC_URL")"
+          ONCHAIN_CAP="$(cast call "$ADDR" "maxSupply()(uint256)" --rpc-url "$SEPOLIA_RPC_URL")"
+          ONCHAIN_SUPPLY="$(cast call "$ADDR" "totalSupply()(uint256)" --rpc-url "$SEPOLIA_RPC_URL")"
+          export ONCHAIN_OWNER ONCHAIN_CAP ONCHAIN_SUPPLY
+          python - <<'PY'
+          import os
+          expected_cap=int(os.environ["NOVA_MAX_SUPPLY_TOKENS"])*10**18
+          if os.environ["ONCHAIN_OWNER"].lower()!=os.environ["EXPECTED_OWNER"].lower():
+              raise SystemExit("owner mismatch")
+          if int(os.environ["ONCHAIN_CAP"])!=expected_cap:
+              raise SystemExit("maxSupply mismatch")
+          if int(os.environ["ONCHAIN_SUPPLY"])!=0:
+              raise SystemExit("totalSupply must start at zero")
+          print("onchain_verification_pass")
+          with open("nova-economy/deployment-verification.txt","w") as f:
+              f.write("owner="+os.environ["ONCHAIN_OWNER"]+"\n")
+              f.write("maxSupplyWei="+os.environ["ONCHAIN_CAP"]+"\n")
+              f.write("totalSupplyWei="+os.environ["ONCHAIN_SUPPLY"]+"\n")
+          PY
+
       - name: Upload public deployment metadata
         uses: actions/upload-artifact@v4
         with:
