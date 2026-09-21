@@ -6,9 +6,10 @@ import { deviceBootstrapAndDoctor } from './device-tools.mjs';
 import { deviceInfo, desktopCommanderDoctor, startDesktopCommanderRemote } from './device-bridge.mjs';
 
 
+const LOCAL_DAEMON=process.env.NOVA_LOCAL_DAEMON==='true';
 const RUN_MINUTES=Math.max(1,Number(process.env.RUN_MINUTES||5));
 const POLL_MS=Math.max(1000,Number(process.env.POLL_MS||600000));
-const deadline=Date.now()+RUN_MINUTES*60_000;
+const deadline=LOCAL_DAEMON ? Number.POSITIVE_INFINITY : Date.now()+RUN_MINUTES*60_000;
 
 function log(event,data={}){console.log(JSON.stringify({ts:new Date().toISOString(),event,...data}));}
 
@@ -23,7 +24,7 @@ function runChainCommand(){
   });
 }
 
-log('runtime_started',{runMinutes:RUN_MINUTES,pollMs:POLL_MS,agentCount:15,controlPlane:'nova-independent',escalation:'xx-only'});
+log('runtime_started',{runMinutes:LOCAL_DAEMON?'infinite':RUN_MINUTES,pollMs:POLL_MS,agentCount:16,controlPlane:'nova-independent',localDaemon:LOCAL_DAEMON,deviceControl:process.env.NOVA_DEVICE_CONTROL==='true',escalation:'xx-only'});
 
 if(process.env.NOVA_DEVICE_COMMAND==='doctor'||process.env.NOVA_DEVICE_COMMAND==='bootstrap'){
   const report=await deviceBootstrapAndDoctor();
