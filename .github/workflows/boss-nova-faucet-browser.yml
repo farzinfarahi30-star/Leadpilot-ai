@@ -1,0 +1,54 @@
+name: Boss Nova Sepolia Faucet Browser
+
+on:
+  push:
+    branches:
+      - boss-nova-sepolia-final-20260921
+    paths:
+      - "BOSS_NOVA_FAUCET_BROWSER_TRIGGER.txt"
+
+permissions:
+  contents: read
+
+jobs:
+  faucet:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install Playwright
+        run: |
+          npm init -y >/dev/null 2>&1
+          npm install playwright
+          npx playwright install --with-deps chromium
+      - name: Run faucet
+        env:
+          TARGET_ADDR: "0x63970A951bd69975eF2aDAD27bf73584D2DCeF9B"
+        run: |
+          set -euo pipefail
+          cat > /tmp/faucet.mjs <<'JS'
+          import { chromium } from 'playwright';
+          const address=process.env.TARGET_ADDR;
+          const browser=await chromium.launch({headless:true,args:['--disable-dev-shm-usage']});
+          const page=await browser.newPage();
+          page.on('console',m=>console.log('[page]',m.type(),m.text()));
+          await page.goto('https://sepolia-faucet.pk910.de/',{waitUntil:'domcontentloaded',timeout:120000});
+          await page.waitForTimeout(5000);
+          console.log('TITLE',await page.title());
+          console.log('TEXT', (await page.locator('body').innerText()).slice(0,12000));
+          console.log('INPUTS',await page.locator('input').evaluateAll(es=>es.map(e=>({type:e.type,name:e.name,placeholder:e.placeholder,value:e.value}))));
+          console.log('BUTTONS',await page.locator('button').evaluateAll(es=>es.map(e=>({text:e.innerText,disabled:e.disabled,type:e.type}))));
+          const input=page.locator('input').first();
+          if(await input.count()){await input.fill(address);}
+          const buttons=page.locator('button');
+          const n=await buttons.count();
+          for(let i=0;i<n;i++){const txt=(await buttons.nth(i).innerText()).trim();if(/start|mine/i.test(txt)&&!/stop/i.test(txt)&&!(await buttons.nth(i).isDisabled())){await buttons.nth(i).click();console.log('CLICKED',txt);break;}}
+          await page.waitForTimeout(30000);
+          console.log('AFTER', (await page.locator('body').innerText()).slice(0,16000));
+          console.log('BUTTONS_AFTER',await page.locator('button').evaluateAll(es=>es.map(e=>({text:e.innerText,disabled:e.disabled}))));
+          await page.screenshot({path:'/tmp/faucet.png',fullPage:true});
+          await browser.close();
+          JS
+          node /tmp/faucet.mjs
