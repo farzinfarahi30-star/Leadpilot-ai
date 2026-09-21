@@ -92,6 +92,8 @@ async function boot(){
   if(SUPERVISE_RUNTIME){
     managed('nova-runtime',process.execPath,['nova-runtime/src/worker.mjs'],REPO_ROOT,{
       NOVA_LOCAL_DAEMON:'true',
+      NOVA_DEVICE_CONTROL:'true',
+      NOVA_DEVICE_ALLOWED_ROOTS:process.env.NOVA_DEVICE_ALLOWED_ROOTS||`${process.env.HOME||REPO_ROOT}:${REPO_ROOT}`,
       NOVA_DEVICE_AUTO_PROVISION:process.env.NOVA_DEVICE_AUTO_PROVISION||'true',
       NOVA_TERMUX_PROFILE:process.env.NOVA_TERMUX_PROFILE||'developer'
     });
