@@ -8,7 +8,7 @@ contract DeployNovaToken is Script {
     function run() external returns (NovaToken token) {
         uint256 deployerKey = vm.envUint("NOVA_DEPLOYER_PRIVATE_KEY");
         address owner = vm.envAddress("NOVA_OWNER");
-        uint256 cap = vm.envUint("NOVA_MAX_SUPPLY");
+        uint256 cap = vm.envUint("NOVA_MAX_SUPPLY_TOKENS") * 1 ether;
 
         require(owner != address(0), "NOVA_OWNER is zero");
         require(cap > 0, "NOVA_MAX_SUPPLY is zero");
