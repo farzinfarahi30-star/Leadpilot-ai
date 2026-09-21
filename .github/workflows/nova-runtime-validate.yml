@@ -26,6 +26,13 @@ jobs:
           node --check nova-runtime/src/nova-chain-controller.mjs
           node --check nova-runtime/src/device-tools.mjs
           node --check nova-runtime/src/smoke.mjs
+          node --check nova-runtime/src/company-takeover.mjs
+          node --check nova-runtime/src/xx-runner.mjs
+          node --check nova-runtime/src/worker.mjs
+      - name: Validate company takeover package
+        run: |
+          node -e "JSON.parse(require('fs').readFileSync('nova-runtime/company-takeover-manifest.json','utf8')); console.log('company-takeover-manifest-json-ok')"
+          node nova-runtime/test/company-takeover.test.mjs
       - name: Validate package metadata
         run: node -e "JSON.parse(require('fs').readFileSync('nova-runtime/package.json','utf8')); console.log('package-json-ok')"
       - name: Validate Alchemy Sepolia RPC
