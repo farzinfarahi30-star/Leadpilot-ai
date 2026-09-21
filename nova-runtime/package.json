@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node src/worker.mjs",
     "smoke": "node src/smoke.mjs",
+    "company:takeover": "node test/company-takeover.test.mjs",
     "device:smoke": "node ../nova-device/src/smoke.mjs",
     "device:supervise": "node ../nova-device/src/supervisor.mjs",
     "device:agent": "NOVA_LOCAL_DAEMON=true NOVA_DEVICE_CONTROL=true node src/worker.mjs",
