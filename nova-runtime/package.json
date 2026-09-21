@@ -8,7 +8,8 @@
     "smoke": "node src/smoke.mjs",
     "device:smoke": "node ../nova-device/src/smoke.mjs",
     "device:supervise": "node ../nova-device/src/supervisor.mjs",
-    "device:agent": "NOVA_LOCAL_DAEMON=true NOVA_DEVICE_CONTROL=true node src/worker.mjs"
+    "device:agent": "NOVA_LOCAL_DAEMON=true NOVA_DEVICE_CONTROL=true node src/worker.mjs",
+    "desktop-commander:doctor": "node -e \"import('./src/desktop-commander-mcp.mjs').then(async m=>console.log(JSON.stringify(await m.desktopCommanderHealth())))\""
   },
   "dependencies": {
     "playwright": "^1.55.0"
