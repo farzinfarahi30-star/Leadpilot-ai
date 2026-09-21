@@ -58,7 +58,7 @@ jobs:
           chmod 600 "$RUNNER_TEMP/nova_deployer_key"
           unset KEY
 
-      - name: Fund disposable deployer from ETH Faucet
+      - name: Fund disposable deployer through existing XX Alchemy capability
         env:
           DEPLOYER_ADDRESS: ${{ steps.key.outputs.deployer_address }}
         run: |
@@ -66,39 +66,33 @@ jobs:
           npm init -y >/dev/null 2>&1
           npm install playwright >/dev/null 2>&1
           npx playwright install --with-deps chromium >/dev/null 2>&1
-          cat > faucet.mjs <<'JS'
+          cat > alchemy-faucet.mjs <<'JS'
           import { chromium } from 'playwright';
           const address=process.env.DEPLOYER_ADDRESS;
           const browser=await chromium.launch({headless:true,args:['--disable-dev-shm-usage']});
           const page=await browser.newPage();
-          page.on('console',m=>{const t=m.text();if(/error/i.test(t))console.log('[ethfaucet-console]',t.slice(0,500));});
-          await page.goto('https://ethfaucet.com/networks/ethereum',{waitUntil:'domcontentloaded',timeout:120000});
+          await page.goto('https://www.alchemy.com/faucets/ethereum-sepolia',{waitUntil:'domcontentloaded',timeout:120000});
           console.log('TITLE',await page.title());
+          console.log('URL',page.url());
           console.log('TEXT',(await page.locator('body').innerText()).slice(0,14000));
-          console.log('INPUTS',await page.locator('input').evaluateAll(es=>es.map(e=>({placeholder:e.placeholder,name:e.name,type:e.type,value:e.value}))));
-          console.log('BUTTONS',await page.locator('button').evaluateAll(es=>es.map(e=>({text:e.innerText,disabled:e.disabled,type:e.type}))));
           const inputs=page.locator('input');
           const n=await inputs.count();
           for(let i=0;i<n;i++){
             const p=(await inputs.nth(i).getAttribute('placeholder'))||'';
             if(/wallet|address|0x/i.test(p)){await inputs.nth(i).fill(address);break;}
           }
-          const claims=page.getByRole('button',{name:/claim/i});
-          console.log('CLAIM_COUNT',await claims.count());
-          if(await claims.count()){
-            const b=claims.last();
-            console.log('CLAIM_DISABLED',await b.isDisabled());
-            if(!(await b.isDisabled())) await b.click();
+          const send=page.getByRole('button',{name:/send.*eth/i});
+          console.log('SEND_COUNT',await send.count());
+          if(await send.count()){
+            console.log('SEND_DISABLED',await send.last().isDisabled());
+            if(!(await send.last().isDisabled())) await send.last().click();
           }
           await page.waitForTimeout(15000);
-          console.log('AFTER_URL',page.url());
           console.log('AFTER_TEXT',(await page.locator('body').innerText()).slice(0,18000));
-          console.log('AFTER_INPUTS',await page.locator('input').evaluateAll(es=>es.map(e=>({placeholder:e.placeholder,name:e.name,type:e.type,value:e.value}))));
-          console.log('AFTER_BUTTONS',await page.locator('button').evaluateAll(es=>es.map(e=>({text:e.innerText,disabled:e.disabled}))));
-          await page.screenshot({path:'/tmp/ethfaucet.png',fullPage:true});
           await browser.close();
           JS
-          node faucet.mjs
+          node alchemy-faucet.mjs
+
           for i in $(seq 1 30); do
             BAL="$(cast balance "$DEPLOYER_ADDRESS" --rpc-url "$SEPOLIA_RPC_URL" --ether)"
             echo "deployer_balance_eth=$BAL"
@@ -111,7 +105,7 @@ jobs:
           PY
             sleep 10
           done
-          echo "ETH Faucet did not fund disposable deployer"
+          echo "Existing XX Alchemy faucet did not fund disposable deployer"
           exit 1
 
       - name: Deploy NovaToken
