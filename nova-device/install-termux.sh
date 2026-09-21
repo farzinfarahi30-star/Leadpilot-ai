@@ -8,8 +8,8 @@ pkg update -y
 pkg upgrade -y
 case "$PROFILE" in
   minimal) PKGS="git curl wget openssh ripgrep jq tar unzip zip" ;;
-  developer) PKGS="git curl wget openssh ripgrep jq tar unzip zip python nodejs npm make clang cmake pkg-config rust golang perl ruby" ;;
-  build) PKGS="git curl wget openssh ripgrep jq tar unzip zip python nodejs npm make clang clang++ cmake pkg-config rust golang perl ruby php" ;;
+  developer) PKGS="git curl wget openssh ripgrep jq tar unzip zip python nodejs npm make clang cmake pkg-config rust golang perl ruby termux-api proot-distro" ;;
+  build) PKGS="git curl wget openssh ripgrep jq tar unzip zip python nodejs npm make clang clang++ cmake pkg-config rust golang perl ruby php termux-api proot-distro" ;;
   *) echo "Unknown NOVA_TERMUX_PROFILE: $PROFILE" >&2; exit 2 ;;
 esac
 pkg install -y $PKGS
