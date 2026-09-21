@@ -1,0 +1,38 @@
+name: Nova dual-layer validation
+
+on:
+  push:
+    paths:
+      - "nova-tokenizer/**"
+      - "nova-economy/**"
+      - ".github/workflows/nova-dual-layer.yml"
+  pull_request:
+    paths:
+      - "nova-tokenizer/**"
+      - "nova-economy/**"
+      - ".github/workflows/nova-dual-layer.yml"
+
+jobs:
+  tokenizer:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run tokenizer tests
+        run: python nova-tokenizer/test_tokenizer.py
+
+  economic-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: foundry-rs/foundry-toolchain@v1
+      - name: Install OpenZeppelin and Forge standard library
+        run: |
+          forge install OpenZeppelin/openzeppelin-contracts --no-commit
+          forge install foundry-rs/forge-std --no-commit
+      - name: Format check
+        run: forge fmt --check
+      - name: Run contract tests
+        run: forge test -vv
