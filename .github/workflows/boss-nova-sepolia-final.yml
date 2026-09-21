@@ -58,7 +58,7 @@ jobs:
           chmod 600 "$RUNNER_TEMP/nova_deployer_key"
           unset KEY
 
-      - name: Fund disposable deployer from QuickNode Sepolia faucet
+      - name: Fund disposable deployer from ETH Faucet
         env:
           DEPLOYER_ADDRESS: ${{ steps.key.outputs.deployer_address }}
         run: |
@@ -68,44 +68,51 @@ jobs:
           npx playwright install --with-deps chromium >/dev/null 2>&1
           cat > faucet.mjs <<'JS'
           import { chromium } from 'playwright';
-          const address = process.env.DEPLOYER_ADDRESS;
-          const browser = await chromium.launch({headless:true,args:['--disable-dev-shm-usage']});
-          const page = await browser.newPage();
-          page.on('console',m=>{const t=m.text();if(/error/i.test(t))console.log('[quicknode-console]',t.slice(0,500));});
-          await page.goto('https://faucet.quicknode.com/ethereum/sepolia',{waitUntil:'domcontentloaded',timeout:120000});
-          const addressInput=page.locator('input[placeholder="0x..."]').first();
-          await addressInput.fill(address);
-          const combos=page.getByRole('combobox');
-          const n=await combos.count();
+          const address=process.env.DEPLOYER_ADDRESS;
+          const browser=await chromium.launch({headless:true,args:['--disable-dev-shm-usage']});
+          const page=await browser.newPage();
+          page.on('console',m=>{const t=m.text();if(/error/i.test(t))console.log('[ethfaucet-console]',t.slice(0,500));});
+          await page.goto('https://ethfaucet.com/networks/ethereum',{waitUntil:'domcontentloaded',timeout:120000});
+          console.log('TITLE',await page.title());
+          console.log('TEXT',(await page.locator('body').innerText()).slice(0,14000));
+          console.log('INPUTS',await page.locator('input').evaluateAll(es=>es.map(e=>({placeholder:e.placeholder,name:e.name,type:e.type,value:e.value}))));
+          console.log('BUTTONS',await page.locator('button').evaluateAll(es=>es.map(e=>({text:e.innerText,disabled:e.disabled,type:e.type}))));
+          const inputs=page.locator('input');
+          const n=await inputs.count();
           for(let i=0;i<n;i++){
-            const opts=await combos.nth(i).locator('option').allTextContents().catch(()=>[]);
-            console.log('COMBO',i,opts);
+            const p=(await inputs.nth(i).getAttribute('placeholder'))||'';
+            if(/wallet|address|0x/i.test(p)){await inputs.nth(i).fill(address);break;}
           }
-          console.log('INITIAL_TEXT',(await page.locator('body').innerText()).slice(0,12000));
-          const buttons=page.locator('button');
-          const bn=await buttons.count();
-          console.log('BUTTONS',await buttons.evaluateAll(es=>es.map(e=>({text:e.innerText,disabled:e.disabled}))));
-          for(let i=0;i<bn;i++){
-            const txt=(await buttons.nth(i).innerText()).trim();
-            if(/continue/i.test(txt)&&!(await buttons.nth(i).isDisabled())){await buttons.nth(i).click();console.log('CLICKED_CONTINUE');break;}
+          const claims=page.getByRole('button',{name:/claim/i});
+          console.log('CLAIM_COUNT',await claims.count());
+          if(await claims.count()){
+            const b=claims.last();
+            console.log('CLAIM_DISABLED',await b.isDisabled());
+            if(!(await b.isDisabled())) await b.click();
           }
-          await page.waitForTimeout(5000);
-          console.log('NEXT_TEXT',(await page.locator('body').innerText()).slice(0,16000));
-          console.log('NEXT_BUTTONS',await page.locator('button').evaluateAll(es=>es.map(e=>({text:e.innerText,disabled:e.disabled}))));
-          console.log('NEXT_INPUTS',await page.locator('input').evaluateAll(es=>es.map(e=>({placeholder:e.placeholder,value:e.value,type:e.type}))));
-          await page.screenshot({path:'/tmp/quicknode.png',fullPage:true});
+          await page.waitForTimeout(15000);
+          console.log('AFTER_URL',page.url());
+          console.log('AFTER_TEXT',(await page.locator('body').innerText()).slice(0,18000));
+          console.log('AFTER_INPUTS',await page.locator('input').evaluateAll(es=>es.map(e=>({placeholder:e.placeholder,name:e.name,type:e.type,value:e.value}))));
+          console.log('AFTER_BUTTONS',await page.locator('button').evaluateAll(es=>es.map(e=>({text:e.innerText,disabled:e.disabled}))));
+          await page.screenshot({path:'/tmp/ethfaucet.png',fullPage:true});
           await browser.close();
           JS
           node faucet.mjs
-          BAL="$(cast balance "$DEPLOYER_ADDRESS" --rpc-url "$SEPOLIA_RPC_URL" --ether)"
-          echo "deployer_balance_eth=$BAL"
-          python - "$BAL" <<'PY'
+          for i in $(seq 1 30); do
+            BAL="$(cast balance "$DEPLOYER_ADDRESS" --rpc-url "$SEPOLIA_RPC_URL" --ether)"
+            echo "deployer_balance_eth=$BAL"
+            python - "$BAL" <<'PY'
           import sys
           from decimal import Decimal
-          if Decimal(sys.argv[1]) <= 0:
-              raise SystemExit("QuickNode faucet did not fund the disposable deployer")
-          print("sepolia_funding_verified")
+          if Decimal(sys.argv[1]) > 0:
+              raise SystemExit(0)
+          raise SystemExit(1)
           PY
+            sleep 10
+          done
+          echo "ETH Faucet did not fund disposable deployer"
+          exit 1
 
       - name: Deploy NovaToken
         shell: bash
