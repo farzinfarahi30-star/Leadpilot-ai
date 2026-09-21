@@ -83,7 +83,7 @@ jobs:
 
       - name: Fund disposable deployer through GetSepolia free faucet API
         env:
-          DEPLOYER_ADDRESS: \${{ steps.key.outputs.deployer_address }}
+          DEPLOYER_ADDRESS: ${{ steps.key.outputs.deployer_address }}
         shell: bash
         run: |
           set -euo pipefail
