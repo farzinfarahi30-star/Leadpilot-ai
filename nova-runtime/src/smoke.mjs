@@ -2,7 +2,15 @@ import { chromium } from 'playwright';
 import { NOVA_DEVICE_TOOLS, listDesktopCommanderTools } from './device-tools.mjs';
 import { desktopCommanderConfigured } from './desktop-commander-mcp.mjs';
 
-const required=['listDesktopCommanderTools','callDesktopCommanderTool','readFile','writeFile','startProcess','listSystemProcesses'];
+const required=[
+  'listDesktopCommanderTools',
+  'callDesktopCommanderTool',
+  'deployNovaTokenTestnet',
+  'readFile',
+  'writeFile',
+  'startProcess',
+  'listSystemProcesses'
+];
 const missing=required.filter(name=>typeof NOVA_DEVICE_TOOLS[name]!=='function');
 if(missing.length) throw new Error('Missing Nova device tools: '+missing.join(','));
 
@@ -19,6 +27,7 @@ try{
     title:await page.title(),
     url:page.url(),
     deviceToolCount:Object.keys(NOVA_DEVICE_TOOLS).length,
+    novaTokenDeploymentTool:true,
     desktopCommander:{configured:remote.configured,connected:Boolean(remote.connected),toolCount:remote.toolCount??0}
   }));
 }finally{await browser.close()}
