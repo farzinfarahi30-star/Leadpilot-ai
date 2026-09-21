@@ -29,6 +29,15 @@ jobs:
           node-version: "20"
       - uses: foundry-rs/foundry-toolchain@v1
 
+      - name: Require latest Boss branch head
+        shell: bash
+        run: |
+          set -euo pipefail
+          BRANCH='boss-nova-sepolia-final-20260921'
+          REMOTE_HEAD="$(git ls-remote origin "refs/heads/$BRANCH" | awk '{print $1}')"
+          test "$REMOTE_HEAD" = "${GITHUB_SHA}"
+          echo "latest_branch_head_confirmed"
+
       - name: Validate source
         shell: bash
         run: |
