@@ -2,6 +2,7 @@ import process from 'node:process';
 import { spawn } from 'node:child_process';
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
+import { alchemySepoliaRpcUrl } from './alchemy.mjs';
 
 const CHAIN_ID = 11155111;
 const DEFAULT_OWNER = '0x63970A951bd69975eF2aDAD27bf73584D2DCeF9B';
@@ -18,6 +19,10 @@ const BROADCAST = path.join(
 
 function env(name) {
   return String(process.env[name] || '').trim();
+}
+
+function rpcUrl() {
+  return env('SEPOLIA_RPC_URL') || alchemySepoliaRpcUrl();
 }
 
 function assertOwner(owner = DEFAULT_OWNER) {
@@ -42,7 +47,7 @@ async function command(cmd, args, { timeoutMs = 120000 } = {}) {
   return await new Promise((resolve, reject) => {
     const child = spawn(cmd, args, {
       cwd: ROOT,
-      env: process.env,
+      env: { ...process.env, SEPOLIA_RPC_URL: rpcUrl() },
       stdio: ['ignore', 'pipe', 'pipe']
     });
     let stdout = '';
@@ -72,12 +77,12 @@ async function requireTool(name) {
 }
 
 async function chainId() {
-  const result = await command('cast', ['chain-id', '--rpc-url', env('SEPOLIA_RPC_URL')], { timeoutMs: 30000 });
+  const result = await command('cast', ['chain-id', '--rpc-url', rpcUrl()], { timeoutMs: 30000 });
   return Number(result.stdout);
 }
 
 async function tokenCalls(address) {
-  const rpc = env('SEPOLIA_RPC_URL');
+  const rpc = rpcUrl();
   const [owner, cap, supply] = await Promise.all([
     command('cast', ['call', address, 'owner()(address)', '--rpc-url', rpc], { timeoutMs: 30000 }),
     command('cast', ['call', address, 'maxSupply()(uint256)', '--rpc-url', rpc], { timeoutMs: 30000 }),
@@ -85,7 +90,7 @@ async function tokenCalls(address) {
   ]);
   return {
     owner: owner.stdout,
-    maxSupplyWei: owner.stdout && cap.stdout,
+    maxSupplyWei: cap.stdout,
     totalSupplyWei: supply.stdout
   };
 }
@@ -97,12 +102,10 @@ export async function novaChainPreflight({
 } = {}) {
   const expectedOwner = assertOwner(owner);
   const cap = assertCap(maxSupplyTokens);
-  const rpc = env('SEPOLIA_RPC_URL');
   const privateKey = env('NOVA_DEPLOYER_PRIVATE_KEY');
   const deployerAddress = env('NOVA_DEPLOYER_ADDRESS');
 
   const missing = [];
-  if (!rpc) missing.push('SEPOLIA_RPC_URL');
   if (!privateKey) missing.push('NOVA_DEPLOYER_PRIVATE_KEY');
   if (requireDeployerAddress && !deployerAddress) missing.push('NOVA_DEPLOYER_ADDRESS');
   if (deployerAddress && !/^0x[0-9a-fA-F]{40}$/.test(deployerAddress)) {
@@ -115,6 +118,7 @@ export async function novaChainPreflight({
       chainId: CHAIN_ID,
       owner: expectedOwner,
       maxSupplyTokens: cap,
+      rpc: rpcUrl(),
       missing
     };
   }
@@ -128,7 +132,7 @@ export async function novaChainPreflight({
 
   let balanceWei = null;
   if (deployerAddress) {
-    const result = await command('cast', ['balance', deployerAddress, '--ether', '--rpc-url', rpc], { timeoutMs: 30000 });
+    const result = await command('cast', ['balance', deployerAddress, '--ether', '--rpc-url', rpcUrl()], { timeoutMs: 30000 });
     balanceWei = result.stdout;
   }
 
@@ -136,6 +140,7 @@ export async function novaChainPreflight({
     ready: true,
     chain: 'sepolia',
     chainId: actualChainId,
+    rpc: rpcUrl(),
     owner: expectedOwner,
     maxSupplyTokens: cap,
     deployerAddress: deployerAddress || null,
@@ -175,7 +180,7 @@ export async function deployNovaTokenSepolia({
 
   await command(
     'forge',
-    ['script', SCRIPT, '--rpc-url', env('SEPOLIA_RPC_URL'), '--broadcast'],
+    ['script', SCRIPT, '--rpc-url', rpcUrl(), '--broadcast'],
     { timeoutMs: 180000 }
   );
 
@@ -201,6 +206,7 @@ export async function deployNovaTokenSepolia({
     transactionHash: deployment.transactionHash,
     blockNumber: deployment.blockNumber,
     verification,
+    rpcProvider: env('SEPOLIA_RPC_URL') ? 'custom' : 'alchemy-public',
     recordedAt: new Date().toISOString()
   };
   await fs.writeFile(
@@ -225,8 +231,6 @@ export async function verifyNovaTokenSepolia({
 
   const expectedOwner = assertOwner(owner);
   const cap = assertCap(maxSupplyTokens);
-  const rpc = env('SEPOLIA_RPC_URL');
-  if (!rpc) throw new Error('SEPOLIA_RPC_URL missing');
 
   const actualChainId = await chainId();
   if (actualChainId !== CHAIN_ID) {
@@ -256,6 +260,7 @@ export async function verifyNovaTokenSepolia({
     contractAddress,
     owner: observedOwner,
     maxSupplyWei: observedCap,
-    totalSupplyWei: observedSupply
+    totalSupplyWei: observedSupply,
+    rpcProvider: env('SEPOLIA_RPC_URL') ? 'custom' : 'alchemy-public'
   };
 }
