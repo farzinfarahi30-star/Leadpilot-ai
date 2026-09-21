@@ -27,6 +27,9 @@ jobs:
       GITHUB_TOKEN: ${{ github.token }}
       RUN_MINUTES: ${{ github.event_name == 'push' && '5' || '50' }}
       POLL_MS: 600000
+      DESKTOP_COMMANDER_MCP_URL: ${{ secrets.DESKTOP_COMMANDER_MCP_URL || 'https://mcp.desktopcommander.app/mcp' }}
+      DESKTOP_COMMANDER_MCP_PROTOCOL: ${{ secrets.DESKTOP_COMMANDER_MCP_PROTOCOL || '2025-06-18' }}
+      DESKTOP_COMMANDER_OAUTH_TOKEN: ${{ secrets.DESKTOP_COMMANDER_OAUTH_TOKEN }}
       NOVA_MAIL_PROVIDER: ${{ secrets.NOVA_MAIL_PROVIDER || 'resend' }}
       XX_MAIL_PROVIDER: ${{ secrets.XX_MAIL_PROVIDER }}
       RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
@@ -104,6 +107,11 @@ jobs:
           node --check src/agent-runtime.mjs
           node --check src/xx-runner.mjs
           node --check src/smoke.mjs
+          node --check src/desktop-commander-mcp.mjs
+
+      - name: Check Desktop Commander MCP
+        working-directory: nova-runtime
+        run: npm run desktop-commander:doctor
 
       - name: Run xx Takeover Runtime
         working-directory: nova-runtime
