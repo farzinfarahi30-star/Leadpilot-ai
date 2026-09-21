@@ -58,28 +58,68 @@ jobs:
           chmod 600 "$RUNNER_TEMP/nova_deployer_key"
           unset KEY
 
-      - name: Fund disposable deployer from public Sepolia faucet
-        shell: bash
+      - name: Mine Sepolia ETH with the official PoW faucet
         env:
           DEPLOYER_ADDRESS: ${{ steps.key.outputs.deployer_address }}
         run: |
           set -euo pipefail
-          npm install -g faucet-terminal
-          faucet-terminal request "$DEPLOYER_ADDRESS" --network ethereum --json
-          for i in $(seq 1 30); do
-            BAL="$(cast balance "$DEPLOYER_ADDRESS" --rpc-url "$SEPOLIA_RPC_URL" --ether)"
-            echo "deployer_balance_eth=$BAL"
-            python - "$BAL" <<'PY'
+          npm init -y >/dev/null 2>&1
+          npm install playwright >/dev/null 2>&1
+          npx playwright install --with-deps chromium >/dev/null 2>&1
+          cat > faucet.mjs <<'JS'
+          import { chromium } from 'playwright';
+          const address = process.env.DEPLOYER_ADDRESS;
+          const browser = await chromium.launch({headless:true,args:['--disable-dev-shm-usage']});
+          const page = await browser.newPage();
+          page.on('console', m => {
+            const txt = m.text();
+            if (/error/i.test(txt)) console.log('[faucet-console]', txt.slice(0,500));
+          });
+          await page.goto('https://sepolia-faucet.pk910.de/', {
+            waitUntil:'domcontentloaded',
+            timeout:120000
+          });
+          await page.locator('input[placeholder*="ETH address" i]').fill(address);
+          await page.getByRole('button', {name:'Start Mining'}).click();
+          let claimable=false;
+          for(let i=0;i<180;i++){
+            const stopBtn=page.getByRole('button', {name:/Stop Mining/}).first();
+            if(await stopBtn.count()){
+              const label=(await stopBtn.innerText()).trim();
+              if(label.includes('Claim Rewards')){
+                claimable=true;
+                await stopBtn.click();
+                break;
+              }
+            }
+            await page.waitForTimeout(1000);
+          }
+          if(!claimable){
+            console.log((await page.locator('body').innerText()).slice(0,12000));
+            throw new Error('PoW faucet did not reach claimable threshold within 180s');
+          }
+          await page.waitForTimeout(3000);
+          console.log('AFTER_MINING_URL', page.url());
+          console.log('AFTER_MINING_TEXT', (await page.locator('body').innerText()).slice(0,12000));
+          const claim=page.getByRole('button', {name:'Claim Rewards'});
+          if(await claim.count() && !(await claim.first().isDisabled())){
+            await claim.first().click();
+            await page.waitForTimeout(10000);
+          }
+          console.log('AFTER_CLAIM_URL', page.url());
+          console.log('AFTER_CLAIM_TEXT', (await page.locator('body').innerText()).slice(0,12000));
+          await browser.close();
+          JS
+          node faucet.mjs
+          BAL="$(cast balance "$DEPLOYER_ADDRESS" --rpc-url "$SEPOLIA_RPC_URL" --ether)"
+          echo "deployer_balance_eth=$BAL"
+          python - "$BAL" <<'PY'
           import sys
           from decimal import Decimal
-          if Decimal(sys.argv[1]) > 0:
-              raise SystemExit(0)
-          raise SystemExit(1)
+          if Decimal(sys.argv[1]) <= 0:
+              raise SystemExit("Sepolia ETH not received by disposable deployer")
+          print("sepolia_funding_verified")
           PY
-            sleep 10
-          done
-          echo "Sepolia faucet funding did not arrive"
-          exit 1
 
       - name: Deploy NovaToken
         shell: bash
