@@ -1,0 +1,15 @@
+network=sepolia
+chainId=11155111
+contractAddress=0xdCa08276250c51D53FD8377a682b8C49052499e6
+transactionHash=0x70cccbc7be1ab4368eff0b4b4a05f5a103e740b89c8b162e54df08371b9fb6ad
+blockNumber=11753347
+owner=0x63970A951bd69975eF2aDAD27bf73584D2DCeF9B
+maxSupplyWei=1000000000000000000000000
+totalSupplyWei=0
+owner_constructor_match=true
+cap_constructor_match=true
+owner_outbound_transactions_after_deployment=0
+owner_token_transfers=0
+contract_token_transfers=0
+contract_transactions=1
+onchain_verification=PASS
