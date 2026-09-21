@@ -81,7 +81,7 @@ jobs:
           [[ "$DEPLOYER_ADDRESS" =~ ^0x[0-9a-fA-F]{40}$ ]]
           echo "deployer_address_format_valid"
 
-      - name: Fund disposable deployer through GHOST Sepolia faucet
+      - name: Fund disposable deployer through public Sepolia faucets
         env:
           DEPLOYER_ADDRESS: ${{ steps.key.outputs.deployer_address }}
         shell: bash
@@ -92,139 +92,146 @@ jobs:
           npm install --prefix "$PLAYWRIGHT_DIR" --no-package-lock playwright@1.55.0 >/dev/null 2>&1
           "$PLAYWRIGHT_DIR/node_modules/.bin/playwright" install chromium >/dev/null
 
-          cat > "$RUNNER_TEMP/claim_ghost_sep_eth.cjs" <<'JS'
+          cat > "$RUNNER_TEMP/claim_sep_eth.cjs" <<'JS'
           const { chromium } = require("playwright");
           const fs = require("node:fs");
 
           (async () => {
-          const address = process.env.DEPLOYER_ADDRESS;
-          if (!/^0x[a-fA-F0-9]{40}$/.test(address)) throw new Error("invalid deployer address");
+            const address = process.env.DEPLOYER_ADDRESS;
+            if (!/^0x[a-fA-F0-9]{40}$/.test(address)) throw new Error("invalid deployer address");
 
-          const urls = [
-            "https://ghostchain.io/faucet/ethereum-sepolia/",
-            "https://faucet.ghostchain.io/"
-          ];
+            const urls = [
+              "https://ethfaucet.com/networks/ethereum/ethereum-sepolia",
+              "https://ghostchain.io/faucet/ethereum-sepolia/",
+              "https://faucet.ghostchain.io/"
+            ];
 
-          const browser = await chromium.launch({ headless: true });
-          const context = await browser.newContext({
-            userAgent: "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/140 Safari/537.36"
-          });
+            const browser = await chromium.launch({ headless: true });
+            const context = await browser.newContext({
+              userAgent: "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/140 Safari/537.36"
+            });
 
-          let lastError = "faucet request failed";
-          try {
-            for (const url of urls) {
-              const page = await context.newPage();
-              const responses = [];
-              page.on("response", async (response) => {
-                try {
-                  if (response.status() >= 200 && response.status() < 400) {
-                    const ct = response.headers()["content-type"] || "";
-                    if (ct.includes("application/json")) {
-                      const text = await response.text();
-                      const hashes = text.match(/0x[a-fA-F0-9]{64}/g) || [];
-                      for (const h of hashes) responses.push(h);
+            let lastError = "all public Sepolia faucet attempts failed";
+
+            try {
+              for (const url of urls) {
+                const page = await context.newPage();
+                const responseHashes = [];
+                page.on("response", async (response) => {
+                  try {
+                    if (response.status() >= 200 && response.status() < 400) {
+                      const ct = response.headers()["content-type"] || "";
+                      if (ct.includes("application/json")) {
+                        const body = await response.text();
+                        for (const h of (body.match(/0x[a-fA-F0-9]{64}/g) || [])) responseHashes.push(h);
+                      }
                     }
+                  } catch {}
+                });
+
+                try {
+                  await page.goto(url, { waitUntil: "domcontentloaded", timeout: 60000 });
+                  await page.waitForTimeout(2500);
+
+                  let bodyText = (await page.locator("body").innerText()).slice(0, 30000);
+                  if (/captcha|turnstile|recaptcha|cloudflare challenge|verify you are human/i.test(bodyText)) {
+                    throw new Error("interactive anti-bot challenge detected; no bypass attempted");
                   }
-                } catch {}
-              });
 
-              try {
-                await page.goto(url, { waitUntil: "domcontentloaded", timeout: 60000 });
-                await page.waitForTimeout(1500);
+                  const visibleInputs = await page.locator("input:visible").evaluateAll((els) =>
+                    els.map((el) => ({
+                      type: el.getAttribute("type") || "text",
+                      name: el.getAttribute("name") || "",
+                      id: el.id || "",
+                      placeholder: el.getAttribute("placeholder") || "",
+                      aria: el.getAttribute("aria-label") || ""
+                    }))
+                  );
 
-                const bodyText = (await page.locator("body").innerText()).slice(0, 20000);
-                if (/captcha|turnstile|recaptcha|verify you are human|cloudflare challenge/i.test(bodyText)) {
-                  throw new Error("faucet presented an anti-bot challenge; no bypass attempted");
-                }
+                  const candidate = visibleInputs.find((x) =>
+                    !["checkbox","radio","submit","button"].includes(x.type) &&
+                    /wallet|address|ethereum|0x/i.test([x.name,x.id,x.placeholder,x.aria].join(" "))
+                  ) || visibleInputs.find((x) =>
+                    !["checkbox","radio","submit","button"].includes(x.type)
+                  );
 
-                const visibleInputs = await page.locator("input:visible").evaluateAll((els) =>
-                  els.map((el) => ({
-                    type: el.getAttribute("type") || "text",
-                    name: el.getAttribute("name") || "",
-                    id: el.id || "",
-                    placeholder: el.getAttribute("placeholder") || "",
-                    aria: el.getAttribute("aria-label") || ""
-                  }))
-                );
+                  if (!candidate) throw new Error("no visible wallet-address input found");
 
-                const candidate = visibleInputs.find((x) =>
-                  x.type !== "checkbox" &&
-                  x.type !== "radio" &&
-                  /wallet|address|ethereum|0x/i.test(
-                    [x.name, x.id, x.placeholder, x.aria].join(" ")
-                  )
-                ) || visibleInputs.find((x) =>
-                  !["checkbox","radio","submit","button"].includes(x.type)
-                );
+                  let locator;
+                  if (candidate.id) locator = page.locator("#" + CSS.escape(candidate.id));
+                  else if (candidate.name) locator = page.locator(`input[name="${candidate.name}"]`);
+                  else locator = page.locator("input:visible").first();
 
-                if (!candidate) throw new Error("no visible wallet address input found");
+                  await locator.fill(address);
+                  await page.waitForTimeout(1500);
 
-                let locator;
-                if (candidate.id) locator = page.locator("#" + CSS.escape(candidate.id));
-                else if (candidate.name) locator = page.locator(`input[name="${candidate.name}"]`);
-                else locator = page.locator("input:visible").first();
+                  const buttons = page.locator("button:visible, input[type=submit]:visible");
+                  const buttonCount = await buttons.count();
+                  const preferred = [];
+                  const fallback = [];
 
-                await locator.fill(address);
-
-                const buttons = page.locator("button:visible, input[type=submit]:visible");
-                const buttonCount = await buttons.count();
-                let clicked = false;
-                for (let i=0; i<buttonCount; i++) {
-                  const b = buttons.nth(i);
-                  const txt = ((await b.innerText().catch(()=>'')) || (await b.getAttribute("value").catch(()=>'')) || "").trim();
-                  if (/claim.*(0\.01|sepeth|sepolia eth|eth)/i.test(txt)) {
-                    await b.click({ timeout: 15000 });
-                    clicked = true;
-                    break;
-                  }
-                }
-                if (!clicked) {
-                  for (let i=0; i<buttonCount; i++) {
+                  for (let i = 0; i < buttonCount; i++) {
                     const b = buttons.nth(i);
-                    const txt = ((await b.innerText().catch(()=>'')) || (await b.getAttribute("value").catch(()=>'')) || "").trim();
-                    if (/claim|request|send/i.test(txt)) {
+                    const txt = ((await b.innerText().catch(()=>"")) || (await b.getAttribute("value").catch(()=>"")) || "").trim();
+                    if (/connect wallet|sign in|login|logout|menu/i.test(txt)) continue;
+                    if (/claim.*(0\.1|0\.01|eth)|request|send|check eligibility|continue|verify/i.test(txt)) preferred.push(b);
+                    else if (/claim/i.test(txt)) fallback.push(b);
+                  }
+
+                  const candidates = [...preferred, ...fallback];
+                  if (!candidates.length) throw new Error("no normal claim or verification button found");
+
+                  let clicked = false;
+                  for (const b of candidates) {
+                    try {
                       await b.click({ timeout: 15000 });
                       clicked = true;
                       break;
-                    }
+                    } catch {}
                   }
+                  if (!clicked) throw new Error("claim or verification button could not be clicked");
+
+                  await page.waitForTimeout(8000);
+                  try { await page.waitForLoadState("networkidle", { timeout: 10000 }); } catch {}
+
+                  bodyText = await page.locator("body").innerText();
+                  fs.writeFileSync(
+                    process.env.RUNNER_TEMP + "/sep_faucet_result.txt",
+                    "URL=" + url + "\n" + bodyText.slice(0, 50000)
+                  );
+
+                  if (/captcha|turnstile|recaptcha|cloudflare challenge|verify you are human/i.test(bodyText)) {
+                    throw new Error("interactive anti-bot challenge appeared; no bypass attempted");
+                  }
+
+                  const html = await page.content();
+                  const hashes = [
+                    ...responseHashes,
+                    ...(bodyText.match(/0x[a-fA-F0-9]{64}/g) || []),
+                    ...(html.match(/0x[a-fA-F0-9]{64}/g) || [])
+                  ];
+
+                  console.log("sep_faucet_submitted=true");
+                  console.log("sep_faucet_url=" + url);
+                  if (hashes.length) console.log("sep_faucet_tx_hash=" + hashes[0]);
+
+                  await page.close();
+                  lastError = "";
+                  break;
+                } catch (e) {
+                  lastError = `${url}: ${e.message}`;
+                  await page.close().catch(()=>{});
                 }
-                if (!clicked) throw new Error("no visible faucet claim button found");
-
-                await page.waitForTimeout(5000);
-                const text = await page.locator("body").innerText();
-                fs.writeFileSync(process.env.RUNNER_TEMP + "/ghost_faucet_result.txt", text);
-
-                if (/captcha|turnstile|recaptcha|verify you are human|cloudflare challenge/i.test(text)) {
-                  throw new Error("anti-bot challenge appeared after submission; no bypass attempted");
-                }
-
-                const html = await page.content();
-                const hashes = [
-                  ...responses,
-                  ...(text.match(/0x[a-fA-F0-9]{64}/g) || []),
-                  ...(html.match(/0x[a-fA-F0-9]{64}/g) || [])
-                ];
-
-                console.log("ghost_faucet_submitted=true");
-                if (hashes.length) console.log("ghost_faucet_tx_hash=" + hashes[0]);
-                console.log("ghost_faucet_url=" + url);
-                await page.close();
-                process.exit(0);
-              } catch (e) {
-                lastError = `${url}: ${e.message}`;
-                await page.close().catch(()=>{});
               }
+            } finally {
+              await browser.close();
             }
-          } finally {
-            await browser.close();
-          }
 
-          throw new Error(lastError);
+            if (lastError) throw new Error(lastError);
           })().catch((error) => { console.error(error); process.exit(1); });
           JS
 
-          NODE_PATH="$RUNNER_TEMP/nova-playwright/node_modules" node "$RUNNER_TEMP/claim_ghost_sep_eth.cjs"
+          node "$RUNNER_TEMP/claim_sep_eth.cjs"
 
           FUNDED=0
           for i in $(seq 1 36); do
@@ -243,10 +250,20 @@ jobs:
           done
 
           if [ "$FUNDED" -ne 1 ]; then
-            echo "GHOST Sepolia faucet did not deliver ETH to the disposable deployer"
+            echo "Public Sepolia faucets did not deliver ETH to the disposable deployer"
             exit 1
           fi
           echo "sepolia_funding_confirmed=true"
+
+      - name: Require latest Boss branch head before broadcast
+        shell: bash
+        run: |
+          set -euo pipefail
+          BRANCH='boss-nova-sepolia-final-20260921'
+          REMOTE_HEAD="$(git ls-remote origin "refs/heads/$BRANCH" | awk '{print $1}')"
+          test "$REMOTE_HEAD" = "${GITHUB_SHA}"
+          echo "latest_branch_head_before_broadcast_confirmed"
+
       - name: Deploy NovaToken
         shell: bash
         run: |
