@@ -1,1 +1,1 @@
-Run the authorized browser faucet path.
+Run corrected browser faucet path v2.
