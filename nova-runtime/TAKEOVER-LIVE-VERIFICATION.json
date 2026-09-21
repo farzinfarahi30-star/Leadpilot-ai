@@ -1,0 +1,81 @@
+{
+  "schema": "nova.company.takeover.verification.v1",
+  "verifiedAt": "2026-09-21T21:32:37Z",
+  "status": "live-direct-verified",
+  "controller": "Nova",
+  "control": "XX",
+  "mode": "company-replication-takeover",
+  "source": {
+    "company": "AI Business Factory",
+    "projectId": "proj_YdSUAosmSpN3",
+    "version": 517,
+    "deploymentStatus": "live",
+    "url": "https://ai-business-factory.hatchable.site"
+  },
+  "inventory": {
+    "totalFiles": 515,
+    "apiSourceFiles": 239,
+    "libraryFiles": 30,
+    "publicFiles": 42,
+    "migrationFiles": 168,
+    "deployedFunctions": 279,
+    "databaseTables": 221
+  },
+  "liveChecks": [
+    {
+      "route": "/api/nova-executive-loop",
+      "method": "POST",
+      "statusCode": 200,
+      "error": null
+    },
+    {
+      "route": "/api/god-connector-worker",
+      "method": "POST",
+      "statusCode": 200,
+      "error": null
+    },
+    {
+      "route": "/api/agent-worker",
+      "method": "POST",
+      "statusCode": 200,
+      "error": null
+    },
+    {
+      "route": "/api/nova-control",
+      "method": "GET",
+      "statusCode": 200,
+      "error": null
+    },
+    {
+      "route": "/api/god-status",
+      "method": "GET",
+      "statusCode": 200,
+      "error": null
+    },
+    {
+      "route": "/api/god-workforce-status",
+      "method": "GET",
+      "statusCode": 200,
+      "error": null
+    },
+    {
+      "route": "/api/company-os/status",
+      "method": "GET",
+      "statusCode": 200,
+      "error": null
+    }
+  ],
+  "sourceCommit": "e9257bca694bafc85089086cb751c44f5ad7cea2",
+  "ci": {
+    "workflowInstalled": true,
+    "externalRunnerObserved": false,
+    "note": "GitHub Actions produced no workflow-run record for the verification commit; this record is based on direct live runtime verification instead."
+  },
+  "handoff": {
+    "novaOwnsOperatingContext": true,
+    "canonicalManifest": "nova-runtime/company-takeover-manifest.json",
+    "runtimeEntry": "nova-runtime/src/xx-runner.mjs",
+    "normalWorkerLoadsTakeover": true,
+    "alternateOutsideXx": false
+  }
+}
