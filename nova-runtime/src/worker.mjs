@@ -2,6 +2,7 @@ import { setTimeout as sleep } from 'node:timers/promises';
 import process from 'node:process';
 import { runAgentCycle, persistStatus } from './agent-runtime.mjs';
 import { execFile } from 'node:child_process';
+import { deviceBootstrapAndDoctor } from './device-tools.mjs';
 import { deviceInfo, desktopCommanderDoctor, startDesktopCommanderRemote } from './device-bridge.mjs';
 
 
@@ -24,17 +25,10 @@ function runChainCommand(){
 
 log('runtime_started',{runMinutes:RUN_MINUTES,pollMs:POLL_MS,agentCount:15,controlPlane:'nova-independent',escalation:'xx-only'});
 
-if(process.env.NOVA_DEVICE_COMMAND==='doctor'){
-  const doctor=await desktopCommanderDoctor();
-  log('device_bridge_doctor',doctor);
-  process.exit(0);
-}
-
-if(process.env.NOVA_DEVICE_COMMAND==='start_desktop_commander'){
-  log('desktop_commander_start_requested',{device:deviceInfo()});
-  await startDesktopCommanderRemote();
-  log('desktop_commander_start_complete');
-  process.exit(0);
+if(process.env.NOVA_DEVICE_COMMAND==='doctor'||process.env.NOVA_DEVICE_COMMAND==='bootstrap'){
+  const report=await deviceBootstrapAndDoctor();
+  log('device_capability_report',report);
+  process.exit(report.provision && !report.provision.ok ? 1 : 0);
 }
 
 if(process.env.NOVA_CHAIN_COMMAND==='deploy_testnet'){
