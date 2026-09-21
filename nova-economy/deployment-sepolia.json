@@ -1,0 +1,30 @@
+{
+  "network": "sepolia",
+  "chainId": 11155111,
+  "owner": "0x63970A951bd69975eF2aDAD27bf73584D2DCeF9B",
+  "maxSupplyTokens": 1000000,
+  "maxSupplyWei": "1000000000000000000000000",
+  "initialTotalSupplyWei": "0",
+  "contractAddress": "0xdCa08276250c51D53FD8377a682b8C49052499e6",
+  "transactionHash": "0x70cccbc7be1ab4368eff0b4b4a05f5a103e740b89c8b162e54df08371b9fb6ad",
+  "blockNumber": 11753347,
+  "deployerAddress": "0x2d579154B3986FccDF6F5D926d0b2C5a4B1E002E",
+  "fundingProvider": "GetSepolia",
+  "fundingTransactionHash": "0xf4639fcfa2f3b63689b5100e23641b7ee5345c519370cb64cfd295d391c88970",
+  "verification": {
+    "verified": true,
+    "method": "Independent Sepolia Blockscout public-chain verification",
+    "chainIdVerified": 11155111,
+    "creationTransactionStatus": "success",
+    "creationTransactionType": "contract_creation",
+    "constructorOwnerMatches": true,
+    "constructorCapMatches": true,
+    "ownerAddressOutboundTransactionsAfterDeployment": 0,
+    "ownerAddressTokenTransfers": 0,
+    "contractTokenTransfers": 0,
+    "contractAddressTransactions": 1,
+    "initialSupplyInference": "No token-transfer/mint activity exists after creation; NovaToken source initializes no supply and only mint() can increase totalSupply.",
+    "caveat": "The CI post-deploy cast verifier failed only because it referenced nova-economy/broadcast/... while Foundry wrote broadcast/... at repository root. The on-chain deployment itself succeeded."
+  },
+  "recordedAt": "2026-09-21T20:52:49Z"
+}
