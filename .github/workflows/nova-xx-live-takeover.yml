@@ -1,0 +1,51 @@
+name: Nova XX Live Takeover Proof
+
+on:
+  push:
+    paths:
+      - 'nova-runtime/company-takeover-manifest.json'
+      - 'nova-runtime/src/company-takeover.mjs'
+      - 'nova-runtime/src/xx-runner.mjs'
+      - 'nova-runtime/test/company-takeover.test.mjs'
+      - '.github/workflows/nova-xx-live-takeover.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  takeover:
+    if: !contains(github.event.head_commit.message || '', 'Record Nova XX live takeover proof')
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Execute company takeover validation
+        run: node nova-runtime/test/company-takeover.test.mjs
+      - name: Execute Nova XX takeover
+        working-directory: nova-runtime
+        env:
+          NOVA_TAKEOVER_ONLY: 'true'
+        run: node src/xx-runner.mjs > ../xx-live-takeover-proof.json
+      - name: Validate live proof
+        run: |
+          node - <<'NODE'
+          const fs=require('fs');
+          const raw=fs.readFileSync('xx-live-takeover-proof.json','utf8').trim().split('\n').filter(Boolean).map(JSON.parse);
+          const proof=raw.find(x=>x.event==='xx_takeover_live_execution_complete');
+          if(!proof) throw new Error('No live takeover completion event');
+          if(proof.control!=='xx'||proof.mode!=='company-replication-takeover'||proof.success!==true) throw new Error('Invalid takeover proof');
+          if(!proof.manifestValidation?.ok) throw new Error('Manifest validation failed');
+          console.log(JSON.stringify(proof,null,2));
+          fs.writeFileSync('nova-runtime/TAKEOVER-CI-PROOF.json',JSON.stringify(proof,null,2)+'\n');
+          NODE
+      - name: Record proof
+        run: |
+          git config user.name 'nova-takeover-proof'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add nova-runtime/TAKEOVER-CI-PROOF.json
+          git commit -m 'Record Nova XX live takeover proof'
+          git push
