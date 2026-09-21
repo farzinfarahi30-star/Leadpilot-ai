@@ -28,15 +28,27 @@ function parseSseBody(body){
       .map(line=>line.slice(5).trim())
       .join('\n');
     if(!data || data==='[DONE]') continue;
-    try{last=JSON.parse(data);}catch{}
+    try{last=JSON.parse(data)}catch{}
   }
   if(last) return last;
   const trimmed=String(body).trim();
-  try{return JSON.parse(trimmed);}catch{return {raw:trimmed};}
+  try{return JSON.parse(trimmed)}catch{return {raw:trimmed}};
+}
+
+function withProtocolMeta(method,params){
+  const next={...(params||{})};
+  if(method!=='initialize' && method!=='notifications/initialized' && !next._meta){
+    next._meta={
+      'io.modelcontextprotocol/protocolVersion':negotiatedProtocol,
+      'io.modelcontextprotocol/clientInfo':{name:CLIENT_NAME,version:CLIENT_VERSION},
+      'io.modelcontextprotocol/clientCapabilities':{}
+    };
+  }
+  return next;
 }
 
 async function rpc(method,params={},id=1,{headers={}}={}){
-  const payload={jsonrpc:'2.0',id,method,params};
+  const payload={jsonrpc:'2.0',id,method,params:withProtocolMeta(method,params)};
   if(sessionId) headers['Mcp-Session-Id']=sessionId;
   const r=await fetch(ENDPOINT,{
     method:'POST',
@@ -104,12 +116,8 @@ export async function desktopCommanderListTools(){
 
 export async function desktopCommanderCall(name,args={},id=2){
   await ensureInitialized();
+  if(!name || typeof name!=='string') throw new Error('Desktop Commander tool name is required.');
   return rpc('tools/call',{
-    _meta:{
-      'io.modelcontextprotocol/protocolVersion':negotiatedProtocol,
-      'io.modelcontextprotocol/clientInfo':{name:CLIENT_NAME,version:CLIENT_VERSION},
-      'io.modelcontextprotocol/clientCapabilities':{}
-    },
     name,
     arguments:args
   },id,{headers:{'Mcp-Name':String(name)}});
@@ -131,6 +139,5 @@ export function desktopCommanderConfigured(){return Boolean(TOKEN);}
 
 export async function executeDesktopCommanderTool(name,args={},id=2){
   if(!desktopCommanderConfigured()) throw new Error('Desktop Commander OAuth token is not configured.');
-  if(!name || typeof name!=='string') throw new Error('Desktop Commander tool name is required.');
   return desktopCommanderCall(name,args,id);
 }
