@@ -79,11 +79,26 @@ jobs:
           deployed=[x for x in txs if x.get("transactionType")=="CREATE" and x.get("contractName")=="NovaToken"]
           if not deployed:
               raise SystemExit("NovaToken CREATE transaction not found")
-          addr=deployed[-1].get("contractAddress")
+          tx=deployed[-1]
+          addr=tx.get("contractAddress")
           if not addr:
               raise SystemExit("contractAddress missing")
+          tx_hash=tx.get("hash") or tx.get("transactionHash") or tx.get("txHash")
+          block=tx.get("blockNumber")
           Path("nova-economy/deployment-address.txt").write_text(addr+"\n")
+          metadata={
+              "network":"sepolia",
+              "chainId":11155111,
+              "owner":os.environ["NOVA_OWNER"],
+              "maxSupplyTokens":int(os.environ["NOVA_MAX_SUPPLY_TOKENS"]),
+              "contractAddress":addr,
+              "transactionHash":tx_hash,
+              "blockNumber":block
+          }
+          Path("nova-economy/deployment-sepolia.json").write_text(json.dumps(metadata, indent=2)+"\n")
           print("NOVA_CONTRACT_ADDRESS="+addr)
+          print("NOVA_TRANSACTION_HASH="+str(tx_hash))
+          print("NOVA_BLOCK_NUMBER="+str(block))
           PY
 
       - name: Verify deployment on-chain
@@ -133,5 +148,7 @@ jobs:
           name: nova-token-sepolia-deployment
           path: |
             nova-economy/deployment-address.txt
+            nova-economy/deployment-sepolia.json
+            nova-economy/deployment-verification.txt
             nova-economy/broadcast/DeployNovaToken.s.sol/11155111/run-latest.json
           if-no-files-found: error
