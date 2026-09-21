@@ -118,6 +118,31 @@ export function readProcessOutput(sessionId,offset=0,length=100){
 }
 export function listActiveSessions(){return [...sessions.values()].map(s=>({sessionId:s.id,pid:s.pid,command:s.command,status:s.status,startedAt:s.startedAt,finishedAt:s.finishedAt??null}))}
 export function terminateSession(sessionId){const s=sessions.get(sessionId);if(!s)throw new Error('unknown session');s.child.kill('SIGTERM');return {sessionId,terminated:true}}
+export async function executeCode(language,code,options={}){
+  const map={node:['node',['-e',String(code)]],python:['python3',['-c',String(code)]],python3:['python3',['-c',String(code)]],r:['Rscript',['-e',String(code)]]};
+  const spec=map[String(language).toLowerCase()];if(!spec)throw new Error('Unsupported code language: '+language);
+  return new Promise((resolve,reject)=>execFile(spec[0],spec[1],{cwd:options.cwd||process.cwd(),env:{...process.env,...(options.env||{})},
+    timeout:Math.min(600000,Math.max(1000,Number(options.timeoutMs||120000))),maxBuffer:MAX_OUTPUT},
+    (error,stdout,stderr)=>{const result={ok:!error,code:error?.code??0,stdout:String(stdout||''),stderr:String(stderr||'')};if(error)reject(Object.assign(new Error(result.stderr||error.message),{result}));else resolve(result)}));
+}
+export async function modifyPdfAppend(target,appendTarget){
+  const source=safePath(target),extra=safePath(appendTarget);
+  const base=await PDFDocument.load(await fs.readFile(source)),append=await PDFDocument.load(await fs.readFile(extra));
+  const pages=await base.copyPages(append,append.getPageIndices());for(const page of pages)base.addPage(page);
+  const bytes=await base.save();await fs.writeFile(source,bytes);return {path:source,appendedPages:pages.length,bytes:bytes.length};
+}
+export function listPairedDevices(){return [{id:deviceInfo().hostname,name:deviceInfo().hostname,online:true,type:'local'}]}
+export function currentUserInfo(){return {username:process.env.USER||process.env.USERNAME||'unknown',home:os.homedir(),platform:process.platform}}
+export async function pingDevice(){return {ok:true,hostname:os.hostname(),timestamp:new Date().toISOString()}}
+export async function shutdownDeviceAgent(){process.nextTick(()=>process.exit(0));return {requested:true}}
+export async function getPromptLibrary(){
+  return [
+    {name:'inspect_project',prompt:'Inspect the project, identify risks, run relevant tests, and report evidence.'},
+    {name:'repair_then_verify',prompt:'Make the smallest safe repair, run validation, and report exactly what changed.'},
+    {name:'build_and_release',prompt:'Build, test, inspect artifacts, and only report release-ready when verification passes.'},
+    {name:'device_doctor',prompt:'Inspect device, Termux, tools, processes, storage, and network readiness without changing secrets.'}
+  ];
+}
 export async function listSystemProcesses(){const r=await execFilePromise('ps',['-eo','pid,ppid,stat,etime,%cpu,%mem,comm,args']);return {ok:r.code===0,output:r.stdout}}
 export async function killSystemProcess(pid){
   if(process.env.NOVA_DEVICE_ALLOW_DANGEROUS!=='true')throw new Error('Killing system processes requires NOVA_DEVICE_ALLOW_DANGEROUS=true');
@@ -171,6 +196,7 @@ export async function termuxBackground(command){if(!deviceInfo().termux)throw ne
 export const TOOL_REGISTRY={
   deviceInfo,listDirectory,readFile,readMultipleFiles,getFileInfo,writeFile,editFileBlock,moveFile,createDirectory,
   searchFiles,getSearchResults,stopSearch,listActiveSearches,startProcess,sendInput,readProcessOutput,listActiveSessions,
-  terminateSession,listSystemProcesses,killSystemProcess,writePdf,readExcel,writeExcel,getConfig,setConfig,getUsageStatistics,
+  terminateSession,listSystemProcesses,killSystemProcess,executeCode,writePdf,modifyPdfAppend,readExcel,writeExcel,
+  listPairedDevices,currentUserInfo,pingDevice,shutdownDeviceAgent,getPromptLibrary,getConfig,setConfig,getUsageStatistics,
   getRecentToolActivity,termuxStatus,termuxProvision,termuxApi,termuxBackground
 };
