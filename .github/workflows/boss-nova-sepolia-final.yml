@@ -81,28 +81,27 @@ jobs:
           [[ "$DEPLOYER_ADDRESS" =~ ^0x[0-9a-fA-F]{40}$ ]]
           echo "deployer_address_format_valid"
 
-      - name: Fund disposable deployer through Nova faucet tool
+      - name: Fund disposable deployer through QuickNode Sepolia faucet
         env:
           DEPLOYER_ADDRESS: ${{ steps.key.outputs.deployer_address }}
         run: |
           set -euo pipefail
 
-          # Pinned public faucet client using its normal anti-abuse PoW flow.
-          # No Coinbase credentials or deployer funding secret is required.
-          FAUCET_OUTPUT="$RUNNER_TEMP/nova_sepolia_faucet.json"
-          npx --yes faucet-terminal@2.0.4 request "$DEPLOYER_ADDRESS" --network ethereum --json | tee "$FAUCET_OUTPUT"
+          # Direct, non-Coinbase Sepolia faucet request.
+          RESPONSE_FILE="$RUNNER_TEMP/nova_quicknode_faucet_response"
+          HTTP_CODE="$(curl -sS -o "$RESPONSE_FILE" -w '%{http_code}' \
+            -X POST 'https://faucet.quicknode.com/ethereum/sepolia' \
+            -H 'Content-Type: application/json' \
+            -H 'Accept: application/json' \
+            --data "{\"wallet_address\":\"$DEPLOYER_ADDRESS\"}")"
 
-          python - "$FAUCET_OUTPUT" <<'PY'
-          import json, sys
-          from pathlib import Path
-          d=json.loads(Path(sys.argv[1]).read_text())
-          if not d.get("success"):
-              raise SystemExit(f"faucet request failed: {d}")
-          tx=d.get("tx_hash") or d.get("transactionHash")
-          if not tx:
-              raise SystemExit(f"faucet returned no transaction hash: {d}")
-          print(f"faucet_tx={tx}")
-          PY
+          echo "quicknode_faucet_http_status=$HTTP_CODE"
+          cat "$RESPONSE_FILE"
+
+          case "$HTTP_CODE" in
+            2??) ;;
+            *) echo "QuickNode Sepolia faucet request failed"; exit 1 ;;
+          esac
 
           for i in $(seq 1 36); do
             BAL="$(cast balance "$DEPLOYER_ADDRESS" --rpc-url "$SEPOLIA_RPC_URL" --ether)"
@@ -117,9 +116,8 @@ jobs:
             sleep 10
           done
 
-          echo "Nova faucet tool did not deliver Sepolia ETH to the disposable deployer"
+          echo "QuickNode Sepolia faucet did not deliver ETH to the disposable deployer"
           exit 1
-
       - name: Deploy NovaToken
         shell: bash
         run: |
