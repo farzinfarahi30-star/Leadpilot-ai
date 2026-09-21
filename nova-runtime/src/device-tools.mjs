@@ -30,6 +30,25 @@ import {
   alchemyBundlerRpc,
   alchemyCapabilityManifest
 } from './alchemy-capabilities.mjs';
+import {
+  coinbaseCdpConfigured,
+  coinbaseCdpDoctor,
+  coinbaseCdpRequestSepoliaEth
+} from './coinbase-cdp.mjs';
+import {
+  chainstackMcpConfigured,
+  chainstackMcpListTools,
+  chainstackMcpRequestSepoliaEth
+} from './chainstack-mcp.mjs';
+import {
+  novaCryptoCapabilityManifest,
+  novaCryptoDoctor,
+  novaCryptoChainDoctor,
+  novaCryptoBalance,
+  novaCryptoReceipt,
+  requestSepoliaEth,
+  requestAndConfirmSepoliaEth
+} from './crypto-capabilities.mjs';
 
 export async function listDesktopCommanderTools(){
   if(!desktopCommanderConfigured()){
@@ -116,7 +135,20 @@ export const NOVA_DEVICE_TOOLS={
   alchemyTransferHistory,
   alchemyRpcGateway,
   alchemyBundlerRpc,
-  alchemyCapabilityManifest
+  alchemyCapabilityManifest,
+  coinbaseCdpConfigured,
+  coinbaseCdpDoctor,
+  coinbaseCdpRequestSepoliaEth,
+  chainstackMcpConfigured,
+  chainstackMcpListTools,
+  chainstackMcpRequestSepoliaEth,
+  novaCryptoCapabilityManifest,
+  novaCryptoDoctor,
+  novaCryptoChainDoctor,
+  novaCryptoBalance,
+  novaCryptoReceipt,
+  requestSepoliaEth,
+  requestAndConfirmSepoliaEth
 };
 
 export async function executeDeviceTool(name,args=[]){
