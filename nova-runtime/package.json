@@ -9,7 +9,7 @@
     "device:smoke": "node ../nova-device/src/smoke.mjs",
     "device:supervise": "node ../nova-device/src/supervisor.mjs",
     "device:agent": "NOVA_LOCAL_DAEMON=true NOVA_DEVICE_CONTROL=true node src/worker.mjs",
-    "desktop-commander:doctor": "node -e \"import('./src/desktop-commander-mcp.mjs').then(async m=>{if(!m.desktopCommanderConfigured()){console.log(JSON.stringify({configured:false,reason:'DESKTOP_COMMANDER_OAUTH_TOKEN not configured'}));return;}console.log(JSON.stringify(await m.desktopCommanderHealth()))}).catch(e=>{console.error(e);process.exit(1)})\""
+    "desktop-commander:doctor": "node -e \"import('./src/desktop-commander-mcp.mjs').then(async m=>{if(!m.desktopCommanderConfigured()){console.log(JSON.stringify({configured:false,reason:'DESKTOP_COMMANDER_OAUTH_TOKEN not configured'}));return;}try{console.log(JSON.stringify(await m.desktopCommanderHealth()))}catch(e){console.log(JSON.stringify({configured:true,connected:false,error:String(e)}));}}).catch(e=>{console.log(JSON.stringify({configured:false,error:String(e)}))})\""
   },
   "dependencies": {
     "playwright": "^1.55.0"
