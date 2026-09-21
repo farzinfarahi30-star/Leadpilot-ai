@@ -36,6 +36,16 @@ forge script script/DeployNovaToken.s.sol:DeployNovaToken \
 
 The deployer key signs the transaction. The contract's `owner()` is set to `NOVA_OWNER`, so the Trust Wallet address remains the administrative owner even if a separate deployer key submits the deployment transaction.
 
+## Nova-controlled execution
+
+The Nova runtime can dispatch the GitHub Actions deployment lane with:
+
+NOVA_CHAIN_COMMAND=deploy_testnet node src/worker.mjs
+
+The runtime uses GITHUB_TOKEN only to dispatch the workflow. The deployment private key is injected by GitHub Actions and is never passed to Nova.
+
+Required repository secrets: NOVA_DEPLOYER_PRIVATE_KEY and SEPOLIA_RPC_URL.
+
 ## Verification
 
 After deployment:
