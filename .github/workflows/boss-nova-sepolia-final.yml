@@ -58,7 +58,7 @@ jobs:
           chmod 600 "$RUNNER_TEMP/nova_deployer_key"
           unset KEY
 
-      - name: Mine Sepolia ETH with the official PoW faucet
+      - name: Fund disposable deployer from QuickNode Sepolia faucet
         env:
           DEPLOYER_ADDRESS: ${{ steps.key.outputs.deployer_address }}
         run: |
@@ -71,43 +71,29 @@ jobs:
           const address = process.env.DEPLOYER_ADDRESS;
           const browser = await chromium.launch({headless:true,args:['--disable-dev-shm-usage']});
           const page = await browser.newPage();
-          page.on('console', m => {
-            const txt = m.text();
-            if (/error/i.test(txt)) console.log('[faucet-console]', txt.slice(0,500));
-          });
-          await page.goto('https://sepolia-faucet.pk910.de/', {
-            waitUntil:'domcontentloaded',
-            timeout:120000
-          });
-          await page.locator('input[placeholder*="ETH address" i]').fill(address);
-          await page.getByRole('button', {name:'Start Mining'}).click();
-          let claimable=false;
-          for(let i=0;i<180;i++){
-            const stopBtn=page.getByRole('button', {name:/Stop Mining/}).first();
-            if(await stopBtn.count()){
-              const label=(await stopBtn.innerText()).trim();
-              if(label.includes('Claim Rewards')){
-                claimable=true;
-                await stopBtn.click();
-                break;
-              }
-            }
-            await page.waitForTimeout(1000);
+          page.on('console',m=>{const t=m.text();if(/error/i.test(t))console.log('[quicknode-console]',t.slice(0,500));});
+          await page.goto('https://faucet.quicknode.com/ethereum/sepolia',{waitUntil:'domcontentloaded',timeout:120000});
+          const addressInput=page.locator('input[placeholder="0x..."]').first();
+          await addressInput.fill(address);
+          const combos=page.getByRole('combobox');
+          const n=await combos.count();
+          for(let i=0;i<n;i++){
+            const opts=await combos.nth(i).locator('option').allTextContents().catch(()=>[]);
+            console.log('COMBO',i,opts);
           }
-          if(!claimable){
-            console.log((await page.locator('body').innerText()).slice(0,12000));
-            throw new Error('PoW faucet did not reach claimable threshold within 180s');
+          console.log('INITIAL_TEXT',(await page.locator('body').innerText()).slice(0,12000));
+          const buttons=page.locator('button');
+          const bn=await buttons.count();
+          console.log('BUTTONS',await buttons.evaluateAll(es=>es.map(e=>({text:e.innerText,disabled:e.disabled}))));
+          for(let i=0;i<bn;i++){
+            const txt=(await buttons.nth(i).innerText()).trim();
+            if(/continue/i.test(txt)&&!(await buttons.nth(i).isDisabled())){await buttons.nth(i).click();console.log('CLICKED_CONTINUE');break;}
           }
-          await page.waitForTimeout(3000);
-          console.log('AFTER_MINING_URL', page.url());
-          console.log('AFTER_MINING_TEXT', (await page.locator('body').innerText()).slice(0,12000));
-          const claim=page.getByRole('button', {name:'Claim Rewards'});
-          if(await claim.count() && !(await claim.first().isDisabled())){
-            await claim.first().click();
-            await page.waitForTimeout(10000);
-          }
-          console.log('AFTER_CLAIM_URL', page.url());
-          console.log('AFTER_CLAIM_TEXT', (await page.locator('body').innerText()).slice(0,12000));
+          await page.waitForTimeout(5000);
+          console.log('NEXT_TEXT',(await page.locator('body').innerText()).slice(0,16000));
+          console.log('NEXT_BUTTONS',await page.locator('button').evaluateAll(es=>es.map(e=>({text:e.innerText,disabled:e.disabled}))));
+          console.log('NEXT_INPUTS',await page.locator('input').evaluateAll(es=>es.map(e=>({placeholder:e.placeholder,value:e.value,type:e.type}))));
+          await page.screenshot({path:'/tmp/quicknode.png',fullPage:true});
           await browser.close();
           JS
           node faucet.mjs
@@ -117,7 +103,7 @@ jobs:
           import sys
           from decimal import Decimal
           if Decimal(sys.argv[1]) <= 0:
-              raise SystemExit("Sepolia ETH not received by disposable deployer")
+              raise SystemExit("QuickNode faucet did not fund the disposable deployer")
           print("sepolia_funding_verified")
           PY
 
