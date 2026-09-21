@@ -16,5 +16,8 @@ pkg install -y $PKGS
 cd "$ROOT"
 npm install --omit=dev
 mkdir -p "$ROOT/.nova-device"
+mkdir -p "$HOME/.termux/boot"
+cp -f "$ROOT/termux/boot/00-nova-supervisor" "$HOME/.termux/boot/00-nova-supervisor"
+chmod +x "$HOME/.termux/boot/00-nova-supervisor"
 node "$ROOT/src/smoke.mjs"
 printf '%s\n' "Nova Termux bootstrap complete."
