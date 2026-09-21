@@ -5,6 +5,11 @@ import {
   alchemySepoliaNetwork
 } from './device-tools.mjs';
 import { desktopCommanderConfigured } from './desktop-commander-mcp.mjs';
+import {
+  novaCryptoCapabilityManifest,
+  novaCryptoDoctor,
+  novaCryptoChainDoctor
+} from './crypto-capabilities.mjs';
 
 const required=[
   'listDesktopCommanderTools',
@@ -29,6 +34,19 @@ const required=[
   'alchemyRpcGateway',
   'alchemyBundlerRpc',
   'alchemyCapabilityManifest',
+  'coinbaseCdpConfigured',
+  'coinbaseCdpDoctor',
+  'coinbaseCdpRequestSepoliaEth',
+  'chainstackMcpConfigured',
+  'chainstackMcpListTools',
+  'chainstackMcpRequestSepoliaEth',
+  'novaCryptoCapabilityManifest',
+  'novaCryptoDoctor',
+  'novaCryptoChainDoctor',
+  'novaCryptoBalance',
+  'novaCryptoReceipt',
+  'requestSepoliaEth',
+  'requestAndConfirmSepoliaEth',
   'readFile',
   'writeFile',
   'startProcess',
@@ -43,6 +61,9 @@ if(desktopCommanderConfigured()!==Boolean(process.env.DESKTOP_COMMANDER_OAUTH_TO
 
 const alchemy=alchemySepoliaNetwork();
 const capabilities=alchemyCapabilityManifest();
+const crypto=novaCryptoCapabilityManifest();
+const doctor=novaCryptoDoctor();
+
 if(alchemy.chainId!==11155111) throw new Error('Alchemy Sepolia chain ID mismatch.');
 if(!alchemy.faucetUrl.includes('alchemy.com/faucets/ethereum-sepolia'))
   throw new Error('Alchemy Sepolia faucet integration mismatch.');
@@ -50,6 +71,13 @@ if(!alchemy.rpcUrl) throw new Error('Alchemy Sepolia RPC URL missing.');
 if(!capabilities.chainApis.includes('jsonRpc')) throw new Error('Alchemy chain API capability missing.');
 if(!capabilities.dataApis.includes('portfolio')) throw new Error('Alchemy portfolio capability missing.');
 if(!capabilities.accountAbstraction.includes('bundler')) throw new Error('Alchemy bundler capability missing.');
+if(crypto.primaryNetwork.chainId!==11155111) throw new Error('Nova crypto primary chain mismatch.');
+if(!crypto.providers.coinbaseCdp.includes('sepoliaFaucet'))
+  throw new Error('Coinbase CDP faucet capability missing.');
+if(!crypto.providers.chainstack.includes('testnetFaucet'))
+  throw new Error('Chainstack testnet faucet capability missing.');
+if(!doctor.coinbaseCdp || !doctor.chainstack)
+  throw new Error('Nova crypto provider doctor is incomplete.');
 
 const browser=await chromium.launch({headless:true});
 try{
@@ -64,6 +92,9 @@ try{
     novaSepoliaControllerTools:true,
     alchemySepoliaIntegration:true,
     alchemyCapabilityGateway:true,
+    novaCryptoControlPlane:true,
+    coinbaseCdpSepoliaFaucet:true,
+    chainstackTestnetFaucet:true,
     desktopCommander:{configured:remote.configured,connected:Boolean(remote.connected),toolCount:remote.toolCount??0}
   }));
 }finally{await browser.close()}
