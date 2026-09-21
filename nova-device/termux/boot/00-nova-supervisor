@@ -1,0 +1,13 @@
+#!/data/data/com.termux/files/usr/bin/sh
+set -eu
+
+REPO="${NOVA_PROJECT_ROOT:-$HOME/Leadpilot-ai}"
+export NOVA_PROJECT_ROOT="$REPO"
+export NOVA_SUPERVISE_RUNTIME="${NOVA_SUPERVISE_RUNTIME:-true}"
+export NOVA_SUPERVISE_DESKTOP_COMMANDER="${NOVA_SUPERVISE_DESKTOP_COMMANDER:-true}"
+export NOVA_DEVICE_AUTO_PROVISION="${NOVA_DEVICE_AUTO_PROVISION:-true}"
+export NOVA_TERMUX_PROFILE="${NOVA_TERMUX_PROFILE:-developer}"
+
+command -v termux-wake-lock >/dev/null 2>&1 && termux-wake-lock || true
+cd "$REPO"
+exec node nova-device/src/supervisor.mjs
