@@ -88,12 +88,13 @@ jobs:
         run: |
           set -euo pipefail
 
-          npm install --no-save --no-package-lock playwright@1.55.0 >/dev/null 2>&1
-          npx playwright install chromium >/dev/null
+          PLAYWRIGHT_DIR="$RUNNER_TEMP/nova-playwright"
+          npm install --prefix "$PLAYWRIGHT_DIR" --no-package-lock playwright@1.55.0 >/dev/null 2>&1
+          "$PLAYWRIGHT_DIR/node_modules/.bin/playwright" install chromium >/dev/null
 
-          cat > "$RUNNER_TEMP/claim_ghost_sep_eth.mjs" <<'JS'
-          import { chromium } from "playwright";
-          import fs from "node:fs";
+          cat > "$RUNNER_TEMP/claim_ghost_sep_eth.cjs" <<'JS'
+          const { chromium } = require("playwright");
+          const fs = require("node:fs");
 
           const address = process.env.DEPLOYER_ADDRESS;
           if (!/^0x[a-fA-F0-9]{40}$/.test(address)) throw new Error("invalid deployer address");
@@ -221,7 +222,7 @@ jobs:
           throw new Error(lastError);
           JS
 
-          node "$RUNNER_TEMP/claim_ghost_sep_eth.mjs"
+          NODE_PATH="$RUNNER_TEMP/nova-playwright/node_modules" node "$RUNNER_TEMP/claim_ghost_sep_eth.cjs"
 
           for i in $(seq 1 36); do
             BAL="$(cast balance "$DEPLOYER_ADDRESS" --rpc-url "$SEPOLIA_RPC_URL" --ether)"
