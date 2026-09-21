@@ -10,6 +10,14 @@ import {
   deployNovaTokenSepolia,
   verifyNovaTokenSepolia
 } from './nova-chain-controller.mjs';
+import {
+  alchemySepoliaResources,
+  alchemySepoliaRpc,
+  alchemySepoliaChainId,
+  alchemySepoliaBlockNumber,
+  alchemySepoliaBalance,
+  alchemySepoliaTransactionReceipt
+} from './alchemy.mjs';
 
 export async function listDesktopCommanderTools(){
   if(!desktopCommanderConfigured()){
@@ -44,6 +52,35 @@ export async function verifyNovaTokenSepoliaOnChain(options={}){
   return await verifyNovaTokenSepolia(options);
 }
 
+/**
+ * Alchemy integration for Nova's Ethereum data/control plane.
+ * Read-only JSON-RPC is exposed here; signing remains in Nova's
+ * dedicated chain controller so private keys never enter this adapter.
+ */
+export function alchemySepoliaNetwork(){
+  return alchemySepoliaResources();
+}
+
+export async function alchemySepoliaRpcCall(method, params=[]){
+  return await alchemySepoliaRpc(method, params);
+}
+
+export async function alchemySepoliaGetChainId(){
+  return await alchemySepoliaChainId();
+}
+
+export async function alchemySepoliaGetBlockNumber(){
+  return await alchemySepoliaBlockNumber();
+}
+
+export async function alchemySepoliaGetBalance(address, blockTag='latest'){
+  return await alchemySepoliaBalance(address, blockTag);
+}
+
+export async function alchemySepoliaGetTransactionReceipt(hash){
+  return await alchemySepoliaTransactionReceipt(hash);
+}
+
 export const NOVA_DEVICE_TOOLS={
   ...device.TOOL_REGISTRY,
   listDesktopCommanderTools,
@@ -51,7 +88,13 @@ export const NOVA_DEVICE_TOOLS={
   deployNovaTokenTestnet,
   novaSepoliaPreflight,
   deployNovaTokenSepoliaOnChain,
-  verifyNovaTokenSepoliaOnChain
+  verifyNovaTokenSepoliaOnChain,
+  alchemySepoliaNetwork,
+  alchemySepoliaRpcCall,
+  alchemySepoliaGetChainId,
+  alchemySepoliaGetBlockNumber,
+  alchemySepoliaGetBalance,
+  alchemySepoliaGetTransactionReceipt
 };
 
 export async function executeDeviceTool(name,args=[]){
