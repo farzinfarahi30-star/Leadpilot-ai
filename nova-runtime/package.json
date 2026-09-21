@@ -12,9 +12,11 @@
     "desktop-commander:doctor": "node -e \"import('./src/desktop-commander-mcp.mjs').then(async m=>{if(!m.desktopCommanderConfigured()){console.log(JSON.stringify({configured:false,reason:'DESKTOP_COMMANDER_OAUTH_TOKEN not configured'}));return;}try{console.log(JSON.stringify(await m.desktopCommanderHealth()))}catch(e){console.log(JSON.stringify({configured:true,connected:false,error:String(e)}));}}).catch(e=>{console.log(JSON.stringify({configured:false,error:String(e)}))})\"",
     "chain:preflight": "node -e \"import('./src/nova-chain-controller.mjs').then(async m=>console.log(JSON.stringify(await m.novaChainPreflight({requireDeployerAddress:true}),null,2))).catch(e=>{console.error(e.message);process.exitCode=1})\"",
     "chain:deploy:sepolia": "node -e \"import('./src/nova-chain-controller.mjs').then(async m=>console.log(JSON.stringify(await m.deployNovaTokenSepolia(),null,2))).catch(e=>{console.error(e.message);process.exitCode=1})\"",
-    "alchemy:doctor": "node -e \"import('./src/alchemy.mjs').then(async m=>console.log(JSON.stringify({resources:m.alchemySepoliaResources(),chainId:await m.alchemySepoliaChainId(),blockNumber:await m.alchemySepoliaBlockNumber()},null,2))).catch(e=>{console.error(e.message);process.exitCode=1})\""
+    "alchemy:doctor": "node -e \"import('./src/alchemy.mjs').then(async m=>console.log(JSON.stringify({resources:m.alchemySepoliaResources(),chainId:await m.alchemySepoliaChainId(),blockNumber:await m.alchemySepoliaBlockNumber()},null,2))).catch(e=>{console.error(e.message);process.exitCode=1})\"",
+    "coinbase-cdp:doctor": "node -e \"import('./src/coinbase-cdp.mjs').then(m=>console.log(JSON.stringify(m.coinbaseCdpDoctor(),null,2))).catch(e=>{console.error(e.message);process.exitCode=1})\""
   },
   "dependencies": {
-    "playwright": "^1.55.0"
+    "playwright": "^1.55.0",
+    "@coinbase/cdp-sdk": "^1.56.0"
   }
 }
