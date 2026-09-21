@@ -19,6 +19,16 @@ const required=[
   'alchemySepoliaGetBlockNumber',
   'alchemySepoliaGetBalance',
   'alchemySepoliaGetTransactionReceipt',
+  'alchemyPlatformRequest',
+  'alchemyPortfolioTokensByAddress',
+  'alchemyPricesBySymbol',
+  'alchemyPricesByAddress',
+  'alchemyPortfolioHistory',
+  'alchemyNftRequest',
+  'alchemyTransferHistory',
+  'alchemyRpcGateway',
+  'alchemyBundlerRpc',
+  'alchemyCapabilityManifest',
   'readFile',
   'writeFile',
   'startProcess',
@@ -32,10 +42,14 @@ if(desktopCommanderConfigured()!==Boolean(process.env.DESKTOP_COMMANDER_OAUTH_TO
   throw new Error('Desktop Commander configuration state mismatch.');
 
 const alchemy=alchemySepoliaNetwork();
+const capabilities=alchemyCapabilityManifest();
 if(alchemy.chainId!==11155111) throw new Error('Alchemy Sepolia chain ID mismatch.');
 if(!alchemy.faucetUrl.includes('alchemy.com/faucets/ethereum-sepolia'))
   throw new Error('Alchemy Sepolia faucet integration mismatch.');
 if(!alchemy.rpcUrl) throw new Error('Alchemy Sepolia RPC URL missing.');
+if(!capabilities.chainApis.includes('jsonRpc')) throw new Error('Alchemy chain API capability missing.');
+if(!capabilities.dataApis.includes('portfolio')) throw new Error('Alchemy portfolio capability missing.');
+if(!capabilities.accountAbstraction.includes('bundler')) throw new Error('Alchemy bundler capability missing.');
 
 const browser=await chromium.launch({headless:true});
 try{
@@ -49,6 +63,7 @@ try{
     novaTokenDeploymentTool:true,
     novaSepoliaControllerTools:true,
     alchemySepoliaIntegration:true,
+    alchemyCapabilityGateway:true,
     desktopCommander:{configured:remote.configured,connected:Boolean(remote.connected),toolCount:remote.toolCount??0}
   }));
 }finally{await browser.close()}
