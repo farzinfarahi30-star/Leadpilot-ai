@@ -86,22 +86,121 @@ jobs:
           DEPLOYER_ADDRESS: ${{ steps.key.outputs.deployer_address }}
         run: |
           set -euo pipefail
+          COOKIE_JAR="$RUNNER_TEMP/nova_quicknode_cookies"
+          STEP_ONE="$RUNNER_TEMP/nova_quicknode_step_one.html"
+          STEP_TWO="$RUNNER_TEMP/nova_quicknode_step_two.html"
 
-          # Direct, non-Coinbase Sepolia faucet request.
-          RESPONSE_FILE="$RUNNER_TEMP/nova_quicknode_faucet_response"
-          HTTP_CODE="$(curl -sS -o "$RESPONSE_FILE" -w '%{http_code}' \
-            -X POST 'https://faucet.quicknode.com/ethereum/sepolia' \
-            -H 'Content-Type: application/json' \
-            -H 'Accept: application/json' \
-            --data "{\"wallet_address\":\"$DEPLOYER_ADDRESS\"}")"
+          curl -fsS -c "$COOKIE_JAR" -b "$COOKIE_JAR" -L \
+            -H 'User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/140 Safari/537.36' \
+            -H 'Content-Type: application/x-www-form-urlencoded' \
+            -H 'Referer: https://faucet.quicknode.com/ethereum/sepolia' \
+            --data-urlencode "wallet=$DEPLOYER_ADDRESS" \
+            --data-urlencode 'chain=ethereum' \
+            --data-urlencode 'network=sepolia' \
+            --data-urlencode '_action=step-one' \
+            'https://faucet.quicknode.com/ethereum/sepolia' > "$STEP_ONE"
 
-          echo "quicknode_faucet_http_status=$HTTP_CODE"
-          cat "$RESPONSE_FILE"
+          python - "$STEP_ONE" "$STEP_TWO" "$DEPLOYER_ADDRESS" <<'PY'
+          from html.parser import HTMLParser
+          from pathlib import Path
+          from urllib.parse import urlencode
+          import sys
 
-          case "$HTTP_CODE" in
-            2??) ;;
-            *) echo "QuickNode Sepolia faucet request failed"; exit 1 ;;
-          esac
+          src=Path(sys.argv[1]).read_text(errors='replace')
+          out=Path(sys.argv[2])
+          address=sys.argv[3]
+
+          class FormParser(HTMLParser):
+              def __init__(self):
+                  super().__init__()
+                  self.forms=[]; self.form=None; self.select=None; self.button=None
+              def handle_starttag(self, tag, attrs):
+                  a=dict(attrs)
+                  if tag=='form':
+                      self.form={'action':a.get('action') or '/ethereum/sepolia','inputs':[],'buttons':[],'selects':[]}
+                      self.forms.append(self.form)
+                  elif self.form and tag=='input':
+                      self.form['inputs'].append(a)
+                  elif self.form and tag=='select':
+                      self.select={'attrs':a,'options':[]}; self.form['selects'].append(self.select)
+                  elif self.form and tag=='option' and self.select is not None:
+                      self.select['options'].append(a)
+                  elif self.form and tag=='button' and a.get('type','submit')=='submit':
+                      self.form['buttons'].append(a)
+              def handle_endtag(self, tag):
+                  if tag=='select': self.select=None
+                  elif tag=='form': self.form=None; self.select=None
+
+          p=FormParser(); p.feed(src)
+          if not p.forms:
+              raise SystemExit('QuickNode step-one returned no form')
+          f=max(p.forms, key=lambda x: len(x['inputs'])+len(x['selects'])+len(x['buttons']))
+          params={}
+          blockers=[]
+          for a in f['inputs']:
+              name=a.get('name')
+              if not name: continue
+              typ=a.get('type','text').lower()
+              value=a.get('value','')
+              if typ in {'checkbox','radio'} and 'checked' not in a: continue
+              if name in {'wallet','address'}: value=address
+              if not value and any(k in name.lower() for k in ('captcha','turnstile','recaptcha')): blockers.append(name)
+              params[name]=value
+          for s in f['selects']:
+              name=s['attrs'].get('name')
+              if not name or not s['options']: continue
+              opts=[o for o in s['options'] if 'disabled' not in o and o.get('value')]
+
+              if not opts: continue
+
+              chosen=opts[0].get('value','')
+
+              if 'amount' in name.lower():
+
+                  numeric=[]
+
+                  for o in opts:
+
+                      try: numeric.append((float(o.get('value')),o.get('value')))
+
+                      except: pass
+
+                  if numeric: chosen=min(numeric)[1]
+
+              params[name]=chosen
+          for b in f['buttons']:
+
+              name=b.get('name'); value=b.get('value','')
+
+              if name and name not in params and value: params[name]=value; break
+          if not any(k in params for k in ('_action','action')) and f['buttons']:
+
+              b=f['buttons'][0];
+
+              if b.get('name') and b.get('value'): params[b['name']]=b['value']
+
+          Path(out).write_text(urlencode(params))
+          print('quicknode_form_action='+f['action'])
+          print('quicknode_form_fields='+','.join(sorted(params)))
+          if blockers:
+
+              raise SystemExit('QuickNode form requires interactive bot verification: '+','.join(blockers))
+          if not any(k in params for k in ('_action','action')):
+
+              raise SystemExit('QuickNode form exposes no submit action')
+          PY
+
+          curl -fsS -c "$COOKIE_JAR" -b "$COOKIE_JAR" -L \
+            -H 'User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/140 Safari/537.36' \
+            -H 'Content-Type: application/x-www-form-urlencoded' \
+            -H 'Referer: https://faucet.quicknode.com/ethereum/sepolia' \
+            --data-binary "$(cat "$STEP_TWO")" \
+            'https://faucet.quicknode.com/ethereum/sepolia' > "$STEP_TWO.response"
+
+          if grep -Eqi 'captcha|turnstile|recaptcha|bot verification|invalid request|error' "$STEP_TWO.response"; then
+            echo "QuickNode returned a verification/error response; no bypass attempted."
+            grep -Eio 'captcha[^<]{0,120}|turnstile[^<]{0,120}|recaptcha[^<]{0,120}|invalid request|bot verification|error[^<]{0,120}' "$STEP_TWO.response" | head -30 || true
+          fi
 
           for i in $(seq 1 36); do
             BAL="$(cast balance "$DEPLOYER_ADDRESS" --rpc-url "$SEPOLIA_RPC_URL" --ether)"
