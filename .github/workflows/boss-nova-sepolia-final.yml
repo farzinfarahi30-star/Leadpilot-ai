@@ -161,6 +161,7 @@ jobs:
           trap 'rm -f "$RUNNER_TEMP/nova_deployer_key"' EXIT
 
           KEY_HEX="$(cat "$RUNNER_TEMP/nova_deployer_key")"
+          [[ "$KEY_HEX" =~ ^0x[0-9a-fA-F]{64}$ ]]
           KEY_UINT="$(python - "$KEY_HEX" <<'PY'
           import sys
           key = sys.argv[1]
