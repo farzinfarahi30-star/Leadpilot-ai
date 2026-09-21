@@ -3,6 +3,7 @@ import { spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import process from 'node:process';
 import { sendEmailViaXx } from '../../nova-mail/src/xx-control.mjs';
+import { runDeviceOperations } from './device-agent.mjs';
 
 export const AGENTS = [
   ['advertising-expert','Advertising','campaign_prepare'],
@@ -19,7 +20,8 @@ export const AGENTS = [
   ['research-expert','Research','market_scan'],
   ['sales-expert','Sales','outreach_prepare'],
   ['security-expert','Security','control_review'],
-  ['testing-expert','Testing','release_verify']
+  ['testing-expert','Testing','release_verify'],
+  ['device-operations-expert','Device Operations','device_takeover']
 ];
 
 const FACTORY='https://pczigr.hatchable.site';
@@ -131,6 +133,20 @@ async function runAgent(key,domain,capability,shared){
       evidence.push({source:'Factory public site',observation:JSON.stringify(shared.browser),trace:FACTORY});
     }else if(key==='operations-expert' || key==='analytics-expert' || key==='portfolio-expert' || key==='finance-expert'){
       evidence.push({source:'Nova runtime control plane',observation:`15 specialist definitions loaded; cycle ${shared.cycle}`,trace:'nova-runtime/src/agent-runtime.mjs'});
+    }else if(key==='device-operations-expert'){
+      const device=await runDeviceOperations(shared.cycle);
+      evidence.push({source:'Nova Device',observation:JSON.stringify(device),trace:'nova-runtime/src/device-agent.mjs'});
+      return {
+        ...base,
+        status:device.enabled ? 'completed' : 'completed',
+        confidence:device.enabled ? 100 : 90,
+        evidence,
+        recommendation:device.enabled
+          ? 'Return device health and takeover state to Boss; keep execution inside Nova device policy.'
+          : 'Device control is disabled on this runtime; supervised Termux mode must set NOVA_DEVICE_CONTROL=true.',
+        device,
+        finishedAt:new Date().toISOString()
+      };
     }else if(key==='advertising-expert'){
       evidence.push({source:'safety policy',observation:'Paid campaign launch is not implemented in the independent runtime; no spend was initiated.',trace:'nova-runtime runtime policy'});
     }else if(key==='compliance-expert' || key==='partnerships-expert'){
