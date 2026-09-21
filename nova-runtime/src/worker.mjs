@@ -12,7 +12,7 @@ function log(event,data={}){console.log(JSON.stringify({ts:new Date().toISOStrin
 
 function runChainCommand(){
   return new Promise((resolve,reject)=>{
-    const child=execFile(process.execPath,['src/chain-deploy.mjs'],{cwd:new URL('..',import.meta.url),env:process.env},(error,stdout,stderr)=>{
+    const child=execFile(process.execPath,['src/chain-deploy.mjs'],{env:process.env},(error,stdout,stderr)=>{
       if(stdout) process.stdout.write(stdout);
       if(stderr) process.stderr.write(stderr);
       error ? reject(error) : resolve();
