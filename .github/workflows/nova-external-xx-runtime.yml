@@ -74,7 +74,7 @@ jobs:
           FACTORY_URL: ${{ env.FACTORY_URL }}
         run: |
           node - <<'NODE'
-          const fs = require('fs');
+          import fs from 'node:fs';
           const log = fs.readFileSync('../nova-external-runtime.log','utf8')
             .trim().split('\n').filter(Boolean).map(line => JSON.parse(line));
           const completion = log.find(x => x.event === 'xx_takeover_complete');
