@@ -1,0 +1,34 @@
+{
+  "schema": "nova.xx.takeover.registry.v1",
+  "control": "XX",
+  "owner": "Nova",
+  "rule": "XX is the canonical replication/takeover control. Each target supplies its own manifest, validator and proof; no target creates a competing controller.",
+  "targets": [
+    {
+      "id": "ai-business-factory",
+      "kind": "company",
+      "mode": "company-replication-takeover",
+      "manifest": "nova-runtime/company-takeover-manifest.json",
+      "validator": "nova-runtime/src/company-takeover.mjs",
+      "runner": "nova-runtime/src/xx-runner.mjs",
+      "proof": "nova-runtime/TAKEOVER-CI-PROOF.json"
+    },
+    {
+      "id": "nova-crypto-economic-layer",
+      "kind": "crypto-company",
+      "mode": "crypto-project-replication-takeover",
+      "manifest": "nova-runtime/crypto-company-takeover-manifest.json",
+      "validator": "nova-runtime/src/crypto-company-takeover.mjs",
+      "runner": "nova-runtime/src/crypto-company-takeover.mjs",
+      "proof": "nova-runtime/CRYPTO-XX-PROOF.json"
+    }
+  ],
+  "security": {
+    "publicThirdPartyReplicationOnly": true,
+    "neverStorePrivateKeys": true,
+    "neverStoreWalletSeeds": true,
+    "neverStoreOAuthRefreshTokens": true,
+    "neverSelfGrantExternalAuthority": true,
+    "neverFabricateEvidence": true
+  }
+}
