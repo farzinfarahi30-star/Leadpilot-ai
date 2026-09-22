@@ -1,0 +1,168 @@
+{
+  "schema": "nova.crypto.takeover.proof.v1",
+  "verifiedAt": "2026-09-22T12:15:30.860Z",
+  "independentExecutor": "GitHub-hosted Nova Runtime",
+  "success": true,
+  "takeover": {
+    "control": "xx",
+    "mode": "crypto-project-replication-takeover",
+    "takeover": true,
+    "owner": "nova",
+    "handoffStatus": "handoff-ready",
+    "source": {
+      "project": "NOVA Economic Layer",
+      "repository": "farzinfarahi30-star/Leadpilot-ai",
+      "branch": "main",
+      "rootDirectories": [
+        "nova-economy",
+        "nova-runtime",
+        "nova-device"
+      ],
+      "primaryRuntime": "nova-runtime",
+      "sourceContract": "nova-economy/contracts/NovaToken.sol",
+      "sourceController": "nova-runtime/src/nova-chain-controller.mjs"
+    },
+    "system": {
+      "network": {
+        "name": "ethereum-sepolia",
+        "chainId": 11155111
+      },
+      "token": {
+        "name": "Nova",
+        "symbol": "NOVA",
+        "maxSupplyTokens": 1000000,
+        "owner": "0x63970A951bd69975eF2aDAD27bf73584D2DCeF9B"
+      },
+      "contractCapabilities": [
+        "ERC-20 compatible",
+        "immutable maximum supply",
+        "owner-controlled capped mint",
+        "pause/unpause",
+        "no transfer tax",
+        "no blacklist",
+        "no arbitrary confiscation"
+      ],
+      "economicUtility": [
+        "API/service credits",
+        "Factory marketplace payments",
+        "developer/service-provider settlement",
+        "product access where appropriate"
+      ],
+      "revenueRule": "Only verified commercial transactions count as Factory revenue; token holdings or market value do not."
+    },
+    "programs": {
+      "token_and_contract": [
+        "NovaToken ERC-20 contract",
+        "OpenZeppelin ERC20/ERC20Pausable/Ownable foundation",
+        "Capped owner minting",
+        "Emergency pause controls"
+      ],
+      "chain_operations": [
+        "Nova Sepolia preflight",
+        "Foundry deployment",
+        "On-chain owner/cap/supply verification",
+        "Deployment record persistence",
+        "GitHub Actions testnet deployment fallback"
+      ],
+      "provider_mesh": [
+        "Alchemy read-only/RPC/data gateway",
+        "Coinbase CDP Sepolia faucet/EVM account capabilities",
+        "Chainstack MCP/testnet faucet/RPC/node infrastructure",
+        "Provider-neutral Nova crypto capability router"
+      ],
+      "runtime_and_devices": [
+        "Nova crypto capability doctor",
+        "Nova device crypto deployment/verification tools",
+        "GitHub-hosted Nova Runtime execution",
+        "Termux/device bridge with secret boundary"
+      ],
+      "liquidity_and_production": [
+        "Uniswap V2 liquidity preparation script",
+        "Mainnet deployment gate",
+        "Mainnet liquidity gate",
+        "Owner/deployer consistency checks",
+        "Production authorization boundary"
+      ],
+      "governance_and_safety": [
+        "Private keys never stored in source-control artifacts",
+        "Owner locked to authorized treasury address",
+        "State-changing generic Alchemy RPC blocked",
+        "Production deployment disabled by default",
+        "No hidden transfer tax, blacklist, honeypot or arbitrary confiscation",
+        "No fabricated deployment, balance, liquidity or revenue evidence"
+      ]
+    },
+    "tools": [
+      {
+        "key": "foundry",
+        "status": "required",
+        "purpose": "compile/test/deploy Solidity contracts"
+      },
+      {
+        "key": "cast",
+        "status": "required",
+        "purpose": "chain ID, balance and on-chain verification"
+      },
+      {
+        "key": "alchemy",
+        "status": "integrated",
+        "purpose": "Ethereum Sepolia RPC, balances, blocks, receipts and data capabilities"
+      },
+      {
+        "key": "coinbase-cdp",
+        "status": "integrated",
+        "purpose": "authorized Sepolia faucet and EVM account capability"
+      },
+      {
+        "key": "chainstack-mcp",
+        "status": "integrated",
+        "purpose": "testnet faucet/RPC/node infrastructure"
+      },
+      {
+        "key": "github-actions",
+        "status": "integrated",
+        "purpose": "independent Nova execution and deployment orchestration"
+      },
+      {
+        "key": "nova-device",
+        "status": "integrated",
+        "purpose": "controlled local device execution under Nova policy"
+      }
+    ],
+    "importantFiles": [
+      "nova-economy/contracts/NovaToken.sol",
+      "nova-economy/script/DeployNovaToken.s.sol",
+      "nova-economy/script/AddUniswapV2Liquidity.s.sol",
+      "nova-runtime/src/nova-chain-controller.mjs",
+      "nova-runtime/src/chain-ops.mjs",
+      "nova-runtime/src/crypto-capabilities.mjs",
+      "nova-runtime/src/alchemy.mjs",
+      "nova-runtime/src/alchemy-capabilities.mjs",
+      "nova-runtime/src/coinbase-cdp.mjs",
+      "nova-runtime/src/chainstack-mcp.mjs",
+      "nova-runtime/src/device-tools.mjs",
+      "nova-economy/ECONOMICS.md",
+      "nova-economy/MAINNET_LAUNCH_ARMED.json"
+    ],
+    "productionGates": {
+      "currentState": "blocked-until-authorized-production-materials-exist",
+      "requirements": [
+        "authorized mainnet signer for the configured owner",
+        "funded mainnet deployer gas",
+        "explicit token allocation",
+        "explicit liquidity token amount",
+        "explicit liquidity ETH amount",
+        "security review",
+        "applicable legal/compliance review",
+        "explicit production authorization"
+      ],
+      "rule": "Nova may prepare and verify these gates but must not self-grant missing authority, fabricate funding or deploy a production financial asset without the required authorization."
+    },
+    "validation": {
+      "ok": true,
+      "errors": [],
+      "checkedAt": "2026-09-22T12:15:30.841Z"
+    },
+    "rule": "Nova operates the replicated crypto project through the existing runtime/governance controls; no competing controller is created."
+  }
+}
