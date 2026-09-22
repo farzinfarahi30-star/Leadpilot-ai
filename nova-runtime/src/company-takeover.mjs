@@ -17,7 +17,7 @@ export function validateCompanyTakeoverManifest(manifest=loadCompanyTakeoverMani
  if(manifest?.takeover?.sourceProjectId!=='proj_YdSUAosmSpN3')errors.push('source project mismatch');
  if(Number(manifest?.takeover?.sourceVersion)!==517)errors.push('source version mismatch');
  const inv=manifest?.inventory||{};
- for(const [key,expected] of [['totalFiles',515],['apiSourceFiles',239],['libraryFiles',30],['publicFiles',42],['deployedFunctions',279],['deployedApiFunctions',248],['scheduledFunctions',6],['databaseTables',221])if(Number(inv[key])!==expected)errors.push(key+' inventory mismatch');
+ for(const [key,expected] of [['totalFiles',515],['apiSourceFiles',239],['libraryFiles',30],['publicFiles',42],['deployedFunctions',279],['deployedApiFunctions',248],['scheduledFunctions',6],['databaseTables',221]])if(Number(inv[key])!==expected)errors.push(key+' inventory mismatch');
  if(!hasAll(Object.keys(manifest?.programs||{}),REQUIRED_PROGRAM_GROUPS))errors.push('program groups incomplete');
  if((manifest?.libraries||[]).length!==30)errors.push('library manifest incomplete');
  if((manifest?.sourcePaths?.allFiles||[]).length!==515)errors.push('file path manifest incomplete');
