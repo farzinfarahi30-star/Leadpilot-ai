@@ -21,14 +21,14 @@ async function api(path,opts){
 async function overview(){
   const [p,pr,h]=await Promise.all([api("/platform"),api("/projects"),api("/health")]);
   content.innerHTML='<div class="grid">'+
-    '<div class="card"><div class="kicker">Runtime</div><div class="value">Edge</div><div class="sub">Nova-owned control plane</div></div>'+
-    '<div class="card"><div class="kicker">Projects</div><div class="value">'+pr.length+'</div><div class="sub">persistent state</div></div>'+
+    '<div class="card"><div class="kicker">Runtime</div><div class="value">'+(staticMode?"Browser":"Edge")+'</div><div class="sub">'+(staticMode?"portable public frontend":"Nova-owned control plane")+'</div></div>'+
+    '<div class="card"><div class="kicker">Projects</div><div class="value">'+pr.length+'</div><div class="sub">'+(staticMode?"browser-local state":"persistent state")+'</div></div>'+
     '<div class="card"><div class="kicker">Providers</div><div class="value">'+p.providers.length+'</div><div class="sub">adapters, not the core</div></div>'+
     '<div class="card"><div class="kicker">Lock-in</div><div class="value">OFF</div><div class="sub">portable source + state model</div></div>'+
   '</div><div class="section"><h2>Independent deployment</h2><div class="rows">'+
     '<div class="row"><span>Hatchable</span><span class="pill ready">not required</span></div>'+
     '<div class="row"><span>AppDeploy</span><span class="pill ready">not required</span></div>'+
-    '<div class="row"><span>State persistence</span><span class="pill ready">Durable Object</span></div>'+
+    '<div class="row"><span>State persistence</span><span class="pill ready">'+(staticMode?"browser localStorage":"Durable Object")+'</span></div>'+
     '<div class="row"><span>API health</span><span class="pill ready">'+(h.ok?"healthy":"degraded")+'</span></div>'+
   '</div></div>';
 }
@@ -44,4 +44,4 @@ async function rules(){content.innerHTML='<div class="card"><div class="kicker">
 async function audit(){const a=await api("/audit");content.innerHTML='<div class="rows">'+(a.length?a.map(x=>'<div class="row"><div><b>'+esc(x.action)+'</b><div class="sub">'+esc(JSON.stringify(x.detail))+'</div></div><span class="pill">'+new Date(x.createdAt).toLocaleString()+'</span></div>').join(""):'<div class="empty">No audit entries yet.</div>')+'</div>'}
 async function show(page){$("#title").textContent=page[0].toUpperCase()+page.slice(1);try{await ({overview,projects,providers,rules,audit}[page]||overview)()}catch(e){content.innerHTML='<div class="empty">Unable to load this view: '+esc(e.message)+'</div>'}}
 document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{document.querySelectorAll("nav button").forEach(x=>x.classList.remove("active"));b.classList.add("active");show(b.dataset.page)});
-api("/health").then(x=>$("#health").textContent=x.ok?"● healthy · independent":"● degraded").catch(()=>$("#health").textContent="● offline");show("overview");
+api("/health").then(x=>$("#health").textContent=x.ok?(staticMode?"● public · portable":"● healthy · independent"):"● degraded").catch(()=>$("#health").textContent="● offline");show("overview");
