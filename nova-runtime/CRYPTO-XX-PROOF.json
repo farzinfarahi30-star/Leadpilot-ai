@@ -1,6 +1,6 @@
 {
   "schema": "nova.crypto.takeover.proof.v1",
-  "verifiedAt": "2026-09-22T12:15:30.860Z",
+  "verifiedAt": "2026-09-22T12:20:31.755Z",
   "independentExecutor": "GitHub-hosted Nova Runtime",
   "success": true,
   "takeover": {
@@ -161,7 +161,7 @@
     "validation": {
       "ok": true,
       "errors": [],
-      "checkedAt": "2026-09-22T12:15:30.841Z"
+      "checkedAt": "2026-09-22T12:20:31.730Z"
     },
     "rule": "Nova operates the replicated crypto project through the existing runtime/governance controls; no competing controller is created."
   }
