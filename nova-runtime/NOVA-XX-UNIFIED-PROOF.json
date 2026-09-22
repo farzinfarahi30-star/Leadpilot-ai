@@ -1,0 +1,396 @@
+{
+  "schema": "nova.xx.unified.takeover.proof.v1",
+  "verifiedAt": "2026-09-22T12:20:17.623Z",
+  "independentExecutor": "GitHub-hosted Nova Runtime",
+  "success": true,
+  "handoff": {
+    "control": "xx",
+    "owner": "nova",
+    "takeover": true,
+    "status": "handoff-ready",
+    "targets": {
+      "company": {
+        "control": "xx",
+        "mode": "company-replication-takeover",
+        "takeover": true,
+        "owner": "nova",
+        "handoffStatus": "handoff-ready",
+        "source": {
+          "company": "AI Business Factory",
+          "projectId": "proj_YdSUAosmSpN3",
+          "version": 517,
+          "url": "https://ai-business-factory.hatchable.site"
+        },
+        "inventory": {
+          "totalFiles": 515,
+          "apiSourceFiles": 239,
+          "libraryFiles": 30,
+          "publicFiles": 42,
+          "migrationFiles": 168,
+          "workflowFiles": 0,
+          "deployedFunctions": 279,
+          "deployedApiFunctions": 248,
+          "scheduledFunctions": 6,
+          "databaseTables": 221
+        },
+        "programGroups": {
+          "control_plane": {
+            "count": 6,
+            "items": [
+              "Boss master control",
+              "Governor hard-rule enforcement",
+              "Mission kernel and first-dollar governor",
+              "Action firewall and authorization continuity",
+              "Independent auditor, expert council and mastery loop",
+              "Persistent memory and learning"
+            ]
+          },
+          "company_os": {
+            "count": 4,
+            "items": [
+              "Mindful AI Social Company OS",
+              "Observe → orient → decide → act → distribute → reflect → self-reliance loop",
+              "Market signal collection and company blueprint generation",
+              "Portfolio brain and evidence-based allocation"
+            ]
+          },
+          "product_and_factory": {
+            "count": 7,
+            "items": [
+              "Business discovery and deep scan",
+              "Factory brain",
+              "Daily generation / generation lanes / worker",
+              "Factory builder governor + executor",
+              "App lifecycle: build, deploy, records, usage, rollback, tracking",
+              "Experiment runner",
+              "Dream agent and memory"
+            ]
+          },
+          "revenue_and_commercial": {
+            "count": 7,
+            "items": [
+              "Revenue OS / revenue engine / revenue sprint",
+              "Buyer intent, prospecting and acquisition",
+              "Commercial lead, offer, proposal and proof pipeline",
+              "Checkout and payment hooks",
+              "Revenue recovery and fulfillment",
+              "Customer success, retention and expansion",
+              "Sales pipeline and first-dollar execution"
+            ]
+          },
+          "growth_and_distribution": {
+            "count": 6,
+            "items": [
+              "Growth engine, command, supervisor and intelligence",
+              "Organic distribution and visitor acquisition",
+              "Promotion assets and visibility mandate",
+              "Advertising preparation/governance",
+              "Partner/referral channels",
+              "SEO / AI discovery / community distribution"
+            ]
+          },
+          "infrastructure_and_tools": {
+            "count": 8,
+            "items": [
+              "Nova Browser / computer automation",
+              "Nova Mail infrastructure, transport and deliverability",
+              "Nova Domain transport, registrar adapters and DNS",
+              "Cloudflare integration",
+              "Storage, database, analytics and monitoring",
+              "Deployment/code runner",
+              "Nova XX public technology intake and blocker engine",
+              "Nova device / Termux / Desktop Commander bridge"
+            ]
+          },
+          "safety_and_governance": {
+            "count": 5,
+            "items": [
+              "Real-evidence-only policy",
+              "No fabricated customers, revenue, engagement or proof",
+              "No spam / no unauthorized access / no credential theft",
+              "External provider authority and paid spend remain gated",
+              "Audit logs, approval records, suppression and unsubscribe controls"
+            ]
+          }
+        },
+        "tools": {
+          "available": [
+            "email",
+            "browser",
+            "website_design_intelligence",
+            "deploy",
+            "code_runner",
+            "runtime:buyer-discovery-agent",
+            "runtime:fulfillment-and-retention-agent",
+            "runtime:lead-rescue-funnel",
+            "runtime:offer-optimization-governor",
+            "runtime:organic-distribution-engine",
+            "runtime:paid-acquisition-adapters",
+            "runtime:revenue-attribution-loop",
+            "compliance",
+            "database",
+            "nova-domain-transport-core",
+            "nova-mail-deliverability",
+            "nova-mail-infrastructure",
+            "nova-mail-transport",
+            "nova-mail-transport-core",
+            "nova-native-mail-adapter",
+            "nova-resend-adapter",
+            "storage",
+            "analytics",
+            "web_search",
+            "platform-auth-governor",
+            "god-access-governor",
+            "god-universal-authorization",
+            "monitoring",
+            "nova-xx-blocker-engine",
+            "native-email-executor",
+            "outbound_sales",
+            "secrets"
+          ],
+          "requiresConnection": [
+            "google_ads",
+            "linkedin_ads",
+            "meta_ads",
+            "tiktok_ads",
+            "sms",
+            "phone",
+            "whatsapp",
+            "social_publishing",
+            "nova-cloudflare",
+            "nova-epp-client",
+            "nova-godaddy-registrar",
+            "nova-namecheap-registrar",
+            "nova-registrar-factory",
+            "nova-verisign-ote",
+            "calendar",
+            "crm",
+            "payments"
+          ],
+          "disabled": [
+            "god-advertising-governor"
+          ],
+          "total": 50
+        },
+        "workflow": {
+          "takeoverSequence": [
+            "Load this canonical manifest as Nova's company context.",
+            "Verify source repository, AI Business Factory project identity and production version.",
+            "Hydrate Boss/Governor/mission/workforce state from the existing control plane.",
+            "Load the program inventory, API surfaces, libraries, data planes and tool registry.",
+            "Reconcile connector/tool readiness without self-granting permissions.",
+            "Resume the existing governed schedules, queues and worker loops.",
+            "Use the existing product, acquisition, revenue, growth, fulfillment and learning loops as one company.",
+            "Persist evidence and lessons back into Nova memory and company state.",
+            "Keep Nova as the operating owner of the replicated company system; do not create a competing controller."
+          ],
+          "ownershipRule": "Nova receives one canonical operating context; no parallel controller is created.",
+          "executionRule": "Prefer existing Nova-owned capability adapters and existing company workflows before introducing anything new.",
+          "verificationRule": "Every completed takeover action must leave durable evidence in company state, logs or source control."
+        },
+        "importantProjectFiles": {
+          "rootAgents": "AGENTS.md",
+          "companyOs": "lib/factory-company-os.js",
+          "companyMarketScout": "lib/company-market-scout.js",
+          "xxPublicIntake": "lib/nova-xx-tools.js",
+          "xxIntakeRoute": "api/xx/intake.js",
+          "companyReplicationLab": "api/god-replication-lab.js",
+          "companyReplicationBuilder": "api/god-replication-builder.js",
+          "bossController": "api/god-master-controller.js",
+          "workforceController": "api/god-workforce-controller.js",
+          "connectorManager": "api/god-connector-manager.js",
+          "companyOsStatus": "api/company-os/status.js",
+          "companyOsCycle": "api/company-os/market-cycle.js",
+          "novaTask": "api/nova-task.js",
+          "novaChat": "api/nova-chat.js"
+        },
+        "validation": {
+          "ok": true,
+          "errors": [],
+          "checkedAt": "2026-09-22T12:20:17.570Z"
+        },
+        "rule": "Nova operates the replicated company through the existing Boss/Governor control plane; no competing controller is created."
+      },
+      "crypto": {
+        "control": "xx",
+        "mode": "crypto-project-replication-takeover",
+        "takeover": true,
+        "owner": "nova",
+        "handoffStatus": "handoff-ready",
+        "source": {
+          "project": "NOVA Economic Layer",
+          "repository": "farzinfarahi30-star/Leadpilot-ai",
+          "branch": "main",
+          "rootDirectories": [
+            "nova-economy",
+            "nova-runtime",
+            "nova-device"
+          ],
+          "primaryRuntime": "nova-runtime",
+          "sourceContract": "nova-economy/contracts/NovaToken.sol",
+          "sourceController": "nova-runtime/src/nova-chain-controller.mjs"
+        },
+        "system": {
+          "network": {
+            "name": "ethereum-sepolia",
+            "chainId": 11155111
+          },
+          "token": {
+            "name": "Nova",
+            "symbol": "NOVA",
+            "maxSupplyTokens": 1000000,
+            "owner": "0x63970A951bd69975eF2aDAD27bf73584D2DCeF9B"
+          },
+          "contractCapabilities": [
+            "ERC-20 compatible",
+            "immutable maximum supply",
+            "owner-controlled capped mint",
+            "pause/unpause",
+            "no transfer tax",
+            "no blacklist",
+            "no arbitrary confiscation"
+          ],
+          "economicUtility": [
+            "API/service credits",
+            "Factory marketplace payments",
+            "developer/service-provider settlement",
+            "product access where appropriate"
+          ],
+          "revenueRule": "Only verified commercial transactions count as Factory revenue; token holdings or market value do not."
+        },
+        "programs": {
+          "token_and_contract": [
+            "NovaToken ERC-20 contract",
+            "OpenZeppelin ERC20/ERC20Pausable/Ownable foundation",
+            "Capped owner minting",
+            "Emergency pause controls"
+          ],
+          "chain_operations": [
+            "Nova Sepolia preflight",
+            "Foundry deployment",
+            "On-chain owner/cap/supply verification",
+            "Deployment record persistence",
+            "GitHub Actions testnet deployment fallback"
+          ],
+          "provider_mesh": [
+            "Alchemy read-only/RPC/data gateway",
+            "Coinbase CDP Sepolia faucet/EVM account capabilities",
+            "Chainstack MCP/testnet faucet/RPC/node infrastructure",
+            "Provider-neutral Nova crypto capability router"
+          ],
+          "runtime_and_devices": [
+            "Nova crypto capability doctor",
+            "Nova device crypto deployment/verification tools",
+            "GitHub-hosted Nova Runtime execution",
+            "Termux/device bridge with secret boundary"
+          ],
+          "liquidity_and_production": [
+            "Uniswap V2 liquidity preparation script",
+            "Mainnet deployment gate",
+            "Mainnet liquidity gate",
+            "Owner/deployer consistency checks",
+            "Production authorization boundary"
+          ],
+          "governance_and_safety": [
+            "Private keys never stored in source-control artifacts",
+            "Owner locked to authorized treasury address",
+            "State-changing generic Alchemy RPC blocked",
+            "Production deployment disabled by default",
+            "No hidden transfer tax, blacklist, honeypot or arbitrary confiscation",
+            "No fabricated deployment, balance, liquidity or revenue evidence"
+          ]
+        },
+        "tools": [
+          {
+            "key": "foundry",
+            "status": "required",
+            "purpose": "compile/test/deploy Solidity contracts"
+          },
+          {
+            "key": "cast",
+            "status": "required",
+            "purpose": "chain ID, balance and on-chain verification"
+          },
+          {
+            "key": "alchemy",
+            "status": "integrated",
+            "purpose": "Ethereum Sepolia RPC, balances, blocks, receipts and data capabilities"
+          },
+          {
+            "key": "coinbase-cdp",
+            "status": "integrated",
+            "purpose": "authorized Sepolia faucet and EVM account capability"
+          },
+          {
+            "key": "chainstack-mcp",
+            "status": "integrated",
+            "purpose": "testnet faucet/RPC/node infrastructure"
+          },
+          {
+            "key": "github-actions",
+            "status": "integrated",
+            "purpose": "independent Nova execution and deployment orchestration"
+          },
+          {
+            "key": "nova-device",
+            "status": "integrated",
+            "purpose": "controlled local device execution under Nova policy"
+          }
+        ],
+        "importantFiles": [
+          "nova-economy/contracts/NovaToken.sol",
+          "nova-economy/script/DeployNovaToken.s.sol",
+          "nova-economy/script/AddUniswapV2Liquidity.s.sol",
+          "nova-runtime/src/nova-chain-controller.mjs",
+          "nova-runtime/src/chain-ops.mjs",
+          "nova-runtime/src/crypto-capabilities.mjs",
+          "nova-runtime/src/alchemy.mjs",
+          "nova-runtime/src/alchemy-capabilities.mjs",
+          "nova-runtime/src/coinbase-cdp.mjs",
+          "nova-runtime/src/chainstack-mcp.mjs",
+          "nova-runtime/src/device-tools.mjs",
+          "nova-economy/ECONOMICS.md",
+          "nova-economy/MAINNET_LAUNCH_ARMED.json"
+        ],
+        "productionGates": {
+          "currentState": "blocked-until-authorized-production-materials-exist",
+          "requirements": [
+            "authorized mainnet signer for the configured owner",
+            "funded mainnet deployer gas",
+            "explicit token allocation",
+            "explicit liquidity token amount",
+            "explicit liquidity ETH amount",
+            "security review",
+            "applicable legal/compliance review",
+            "explicit production authorization"
+          ],
+          "rule": "Nova may prepare and verify these gates but must not self-grant missing authority, fabricate funding or deploy a production financial asset without the required authorization."
+        },
+        "validation": {
+          "ok": true,
+          "errors": [],
+          "checkedAt": "2026-09-22T12:20:17.571Z"
+        },
+        "rule": "Nova operates the replicated crypto project through the existing runtime/governance controls; no competing controller is created."
+      }
+    },
+    "validations": {
+      "registry": {
+        "ok": true,
+        "errors": [],
+        "checkedAt": "2026-09-22T12:20:17.569Z"
+      },
+      "company": {
+        "ok": true,
+        "errors": [],
+        "checkedAt": "2026-09-22T12:20:17.570Z"
+      },
+      "crypto": {
+        "ok": true,
+        "errors": [],
+        "checkedAt": "2026-09-22T12:20:17.571Z"
+      }
+    },
+    "rule": "Nova is the operating owner of every registered XX target; external authority and irreversible actions remain governed by their real authorization boundaries."
+  }
+}
