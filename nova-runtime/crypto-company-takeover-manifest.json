@@ -21,7 +21,8 @@
     "takeoverMode": "crypto-project-replication-takeover",
     "operation": "Nova operates the replicated crypto system through its existing runtime/governance controls; no second controller is created.",
     "externalEffects": "Production chain writes, liquidity, listings, account changes and paid provider actions remain authority-gated.",
-    "publicEvidenceOnlyForThirdPartyReplication": true
+    "publicEvidenceOnlyForThirdPartyReplication": true,
+    "lastOrchestrationUpdate": "2026-09-22T12:20:00Z"
   },
   "system": {
     "network": {
