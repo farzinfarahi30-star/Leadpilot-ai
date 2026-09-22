@@ -68,14 +68,66 @@ export function novaCryptoDoctor() {
 }
 
 export async function novaCryptoChainDoctor() {
-  const [chainId, blockNumber] = await Promise.all([
-    alchemySepoliaChainId(),
-    alchemySepoliaBlockNumber()
-  ]);
-  if (chainId !== SEPOLIA_CHAIN_ID) {
-    throw new Error(`Sepolia chain ID mismatch: expected ${SEPOLIA_CHAIN_ID}, received ${chainId}`);
+  const candidates = [];
+  const configured = env('NOVA_SEPOLIA_RPC_URL') || env('SEPOLIA_RPC_URL');
+  if (configured) candidates.push({ provider: 'configured', url: configured });
+  if (env('NOVA_ALCHEMY_API_KEY') || env('ALCHEMY_API_KEY')) {
+    candidates.push({ provider: 'alchemy', url: alchemySepoliaRpcUrl() });
+  } else {
+    candidates.push({ provider: 'alchemy-public', url: alchemySepoliaRpcUrl() });
   }
-  return { chainId, blockNumber, network: 'ethereum-sepolia' };
+  candidates.push(
+    { provider: 'sepolia-public-rpc', url: 'https://rpc.sepolia.org' },
+    { provider: 'publicnode', url: 'https://ethereum-sepolia.publicnode.com' }
+  );
+
+  const errors = [];
+  for (const candidate of candidates) {
+    try {
+      const response = await fetch(candidate.url, {
+        method: 'POST',
+        headers: { accept: 'application/json', 'content-type': 'application/json' },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: Date.now(),
+          method: 'eth_chainId',
+          params: []
+        }),
+        signal: AbortSignal.timeout(12000)
+      });
+      const body = await response.text();
+      if (!response.ok) {
+        throw new Error('HTTP ' + response.status + (body ? ': ' + body.slice(0, 300) : ''));
+      }
+      const payload = JSON.parse(body);
+      if (payload?.error) throw new Error(payload.error.message || 'RPC error');
+      const chainId = Number.parseInt(String(payload.result), 16);
+      if (chainId !== SEPOLIA_CHAIN_ID) throw new Error('unexpected chain ID ' + chainId);
+
+      const blockResponse = await fetch(candidate.url, {
+        method: 'POST',
+        headers: { accept: 'application/json', 'content-type': 'application/json' },
+        body: JSON.stringify({
+          jsonrpc: '2.0',
+          id: Date.now(),
+          method: 'eth_blockNumber',
+          params: []
+        }),
+        signal: AbortSignal.timeout(12000)
+      });
+      const blockBody = await blockResponse.text();
+      if (!blockResponse.ok) throw new Error('block HTTP ' + blockResponse.status);
+      const blockPayload = JSON.parse(blockBody);
+      if (blockPayload?.error) throw new Error(blockPayload.error.message || 'block RPC error');
+      const blockNumber = Number.parseInt(String(blockPayload.result), 16);
+
+      return { chainId, blockNumber, network: 'ethereum-sepolia', provider: candidate.provider };
+    } catch (error) {
+      errors.push({ provider: candidate.provider, error: String(error.message || error) });
+    }
+  }
+
+  throw new Error('No read-only Sepolia RPC succeeded: ' + JSON.stringify(errors));
 }
 
 export async function novaCryptoBalance(address) {
