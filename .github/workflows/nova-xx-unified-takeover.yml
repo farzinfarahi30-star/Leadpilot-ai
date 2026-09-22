@@ -1,0 +1,66 @@
+name: Nova XX Unified Takeover Verification
+
+on:
+  push:
+    paths:
+      - 'nova-runtime/xx-takeover-registry.json'
+      - 'nova-runtime/src/xx-takeover-registry.mjs'
+      - 'nova-runtime/test/xx-takeover-registry.test.mjs'
+      - 'nova-runtime/src/company-takeover.mjs'
+      - 'nova-runtime/src/crypto-company-takeover.mjs'
+      - 'nova-runtime/company-takeover-manifest.json'
+      - 'nova-runtime/crypto-company-takeover-manifest.json'
+      - '.github/workflows/nova-xx-unified-takeover.yml'
+  workflow_dispatch:
+  schedule:
+    - cron: '27 * * * *'
+
+permissions:
+  contents: write
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Validate unified XX registry
+        run: node nova-runtime/test/xx-takeover-registry.test.mjs
+
+      - name: Syntax checks
+        run: |
+          node --check nova-runtime/src/xx-takeover-registry.mjs
+          node --check nova-runtime/src/company-takeover.mjs
+          node --check nova-runtime/src/crypto-company-takeover.mjs
+
+      - name: Build unified Nova handoff
+        run: node nova-runtime/src/nova-xx-handoff.mjs > nova-runtime/NOVA-XX-UNIFIED-HANDOFF.json
+
+      - name: Record proof
+        run: |
+          node -e "
+          const fs=require('fs');
+          const x=JSON.parse(fs.readFileSync('nova-runtime/NOVA-XX-UNIFIED-HANDOFF.json','utf8'));
+          if(x.control!=='xx'||x.owner!=='nova'||x.takeover!==true||x.status!=='handoff-ready') process.exit(1);
+          fs.writeFileSync('nova-runtime/NOVA-XX-UNIFIED-PROOF.json',JSON.stringify({
+            schema:'nova.xx.unified.takeover.proof.v1',
+            verifiedAt:new Date().toISOString(),
+            independentExecutor:'GitHub-hosted Nova Runtime',
+            success:true,
+            handoff:x
+          },null,2)+'\n');
+          "
+
+      - name: Persist unified proof
+        run: |
+          git config user.name 'nova-xx-unified-proof'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git pull --rebase --autostash origin main
+          git add nova-runtime/NOVA-XX-UNIFIED-HANDOFF.json nova-runtime/NOVA-XX-UNIFIED-PROOF.json
+          git diff --cached --quiet && exit 0
+          git commit -m 'Record Nova XX unified takeover proof'
+          git push
