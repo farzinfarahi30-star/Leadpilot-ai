@@ -1,7 +1,7 @@
 {
   "runtime": "nova-runtime",
   "cycle": 1,
-  "timestamp": "2026-09-22T12:00:01.635Z",
+  "timestamp": "2026-09-22T12:01:30.918Z",
   "agentCount": 16,
   "completed": 16,
   "failed": 0,
@@ -10,7 +10,7 @@
     "httpStatus": 401,
     "title": "Sign in to continue to Nova Business Factory",
     "url": "https://pczigr.hatchable.site/?_hbgate=1",
-    "latencyMs": 1829
+    "latencyMs": 291
   },
   "staticChecks": [
     {
@@ -39,7 +39,7 @@
       "agent": "advertising-expert",
       "domain": "Advertising",
       "capability": "campaign_prepare",
-      "startedAt": "2026-09-22T12:00:01.554Z",
+      "startedAt": "2026-09-22T12:01:30.835Z",
       "status": "completed",
       "confidence": 90,
       "evidence": [
@@ -50,13 +50,13 @@
         }
       ],
       "recommendation": "Return findings to Boss; do not create a second controller.",
-      "finishedAt": "2026-09-22T12:00:01.554Z"
+      "finishedAt": "2026-09-22T12:01:30.835Z"
     },
     {
       "agent": "analytics-expert",
       "domain": "Analytics",
       "capability": "funnel_review",
-      "startedAt": "2026-09-22T12:00:01.555Z",
+      "startedAt": "2026-09-22T12:01:30.835Z",
       "status": "completed",
       "confidence": 90,
       "evidence": [
@@ -67,13 +67,13 @@
         }
       ],
       "recommendation": "Return findings to Boss; do not create a second controller.",
-      "finishedAt": "2026-09-22T12:00:01.555Z"
+      "finishedAt": "2026-09-22T12:01:30.835Z"
     },
     {
       "agent": "compliance-expert",
       "domain": "Compliance",
       "capability": "policy_review",
-      "startedAt": "2026-09-22T12:00:01.555Z",
+      "startedAt": "2026-09-22T12:01:30.835Z",
       "status": "completed",
       "confidence": 90,
       "evidence": [
@@ -84,30 +84,30 @@
         }
       ],
       "recommendation": "Return findings to Boss; do not create a second controller.",
-      "finishedAt": "2026-09-22T12:00:01.555Z"
+      "finishedAt": "2026-09-22T12:01:30.835Z"
     },
     {
       "agent": "customer-success-expert",
       "domain": "Customer Success",
       "capability": "outcomes_review",
-      "startedAt": "2026-09-22T12:00:01.555Z",
+      "startedAt": "2026-09-22T12:01:30.835Z",
       "status": "completed",
       "confidence": 90,
       "evidence": [
         {
           "source": "Factory public site",
-          "observation": "{\"ok\":true,\"httpStatus\":401,\"title\":\"Sign in to continue to Nova Business Factory\",\"url\":\"https://pczigr.hatchable.site/?_hbgate=1\",\"latencyMs\":1829}",
+          "observation": "{\"ok\":true,\"httpStatus\":401,\"title\":\"Sign in to continue to Nova Business Factory\",\"url\":\"https://pczigr.hatchable.site/?_hbgate=1\",\"latencyMs\":291}",
           "trace": "https://pczigr.hatchable.site"
         }
       ],
       "recommendation": "Return findings to Boss; do not create a second controller.",
-      "finishedAt": "2026-09-22T12:00:01.555Z"
+      "finishedAt": "2026-09-22T12:01:30.835Z"
     },
     {
       "agent": "engineering-expert",
       "domain": "Engineering",
       "capability": "change_prepare",
-      "startedAt": "2026-09-22T12:00:01.555Z",
+      "startedAt": "2026-09-22T12:01:30.836Z",
       "status": "completed",
       "confidence": 90,
       "evidence": [
@@ -118,13 +118,13 @@
         }
       ],
       "recommendation": "Return findings to Boss; do not create a second controller.",
-      "finishedAt": "2026-09-22T12:00:01.555Z"
+      "finishedAt": "2026-09-22T12:01:30.836Z"
     },
     {
       "agent": "finance-expert",
       "domain": "Finance",
       "capability": "unit_economics",
-      "startedAt": "2026-09-22T12:00:01.555Z",
+      "startedAt": "2026-09-22T12:01:30.836Z",
       "status": "completed",
       "confidence": 90,
       "evidence": [
@@ -135,30 +135,30 @@
         }
       ],
       "recommendation": "Return findings to Boss; do not create a second controller.",
-      "finishedAt": "2026-09-22T12:00:01.555Z"
+      "finishedAt": "2026-09-22T12:01:30.836Z"
     },
     {
       "agent": "growth-expert",
       "domain": "Growth",
       "capability": "experiment_prepare",
-      "startedAt": "2026-09-22T12:00:01.555Z",
+      "startedAt": "2026-09-22T12:01:30.836Z",
       "status": "completed",
       "confidence": 90,
       "evidence": [
         {
           "source": "Factory public site",
-          "observation": "{\"ok\":true,\"httpStatus\":401,\"title\":\"Sign in to continue to Nova Business Factory\",\"url\":\"https://pczigr.hatchable.site/?_hbgate=1\",\"latencyMs\":1829}",
+          "observation": "{\"ok\":true,\"httpStatus\":401,\"title\":\"Sign in to continue to Nova Business Factory\",\"url\":\"https://pczigr.hatchable.site/?_hbgate=1\",\"latencyMs\":291}",
           "trace": "https://pczigr.hatchable.site"
         }
       ],
       "recommendation": "Return findings to Boss; do not create a second controller.",
-      "finishedAt": "2026-09-22T12:00:01.555Z"
+      "finishedAt": "2026-09-22T12:01:30.836Z"
     },
     {
       "agent": "operations-expert",
       "domain": "Operations",
       "capability": "health_review",
-      "startedAt": "2026-09-22T12:00:01.555Z",
+      "startedAt": "2026-09-22T12:01:30.836Z",
       "status": "completed",
       "confidence": 90,
       "evidence": [
@@ -169,13 +169,13 @@
         }
       ],
       "recommendation": "Return findings to Boss; do not create a second controller.",
-      "finishedAt": "2026-09-22T12:00:01.555Z"
+      "finishedAt": "2026-09-22T12:01:30.836Z"
     },
     {
       "agent": "partnerships-expert",
       "domain": "Partnerships",
       "capability": "partner_discovery",
-      "startedAt": "2026-09-22T12:00:01.555Z",
+      "startedAt": "2026-09-22T12:01:30.836Z",
       "status": "completed",
       "confidence": 90,
       "evidence": [
@@ -186,13 +186,13 @@
         }
       ],
       "recommendation": "Return findings to Boss; do not create a second controller.",
-      "finishedAt": "2026-09-22T12:00:01.555Z"
+      "finishedAt": "2026-09-22T12:01:30.836Z"
     },
     {
       "agent": "portfolio-expert",
       "domain": "Portfolio",
       "capability": "capital_allocation",
-      "startedAt": "2026-09-22T12:00:01.555Z",
+      "startedAt": "2026-09-22T12:01:30.836Z",
       "status": "completed",
       "confidence": 90,
       "evidence": [
@@ -203,30 +203,30 @@
         }
       ],
       "recommendation": "Return findings to Boss; do not create a second controller.",
-      "finishedAt": "2026-09-22T12:00:01.555Z"
+      "finishedAt": "2026-09-22T12:01:30.836Z"
     },
     {
       "agent": "product-expert",
       "domain": "Product",
       "capability": "experiment_design",
-      "startedAt": "2026-09-22T12:00:01.555Z",
+      "startedAt": "2026-09-22T12:01:30.836Z",
       "status": "completed",
       "confidence": 90,
       "evidence": [
         {
           "source": "Factory public site",
-          "observation": "{\"ok\":true,\"httpStatus\":401,\"title\":\"Sign in to continue to Nova Business Factory\",\"url\":\"https://pczigr.hatchable.site/?_hbgate=1\",\"latencyMs\":1829}",
+          "observation": "{\"ok\":true,\"httpStatus\":401,\"title\":\"Sign in to continue to Nova Business Factory\",\"url\":\"https://pczigr.hatchable.site/?_hbgate=1\",\"latencyMs\":291}",
           "trace": "https://pczigr.hatchable.site"
         }
       ],
       "recommendation": "Return findings to Boss; do not create a second controller.",
-      "finishedAt": "2026-09-22T12:00:01.555Z"
+      "finishedAt": "2026-09-22T12:01:30.836Z"
     },
     {
       "agent": "research-expert",
       "domain": "Research",
       "capability": "market_scan",
-      "startedAt": "2026-09-22T12:00:01.555Z",
+      "startedAt": "2026-09-22T12:01:30.836Z",
       "status": "completed",
       "confidence": 90,
       "evidence": [
@@ -237,13 +237,13 @@
         }
       ],
       "recommendation": "Return findings to Boss; do not create a second controller.",
-      "finishedAt": "2026-09-22T12:00:01.635Z"
+      "finishedAt": "2026-09-22T12:01:30.917Z"
     },
     {
       "agent": "sales-expert",
       "domain": "Sales",
       "capability": "outreach_prepare",
-      "startedAt": "2026-09-22T12:00:01.635Z",
+      "startedAt": "2026-09-22T12:01:30.917Z",
       "status": "completed",
       "confidence": 90,
       "evidence": [
@@ -254,7 +254,7 @@
         }
       ],
       "recommendation": "No live email test is configured for this cycle; keep outbound send approval-gated.",
-      "finishedAt": "2026-09-22T12:00:01.635Z",
+      "finishedAt": "2026-09-22T12:01:30.917Z",
       "email": {
         "attempted": false,
         "reason": "NOVA_MAIL_TEST_TO not configured"
@@ -264,7 +264,7 @@
       "agent": "security-expert",
       "domain": "Security",
       "capability": "control_review",
-      "startedAt": "2026-09-22T12:00:01.635Z",
+      "startedAt": "2026-09-22T12:01:30.918Z",
       "status": "completed",
       "confidence": 90,
       "evidence": [
@@ -275,13 +275,13 @@
         }
       ],
       "recommendation": "Return findings to Boss; do not create a second controller.",
-      "finishedAt": "2026-09-22T12:00:01.635Z"
+      "finishedAt": "2026-09-22T12:01:30.918Z"
     },
     {
       "agent": "testing-expert",
       "domain": "Testing",
       "capability": "release_verify",
-      "startedAt": "2026-09-22T12:00:01.635Z",
+      "startedAt": "2026-09-22T12:01:30.918Z",
       "status": "completed",
       "confidence": 90,
       "evidence": [
@@ -292,13 +292,13 @@
         }
       ],
       "recommendation": "Return findings to Boss; do not create a second controller.",
-      "finishedAt": "2026-09-22T12:00:01.635Z"
+      "finishedAt": "2026-09-22T12:01:30.918Z"
     },
     {
       "agent": "device-operations-expert",
       "domain": "Device Operations",
       "capability": "device_takeover",
-      "startedAt": "2026-09-22T12:00:01.635Z",
+      "startedAt": "2026-09-22T12:01:30.918Z",
       "status": "completed",
       "confidence": 90,
       "evidence": [
@@ -314,7 +314,7 @@
         "cycle": 1,
         "reason": "NOVA_DEVICE_CONTROL is not true"
       },
-      "finishedAt": "2026-09-22T12:00:01.635Z"
+      "finishedAt": "2026-09-22T12:01:30.918Z"
     }
   ]
 }
