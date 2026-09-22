@@ -25,20 +25,29 @@ jobs:
           node-version: 22
       - name: Execute company takeover validation
         run: node nova-runtime/test/company-takeover.test.mjs
-      - name: Execute Nova XX takeover
+      - name: Install Nova Mail
+        working-directory: nova-mail
+        run: npm install --omit=dev
+      - name: Install Nova Device
+        working-directory: nova-device
+        run: npm install --omit=dev
+      - name: Install Chromium
         working-directory: nova-runtime
-        env:
-          NOVA_TAKEOVER_ONLY: 'true'
+        run: npx playwright install --with-deps chromium
+      - name: Execute real Nova XX takeover
+        working-directory: nova-runtime
         run: node src/xx-runner.mjs > ../xx-live-takeover-proof.json
       - name: Validate live proof
         run: |
           node - <<'NODE'
           const fs=require('fs');
           const raw=fs.readFileSync('xx-live-takeover-proof.json','utf8').trim().split('\n').filter(Boolean).map(JSON.parse);
-          const proof=raw.find(x=>x.event==='xx_takeover_live_execution_complete');
-          if(!proof) throw new Error('No live takeover completion event');
-          if(proof.control!=='xx'||proof.mode!=='company-replication-takeover'||proof.success!==true) throw new Error('Invalid takeover proof');
-          if(!proof.manifestValidation?.ok) throw new Error('Manifest validation failed');
+          const proof=raw.find(x=>x.event==='xx_takeover_complete');
+          if(!proof) throw new Error('No real Nova takeover completion event');
+          if(proof.control!=='xx'||proof.mode!=='company-replication-takeover'||proof.takeover!==true) throw new Error('Invalid takeover proof');
+          if(!proof.companyTakeover?.validation?.ok) throw new Error('Manifest validation failed');
+          if(Number(proof.completed)!==16 || Number(proof.failed)!==0) throw new Error('Specialist runtime did not complete cleanly');
+          console.log(JSON.stringify({realRuntime:true,completed:proof.completed,failed:proof.failed,source:proof.companyTakeover.source},null,2));
           console.log(JSON.stringify(proof,null,2));
           fs.writeFileSync('nova-runtime/TAKEOVER-CI-PROOF.json',JSON.stringify(proof,null,2)+'\n');
           NODE
@@ -46,6 +55,7 @@ jobs:
         run: |
           git config user.name 'nova-takeover-proof'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git pull --rebase --autostash origin main
           git add nova-runtime/TAKEOVER-CI-PROOF.json
           git commit -m 'Record Nova XX live takeover proof'
           git push
