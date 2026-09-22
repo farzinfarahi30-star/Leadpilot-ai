@@ -138,6 +138,7 @@ jobs:
         run: |
           git config user.name 'nova-external-runtime'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git pull --rebase --autostash origin main
           git add nova-runtime/EXTERNAL-XX-LIVE-PROOF.json
           git commit -m 'Record Nova external XX live proof'
           git push
