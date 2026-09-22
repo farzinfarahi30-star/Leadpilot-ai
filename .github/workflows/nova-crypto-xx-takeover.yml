@@ -1,0 +1,75 @@
+name: Nova Crypto XX Takeover
+
+on:
+  push:
+    paths:
+      - 'nova-runtime/crypto-company-takeover-manifest.json'
+      - 'nova-runtime/src/crypto-company-takeover.mjs'
+      - 'nova-runtime/test/crypto-company-takeover.test.mjs'
+      - 'nova-runtime/src/crypto-capabilities.mjs'
+      - 'nova-economy/**'
+      - '.github/workflows/nova-crypto-xx-takeover.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  takeover:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Validate XX crypto takeover package
+        run: node nova-runtime/test/crypto-company-takeover.test.mjs
+
+      - name: Validate JavaScript runtime modules
+        run: |
+          node --check nova-runtime/src/crypto-company-takeover.mjs
+          node --check nova-runtime/src/crypto-capabilities.mjs
+          node --check nova-runtime/src/nova-chain-controller.mjs
+          node --check nova-runtime/src/chain-ops.mjs
+          node --check nova-runtime/src/device-tools.mjs
+
+      - name: Install Nova runtime
+        working-directory: nova-runtime
+        run: npm install --omit=dev
+
+      - name: Run Nova crypto capability doctor
+        working-directory: nova-runtime
+        run: npm run crypto:doctor
+
+      - name: Run read-only Sepolia chain doctor
+        working-directory: nova-runtime
+        run: npm run crypto:chain-doctor
+
+      - name: Build immutable takeover proof
+        run: |
+          node nova-runtime/src/crypto-company-takeover.mjs > nova-runtime/CRYPTO-XX-PROOF.json
+          node -e "
+          const fs=require('fs');
+          const proof=JSON.parse(fs.readFileSync('nova-runtime/CRYPTO-XX-PROOF.json','utf8'));
+          if(!proof.takeover || proof.control!=='xx' || proof.mode!=='crypto-project-replication-takeover' || !proof.validation?.ok) process.exit(1);
+          fs.writeFileSync('nova-runtime/CRYPTO-XX-PROOF.json', JSON.stringify({
+            schema:'nova.crypto.takeover.proof.v1',
+            verifiedAt:new Date().toISOString(),
+            independentExecutor:'GitHub-hosted Nova Runtime',
+            success:true,
+            takeover:proof
+          },null,2)+'\n');
+          "
+
+      - name: Persist proof
+        run: |
+          git config user.name 'nova-crypto-xx-proof'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git pull --rebase --autostash origin main
+          git add nova-runtime/CRYPTO-XX-PROOF.json
+          git diff --cached --quiet && exit 0
+          git commit -m 'Record Nova crypto XX takeover proof'
+          git push
