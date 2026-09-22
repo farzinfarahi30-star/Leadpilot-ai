@@ -1,7 +1,23 @@
 
 const $=s=>document.querySelector(s),content=$("#content");
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
-async function api(path,opts){const r=await fetch("/api"+path,opts);const j=await r.json();if(!r.ok)throw new Error(j.error||"request failed");return j}
+const staticMode = location.hostname.includes("jsdelivr.net") || location.hostname.includes("githubusercontent.com") || location.hostname.includes("github.io");
+const localKey="nova-platform-local-state-v1";
+const localDefault={projects:[],providers:[{id:"local",name:"Nova Local Runtime",kind:"runtime",status:"ready",external:false},{id:"cloudflare",name:"Cloudflare Runtime Adapter",kind:"hosting",status:"active",external:true},{id:"github",name:"GitHub Source Adapter",kind:"source",status:"active",external:true}],audit:[]};
+function localState(){try{return JSON.parse(localStorage.getItem(localKey))||localDefault}catch{return localDefault}}
+function saveLocal(s){localStorage.setItem(localKey,JSON.stringify(s))}
+async function api(path,opts){
+  if(staticMode){
+    const s=localState();
+    if(path==="/health") return {ok:true,platform:"Nova Platform",version:"0.2.0",mode:"static_portable_frontend",vendor_lock_in:false,stateful:false,runtime:"portable frontend"};
+    if(path==="/platform") return {name:"Nova Platform",version:"0.2.0",mode:"static_portable_frontend",projects:s.projects.length,providers:s.providers,storage:"browser localStorage (static preview)"};
+    if(path==="/projects" && (!opts || opts.method==="GET")) return s.projects;
+    if(path==="/providers") return s.providers;
+    if(path==="/audit") return s.audit;
+    if(path==="/projects" && opts?.method==="POST"){const b=JSON.parse(opts.body||"{}"),p={id:"proj_"+Date.now(),name:String(b.name||"Untitled Project"),description:String(b.description||""),status:"draft",files:1,deployments:0};s.projects.unshift(p);s.audit.unshift({action:"project.create",detail:{projectId:p.id,name:p.name},createdAt:new Date().toISOString()});saveLocal(s);return p}
+  }
+  const r=await fetch("/api"+path,opts);const j=await r.json();if(!r.ok)throw new Error(j.error||"request failed");return j
+}
 async function overview(){
   const [p,pr,h]=await Promise.all([api("/platform"),api("/projects"),api("/health")]);
   content.innerHTML='<div class="grid">'+
