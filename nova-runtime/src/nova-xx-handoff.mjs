@@ -2,8 +2,8 @@ import { buildXxTakeoverRegistry } from './xx-takeover-registry.mjs';
 import { buildCompanyTakeoverPlan } from './company-takeover.mjs';
 import { buildCryptoTakeoverPlan } from './crypto-company-takeover.mjs';
 
-export function buildNovaXxHandoff() {
-  const registry = buildXxTakeoverRegistry();
+export async function buildNovaXxHandoff() {
+  const registry = await buildXxTakeoverRegistry();
   const company = buildCompanyTakeoverPlan();
   const crypto = buildCryptoTakeoverPlan();
   const validations = {
@@ -22,4 +22,4 @@ export function buildNovaXxHandoff() {
   };
 }
 
-console.log(JSON.stringify(buildNovaXxHandoff(),null,2));
+buildNovaXxHandoff().then(x=>console.log(JSON.stringify(x,null,2))).catch(error=>{console.error(error);process.exitCode=1;});
