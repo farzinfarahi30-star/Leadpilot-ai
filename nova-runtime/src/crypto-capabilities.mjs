@@ -1,6 +1,7 @@
 import process from 'node:process';
 import {
   alchemySepoliaBalance,
+  alchemySepoliaRpcUrl,
   alchemySepoliaBlockNumber,
   alchemySepoliaChainId,
   alchemySepoliaTransactionReceipt
