@@ -65,3 +65,12 @@ Build less. Learn faster. Earn attention through useful work. Measure real visit
 - Product catalog: https://ai-business-factory.hatchable.site/products.json
 
 The factory publishes evidence-backed research and transparent internal observations so people can inspect the work instead of relying on promotional claims.
+
+
+## Nova CleanSheet
+
+Nova CleanSheet is the current small-business CSV/XLSX data-quality offer stack, with free, fixed-price, recurring, and local-first digital-tool options.
+
+**Offers and live checkouts:** [NOVA_CLEANSHEET.md](./NOVA_CLEANSHEET.md)
+
+The public offer page includes the free CSV Health Check Starter, fixed-price cleanup, recurring QA, Supplier Price Change Checker, and Data QA API source license.
