@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Nova CSV Health Check</title>
+<style>
+body{font-family:system-ui,-apple-system,Segoe UI,sans-serif;margin:0;background:#0a0f1b;color:#eef3ff}
+.wrap{max-width:860px;margin:auto;padding:22px}.card{background:#111827;border:1px solid #2b3855;border-radius:18px;padding:18px;margin:14px 0}
+h1{font-size:30px;margin:.2em 0}.muted{color:#9eabc5}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.stat{padding:14px;border:1px solid #2d3a57;border-radius:14px}.stat b{display:block;font-size:24px;margin-top:4px}
+input,button{width:100%;padding:12px;border-radius:10px;border:1px solid #3a4969;background:#0c1425;color:#fff;margin-top:8px}
+button{background:#155e75;font-weight:700;cursor:pointer}.good{color:#86efac}.warn{color:#fde68a}.bad{color:#fda4af}
+table{width:100%;border-collapse:collapse}th,td{border-bottom:1px solid #26324a;padding:9px;text-align:left;font-size:14px}
+@media(max-width:640px){.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body><div class="wrap">
+<div class="card">
+<div class="muted">NOVA CLEANSHEET • LOCAL-FIRST</div>
+<h1>CSV Health Check</h1>
+<p>Your CSV stays on this device. Nothing is uploaded to a server.</p>
+<input id="file" type="file" accept=".csv,text/csv">
+<button onclick="run()">Analyze CSV</button>
+</div>
+<div id="results" style="display:none">
+<div class="grid">
+<div class="stat"><span class="muted">Rows</span><b id="rows">0</b></div>
+<div class="stat"><span class="muted">Columns</span><b id="cols">0</b></div>
+<div class="stat"><span class="muted">Health score</span><b id="score">—</b></div>
+</div>
+<div class="card"><h3>Issues found</h3><table><tbody id="issues"></tbody></table></div>
+<div class="card">
+<button onclick="downloadReport()">Download QA report</button>
+<p class="muted">Need it fixed? Nova CleanSheet packages: Starter £20 • Standard £50 • Automation £100+</p>
+<a href="https://buy.stripe.com/6oUaEX5ru4mi1Uv5C19Zm06"><button>£5 Pro Health Check</button></a>
+</div>
+</div>
+</div>
+<script>
+let report = {};
+function parseCSV(text){
+  const rows=[]; let row=[], cell='', q=false;
+  for(let i=0;i<text.length;i++){
+    const c=text[i], n=text[i+1];
+    if(c=='"' && q && n=='"'){cell+='"';i++}
+    else if(c=='"'){q=!q}
+    else if(c==',' && !q){row.push(cell);cell=''}
+    else if((c=='\n'||c=='\r') && !q){
+      if(c=='\r'&&n=='\n') i++;
+      row.push(cell); cell='';
+      if(row.some(v=>v!=='')) rows.push(row);
+      row=[];
+    } else cell+=c;
+  }
+  if(cell.length||row.length){row.push(cell); if(row.some(v=>v!=='')) rows.push(row)}
+  return rows;
+}
+function run(){
+ const f=document.getElementById('file').files[0];
+ if(!f){alert('Choose a CSV first.');return}
+ const r=new FileReader();
+ r.onload=()=>analyze(r.result);
+ r.readAsText(f);
+}
+function analyze(text){
+ const data=parseCSV(text); if(data.length<1){alert('No rows found.');return}
+ const head=data[0].map(x=>x.trim()); const body=data.slice(1);
+ const cols=head.length; let missing=0, malformed=0, inconsistent=0;
+ const seen=new Set(); let dup=0; const dupRows=[];
+ const emailIdx=head.map((h,i)=>/e-?mail/i.test(h)?i:-1).filter(i=>i>=0);
+ body.forEach((row,idx)=>{
+   if(row.length!==cols) inconsistent++;
+   let key=row.join('\u001f');
+   if(seen.has(key)){dup++;dupRows.push(idx+2)} else seen.add(key);
+   for(let i=0;i<cols;i++){if((row[i]??'').trim()==='') missing++}
+   emailIdx.forEach(i=>{
+     const v=(row[i]??'').trim();
+     if(v && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)) malformed++;
+   })
+ });
+ const cells=Math.max(1,body.length*cols);
+ let penalty=(missing/cells)*45 + (dup/Math.max(1,body.length))*30 + (inconsistent/Math.max(1,body.length))*15 + (malformed/Math.max(1,body.length))*10;
+ const score=Math.max(0,Math.round(100-penalty));
+ report={rows:body.length,columns:cols,headers:head,missingCells:missing,duplicateRows:dup,duplicateRowNumbers:dupRows,inconsistentRows:inconsistent,malformedEmails:malformed,healthScore:score};
+ document.getElementById('rows').textContent=body.length;
+ document.getElementById('cols').textContent=cols;
+ document.getElementById('score').textContent=score+'/100';
+ const issues=[['Missing / blank cells',missing],['Exact duplicate rows',dup],['Rows with inconsistent column counts',inconsistent],['Obvious malformed emails',malformed]];
+ document.getElementById('issues').innerHTML=issues.map(([k,v])=>`<tr><td>${k}</td><td>${v}</td></tr>`).join('');
+ document.getElementById('results').style.display='block';
+}
+function downloadReport(){
+ if(!report.rows && report.rows!==0){return}
+ const lines=['Nova CSV Health Check','Generated: '+new Date().toISOString(),'Rows: '+report.rows,'Columns: '+report.columns,'Health score: '+report.healthScore+'/100','Missing / blank cells: '+report.missingCells,'Exact duplicate rows: '+report.duplicateRows,'Duplicate row numbers: '+(report.duplicateRowNumbers.join(', ')||'None'),'Rows with inconsistent column counts: '+report.inconsistentRows,'Obvious malformed emails: '+report.malformedEmails,'','Headers: '+report.headers.join(' | ')];
+ const blob=new Blob([lines.join('\n')],{type:'text/plain'});
+ const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='nova_csv_health_report.txt'; a.click(); URL.revokeObjectURL(a.href);
+}
+</script>
+</body></html>
