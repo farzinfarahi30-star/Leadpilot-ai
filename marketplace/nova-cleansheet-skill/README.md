@@ -2,6 +2,13 @@
 
 A reusable agent skill for spreadsheet, CSV, supplier-feed, CRM-export and ecommerce data-quality auditing.
 
+## Buy now
+
+**Launch price: £15 one-time**
+
+Stripe checkout:
+https://buy.stripe.com/3cI9AT3jm7yuar12pP9Zn0T
+
 ## What buyers get
 
 Nova CleanSheet helps an AI agent perform structured data QA instead of giving generic spreadsheet advice. It profiles data, detects duplicates and missing fields, checks keys and schema consistency, prioritizes issues, and returns a remediation plan with clear automation boundaries.
@@ -16,15 +23,21 @@ Nova CleanSheet helps an AI agent perform structured data QA instead of giving g
 - spreadsheet-heavy small businesses
 - AI agents that need a deterministic data-QA workflow
 
-## Suggested marketplace positioning
+## Marketplace positioning
 
 **Title:** Nova CleanSheet — CSV & Spreadsheet QA Agent Skill
 
 **Short description:** Turn any compatible AI agent into a structured CSV/spreadsheet QA reviewer for duplicates, missing values, schema drift, key integrity and supplier-feed changes.
 
-**Suggested one-time launch price:** $19
+**Launch price:** £15 one-time direct / equivalent marketplace price
 
-A lower introductory price can be used for the first sales, but the skill should not be advertised as producing guaranteed savings or revenue.
+The skill should not be advertised as producing guaranteed savings or revenue.
+
+## Included files
+
+- `SKILL.md` — the reusable agent workflow
+- `LAUNCHGUIDE.md` — marketplace-ready listing copy and requirements
+- `README.md` — buyer-facing overview
 
 ## Related Nova offers
 
