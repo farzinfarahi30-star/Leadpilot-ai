@@ -20,6 +20,7 @@ Count revenue only after a completed customer payment or independently verified 
 - Original dead-end Shopify draft archived.
 - Five targeted CleanSheet sales contacts/follow-ups sent on 2026-09-30.
 - SportsData.io transferred the EPL data-pricing discussion to its sales colleague for follow-up.
+- Fradle-ready AI-trainer résumé uploaded to Google Drive.
 - Live Stripe charges rechecked after execution: 0 completed charges.
 
 ## LIVE BUY PATHS
@@ -38,24 +39,39 @@ Store currency / price: EUR 17.55
 Delivery: automatic Google Drive link via Shopify Digital Products
 Online Store publication was requested successfully, but Shopify's connector does not independently confirm the public storefront listing.
 
+## APPLICATION ASSETS
+
+### AI evaluator / trainer résumé
+Google Drive:
+https://drive.google.com/file/d/1hTjW8PbGW_S-CC6XReWe-MhaVErIWXir/view?usp=drivesdk
+
+GitHub / portfolio:
+https://github.com/farzinfarahi30-star/Leadpilot-ai
+
 ## NEW / DISTINCT ROUTES FOUND
 
 ### 1. Paid AI expert-evaluation networks
 Distinct from generic microtask/data-labeling sites because buyers recruit specialist evaluators, red-teamers, programmers and domain experts.
-Current examples identified in research:
-- Fradle
-- Braintrust AI Training
-- Aced talent network
-- Pathwize (credential-gated)
 
-Status: signup/profile actions still required. No earnings verified.
+Verified current examples:
+- Fradle — published expert-network application for RLHF, model evaluation, QA, safety/red teaming, code evaluation and AI data work.
+- Braintrust AI Training — free talent profile, AI skills interview, transparent paid tasks.
+- Aced talent network — retained as a research candidate but not yet independently verified enough to prioritize over Fradle/Braintrust.
+- Pathwize — credential-gated; only pursue if credentials fit.
+
+Status:
+- Fradle application needs the operator's current physical location/time zone, truthful years of professional experience, and submission of the application form.
+- Braintrust needs account creation and an AI skills interview.
+- No earnings verified.
 
 ### 2. Paid research participant networks
-Distinct from ordinary surveys and usability microtasks because participants are recruited for moderated professional research and interviews.
-Current example:
-- Respondent
+Current verified example:
+- Respondent — participant signup is free; profiles are matched to paid research; identity verification is part of the participant process.
 
-Status: participant profile/signup required. No earnings verified.
+Status:
+- Signup requires the operator to accept Respondent's Terms & Conditions / Privacy Policy.
+- Identity verification is a human-only gate.
+- No earnings verified.
 
 ### 3. Agent / MCP / skill marketplaces
 Distinct distribution channel for code and workflows already owned by Nova.
@@ -63,7 +79,7 @@ Current examples identified:
 - MCP Marketplace
 - MCP Market
 - Agent Marketplace
-- Apify paid Actors (already overlaps with an earlier Nova route; merge rather than duplicate)
+- Apify paid Actors (overlaps an earlier Nova route; merge rather than duplicate)
 
 Execution:
 - Nova CleanSheet Agent Skill packaged.
@@ -120,7 +136,9 @@ Do not chase Nitrotek: its support ticket explicitly says chaser messages reset 
 
 - No completed Stripe charge verified yet.
 - Agent/MCP marketplace listing publication requires account login/authorization on platforms where no connected tool is available.
-- Specialist AI evaluation and paid-research routes require the operator to create/verify participant profiles and, where required, complete identity/KYC.
+- Fradle requires truthful current location/timezone and years-of-experience fields plus form submission.
+- Braintrust requires account creation and an AI skills interview.
+- Respondent requires Terms acceptance and later identity verification.
 - warpSpeed requires signup/KYC/maintainer assignment before work.
 - Shopify product is ACTIVE, but the connector cannot independently confirm the public Online Store listing URL.
 - Exa deep-research credits were exhausted during the initial sweep; public web search can still be used for additional route discovery.
@@ -129,7 +147,7 @@ Do not chase Nitrotek: its support ticket explicitly says chaser messages reset 
 
 1. Convert the five CleanSheet targets into sample-file audits and paid cleanup/licence sales.
 2. Monitor Stripe and Shopify for a real completed payment.
-3. Publish the existing CleanSheet commercial licence to agent/MCP marketplaces when platform account authorization is available.
-4. Open free profiles on Respondent and the strongest zero-upfront AI expert networks.
+3. Complete Fradle, Braintrust and Respondent owner-only signup gates.
+4. Publish the existing CleanSheet commercial licence to agent/MCP marketplaces when platform account authorization is available.
 5. Prefer low-competition paid bounties only after eligibility and assignment are verified.
 6. Continue route-gap discovery only when it produces a genuinely new payer/distribution mechanism rather than another duplicate platform.
