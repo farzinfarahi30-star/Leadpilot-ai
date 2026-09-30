@@ -5,7 +5,10 @@ Name: Nova CleanSheet — CSV & Spreadsheet QA Agent Skill
 
 Category: Data & Analytics / Business Tools
 
-Price: $19 one-time
+Price: £15 one-time at direct launch; use the closest marketplace-equivalent price where GBP is unavailable.
+
+Direct checkout:
+https://buy.stripe.com/3cI9AT3jm7yuar12pP9Zn0T
 
 ## Description
 Nova CleanSheet gives an AI agent a disciplined workflow for auditing CSV, spreadsheet-export and tabular business data. It checks duplicates, missing values, row/schema consistency, key integrity, common formatting issues, ecommerce/supplier-feed anomalies and old-vs-new price changes. It explicitly separates detected facts from suggested corrections and avoids silently guessing ambiguous values.
