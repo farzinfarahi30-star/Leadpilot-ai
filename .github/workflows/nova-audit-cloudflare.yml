@@ -53,26 +53,16 @@ jobs:
           fi
 
           health=$(curl --fail --silent --show-error --retry 8 --retry-delay 2 "$url/health" || true)
-          audit=$(curl --fail --silent --show-error --retry 4 --retry-delay 2             -H 'content-type: application/json'             --data '{"url":"https://example.com"}'             "$url/api/audit/rapid" || true)
+          audit=$(curl --fail --silent --show-error --retry 4 --retry-delay 2 -H 'content-type: application/json' --data '{"url":"https://example.com"}' "$url/api/audit/rapid" || true)
 
-          python - "$url" "$health" "$audit" <<'PY'
-import json,sys
-from datetime import datetime,timezone
-url,health_raw,audit_raw=sys.argv[1:4]
-proof={"success":False,"url":url,"verifiedAt":datetime.now(timezone.utc).isoformat()}
-try:
-    h=json.loads(health_raw)
-    a=json.loads(audit_raw)
-    assert h.get("ok") is True
-    assert a.get("ok") is True
-    assert a.get("http",{}).get("status")==200
-    proof.update({"success":True,"healthVerified":True,"auditVerified":True,"version":h.get("version")})
-except Exception as e:
-    proof["reason"]="live_verification_failed"
-    proof["detail"]=str(e)[:300]
-json.dump(proof,open("DEPLOYMENT-PROOF.json","w"),indent=2)
-print(json.dumps(proof,indent=2))
-PY
+          if printf '%s' "$health" | jq -e '.ok == true' >/dev/null 2>&1 && printf '%s' "$audit" | jq -e '.ok == true and .http.status == 200' >/dev/null 2>&1; then
+            version=$(printf '%s' "$health" | jq -r '.version // "unknown"')
+            jq -n --arg url "$url" --arg version "$version" --arg verifiedAt "$(date -u +%Y-%m-%dT%H:%M:%SZ)" '{success:true,url:$url,verifiedAt:$verifiedAt,healthVerified:true,auditVerified:true,version:$version}' > DEPLOYMENT-PROOF.json
+          else
+            jq -n --arg url "$url" --arg verifiedAt "$(date -u +%Y-%m-%dT%H:%M:%SZ)" '{success:false,url:$url,verifiedAt:$verifiedAt,reason:"live_verification_failed"}' > DEPLOYMENT-PROOF.json
+          fi
+
+          cat DEPLOYMENT-PROOF.json
 
       - name: Publish deployment proof
         shell: bash
