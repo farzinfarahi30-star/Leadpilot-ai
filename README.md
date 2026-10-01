@@ -1,5 +1,11 @@
 # Leadpilot AI
 
+## Live Nova Website Audit offer
+
+**Nova Website Technical Audit — £9 one-time:** https://buy.stripe.com/4gM9AT3jm1a656Hc0p9Zn0V
+
+Submit one public webpage URL at checkout. Nova returns a technical SEO, structure, metadata, structured-data and security-header audit. Details: [NOVA_WEBSITE_AUDIT.md](./NOVA_WEBSITE_AUDIT.md)
+
 AI-powered business automation platform for lead generation, customer communication, and sales workflows.
 
 ## Free home-service revenue tool
