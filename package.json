@@ -1,13 +1,12 @@
 {
-  "name": "nova-edge-deploy",
+  "name": "nova-website-audit-api",
   "private": true,
-  "version": "1.0.0",
+  "type": "module",
   "scripts": {
     "deploy": "wrangler deploy",
-    "check": "wrangler deploy --dry-run --outdir .wrangler-dry-run",
-    "build": "wrangler deploy --dry-run --outdir .wrangler-dry-run"
+    "check": "node --check nova-audit-worker/worker.mjs"
   },
   "devDependencies": {
-    "wrangler": "^4.68.0"
+    "wrangler": "^4.45.0"
   }
 }
