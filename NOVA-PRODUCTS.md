@@ -15,6 +15,30 @@ Audit one public webpage for technical SEO, structure, metadata, structured data
 
 Stripe collects the webpage URL at checkout.
 
+### Nova Competitor Snapshot — £14.90 one-time
+
+Compare one public business website with one public competitor website for positioning, technical SEO signals, page structure, trust/conversion signals and practical differentiators.
+
+**Buy:** https://buy.stripe.com/00w5kD6vy6uqdDdaWl9Zn0X
+
+Stripe collects both public website URLs at checkout.
+
+### Nova AI Growth Opportunity Map — £19.90 one-time
+
+Review one public business website and identify practical AI/automation opportunities prioritized by business goal, implementation difficulty, prerequisites and likely operational benefit.
+
+**Buy:** https://buy.stripe.com/00waEX5ru7yu2Yz7K99Zn0Y
+
+Stripe collects the business website URL and main goal at checkout.
+
+### Nova AI Business Execution Tracker — £4.90 one-time
+
+A private editable Google Sheets tracker with Dashboard, Revenue, Leads, Tasks and Experiments tabs.
+
+**Buy:** https://buy.stripe.com/dRmfZhdY08CyfLl6G59Zn0Z
+
+A fresh private copy is created for each successful order and shared to the checkout email.
+
 ### Nova Website & App QA Audit — £79 one-time
 
 Functional/usability QA review for an authorized website or app, including broken flows, mobile/responsive checks and a prioritized bug report.
@@ -63,6 +87,10 @@ Improve one agreed Google Sheets workflow through cleanup, formulas, validation,
 Implement one agreed business workflow such as intake → structured record → qualification/routing → follow-up task → owner notification.
 
 **Buy:** https://book.stripe.com/eVq6oH4nqbOKar16G59Zn0H
+
+## Direct fulfilment engine
+
+Nova's direct-sales fulfilment checks live Stripe payments for the direct offers, prevents duplicate delivery using the Stripe Checkout Session ID, then delivers reports through Gmail or creates/shares a private Google Drive copy for digital templates. Unpaid, failed, refunded, disputed and incomplete checkouts are not treated as orders.
 
 ## Permanent-host rule
 
