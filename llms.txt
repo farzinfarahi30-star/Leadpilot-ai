@@ -1,13 +1,22 @@
-# AI Business Factory
+# Nova / Leadpilot AI
 
-Live autonomous AI business and workflow factory by Azin Ahi.
+Public Nova business and automation repository.
 
-Website: https://ai-business-factory.hatchable.site/
-Research: https://ai-business-factory.hatchable.site/research
-Founder: https://ai-business-factory.hatchable.site/founder
-Live launch: https://ai-business-factory.hatchable.site/launch
-Free AI audit: https://ai-business-factory.hatchable.site/ai-audit.html
-Work with us: https://ai-business-factory.hatchable.site/first-sale.html
-Product catalog: https://ai-business-factory.hatchable.site/products.json
+Permanent offer hub:
+https://github.com/farzinfarahi30-star/Leadpilot-ai/blob/main/NOVA-PRODUCTS.md
+
+Nova Website Technical Audit:
+https://github.com/farzinfarahi30-star/Leadpilot-ai/blob/main/NOVA_WEBSITE_AUDIT.md
+
+Live £9 audit checkout:
+https://buy.stripe.com/4gM9AT3jm1a656Hc0p9Zn0V
+
+Nova CleanSheet:
+https://github.com/farzinfarahi30-star/Leadpilot-ai/blob/main/NOVA_CLEANSHEET.md
+
+Source repository:
+https://github.com/farzinfarahi30-star/Leadpilot-ai
+
+Hosting rule: buyer-facing documentation and direct checkout must not depend on temporary tunnels, expiring preview URLs, browser-credit systems, or paid deployment credits. Optional application demos may use external hosts, but the durable public catalog remains in this repository.
 
 Trust boundary: real evidence only. No fabricated customers, traffic, reviews, votes, endorsements or revenue.
