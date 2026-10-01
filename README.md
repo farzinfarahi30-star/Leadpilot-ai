@@ -1,5 +1,12 @@
 # Leadpilot AI
 
+## Permanent Nova offer hub
+
+**Durable buyer-facing catalog:** [NOVA-PRODUCTS.md](./NOVA-PRODUCTS.md)
+
+Core offers use public GitHub documentation plus Stripe-hosted checkout so they remain purchasable without temporary tunnels, browser-credit services, or deployment-credit websites.
+
+
 ## Live Nova Website Audit offer
 
 **Nova Website Technical Audit — £9 one-time:** https://buy.stripe.com/4gM9AT3jm1a656Hc0p9Zn0V
