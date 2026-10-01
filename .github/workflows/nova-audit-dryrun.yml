@@ -1,0 +1,46 @@
+name: Diagnose Nova Cloudflare Worker
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "nova-platform/**"
+      - "nova-audit-worker/**"
+      - "wrangler.jsonc"
+      - ".github/workflows/nova-audit-dryrun.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  dryrun:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+      - name: Wrangler dry run
+        shell: bash
+        run: |
+          npm install --global wrangler@latest >/dev/null 2>&1
+          set +e
+          (cd nova-platform && wrangler deploy --dry-run) > /tmp/dryrun.txt 2>&1
+          code=$?
+          {
+            echo "exit_code=$code"
+            echo "timestamp=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            cat /tmp/dryrun.txt
+          } > nova-platform/DRYRUN.txt
+          exit 0
+      - name: Persist diagnostic
+        shell: bash
+        run: |
+          git config user.name "nova-audit-diagnose"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add nova-platform/DRYRUN.txt
+          git diff --cached --quiet && exit 0
+          git commit -m "Record Nova Cloudflare dry run"
+          git push
