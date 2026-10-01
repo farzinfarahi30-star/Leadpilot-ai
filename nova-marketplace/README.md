@@ -1,13 +1,17 @@
 # Nova direct-sales marketplace
 
-This folder is a zero-upfront-cost direct sales route for Nova services.
+This is Nova's zero-upfront-cost direct-sales route.
 
-Current live offer:
-- Nova Website Audit
-- GBP 9.90 one-time
-- Stripe Payment Link: https://buy.stripe.com/6oUdR93jmbOKeHhaWl9Zn0W
+The permanent buyer-facing catalog is rendered directly by GitHub:
+https://github.com/farzinfarahi30-star/Leadpilot-ai/blob/main/NOVA-PRODUCTS.md
 
-Public static mirror:
-https://cdn.jsdelivr.net/gh/farzinfarahi30-star/Leadpilot-ai@main/nova-marketplace/index.html
+Canonical low-ticket offer:
+- Nova Website Technical Audit
+- GBP 9 one-time
+- Live Stripe checkout: https://buy.stripe.com/4gM9AT3jm1a656Hc0p9Zn0V
 
-The checkout collects the website URL to audit. Fulfilment is handled by the Nova sales automation, which checks for new successful Stripe payments, audits the submitted public URL, and emails the result while preventing duplicate fulfilments.
+Other current direct offers are listed in `NOVA-PRODUCTS.md`.
+
+The purchase path does not depend on temporary tunnels, AppDeploy credits, Hatchable visibility, TinyFish, Firecrawl, browser-agent credits, or trial hosting. Stripe collects the required intake fields at checkout. Nova's consolidated earnings controller checks for genuinely settled payments and fulfills only successful paid orders, using Gmail/Google Drive/public web analysis as appropriate while preventing duplicate fulfilment by Checkout Session ID.
+
+The HTML file in this folder is an optional mirror only. It is not a critical dependency.
