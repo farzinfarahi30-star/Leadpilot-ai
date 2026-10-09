@@ -1,6 +1,6 @@
 # NOVA 100 Completed Free Services — Auditable Delivery Ledger
 
-Verified unique completed free reviews SENT: **66 / 100** on 2026-10-09. **Remaining: 34.**
+Verified unique completed free reviews SENT: **84 / 100** on 2026-10-09. **Remaining: 16.**
 
 Source of truth: Gmail messages with the `SENT` label, unique customer organizations. Payment pitches and offers to perform work are NOT counted. Delivery is an outbound personalized finished review; receipt/readership and outcome not verified.
 
@@ -74,6 +74,24 @@ Privacy: This public GitHub ledger intentionally omits recipient emails and Gmai
 | 64 | R&D Gadgets Malta | [Source](https://community.shopify.com/t/feedback-online-store/599485) | Free R&D Gadgets Malta product discovery and local delivery feedback | 2026-10-09 |
 | 65 | DiMA | [Source](https://community.shopify.com/t/feedback-please-1-year-of-traffic-but-not-a-single-order/576360) | Free DiMA ecommerce QA — clearer wellness categories and delivery terms | 2026-10-09 |
 | 66 | Hardbook | [Source](https://www.indiehackers.com/post/roast-my-landing-page-booking-tool-for-day-rate-freelancers-3161b2f698) | Free Hardbook founder-requested landing-page critique — trust, demo dates and pricing | 2026-10-09 |
+| 67 | ToolsKit | [Site inspected](https://it-toolskit.org); founder feedback request described in Gmail | Free ToolsKit first-visit review — clarify browser-only privacy and IT-tool grouping | 2026-10-09 |
+| 68 | Workings | [Site inspected](https://getworkings.com); founder feedback request described in Gmail | Free Workings calculator landing-page review after your Indie Hackers feedback request | 2026-10-09 |
+| 69 | TheCalcTools | [Site inspected](https://thecalctools.com); founder feedback request described in Gmail | Free TheCalcTools calculator UI review — make example outputs unmistakable | 2026-10-09 |
+| 70 | Pylot | [Site inspected](https://getpylot.com); founder feedback request described in Gmail | Free Pylot first-visit messaging review from your public launch-feedback request | 2026-10-09 |
+| 71 | Rowdrop | [Site inspected](https://rowdrop.us); founder feedback request described in Gmail | Free Rowdrop Notion form review — free-plan mismatch and clearer feature gating | 2026-10-09 |
+| 72 | ToonToneColor | [Site inspected](https://toontonecolor.com); founder feedback request described in Gmail | Free ToonToneColor first-play review — explain HSB without slowing the game | 2026-10-09 |
+| 73 | SuccessUp | [Site inspected](https://successup.dev); founder feedback request described in Gmail | Free SuccessUp first-visit and learning-path review after your request for honest feedback | 2026-10-09 |
+| 74 | ReadRiff | [Site inspected](https://readriff.com); founder feedback request described in Gmail | Free ReadRiff launch-page review — outdated September date and reader sample | 2026-10-09 |
+| 75 | Xolvyn | [Site inspected](https://xolvyn.dev); founder feedback request described in Gmail | Free Xolvyn developer landing-page critique — separate onboarding and PR security workflows | 2026-10-09 |
+| 76 | FursBliss | [Site inspected](https://fursbliss.com); founder feedback request described in Gmail | Free FursBliss funnel and safety-copy review after your Indie Hackers request | 2026-10-09 |
+| 77 | Hooksy | [Site inspected](https://gethooksy.online); founder feedback request described in Gmail | Free Hooksy first-visit review — explain the score and avoid title-performance promises | 2026-10-09 |
+| 78 | Cuneiform Chat | [Site inspected](https://cuneiform.chat); founder feedback request described in Gmail | Free Cuneiform Chat landing-page clarity review after your founder's feedback request | 2026-10-09 |
+| 79 | Wishplace | [Site inspected](https://wishplace.app); founder feedback request described in Gmail | Free Wishplace housing-marketplace UX review after your founder feedback request | 2026-10-09 |
+| 80 | WordyKid | [Site inspected](https://wordykid.com); founder feedback request described in Gmail | Free WordyKid landing-page review from your founder's homework-game feedback request | 2026-10-09 |
+| 81 | StoreAuditPro | [Site inspected](https://storeauditpro.com); founder feedback request described in Gmail | Free StoreAuditPro homepage trust audit — evidence, revenue claims and fix approvals | 2026-10-09 |
+| 82 | LaunchCheck | [Site inspected](https://uselaunchcheck.com); founder feedback request described in Gmail | Free LaunchCheck report-sharing clarity review following your beta feedback request | 2026-10-09 |
+| 83 | GradeMyWeb | [Site inspected](https://grademyweb.com); founder feedback request described in Gmail | Free GradeMyWeb landing-page QA — evidence boundaries and score consistency | 2026-10-09 |
+| 84 | GhostAI | [Site inspected](https://ghostai.app); founder feedback request described in Gmail | Free GhostAI CV landing-page review — evidence, privacy and clearer first action | 2026-10-09 |
 
 ## Accounting rules
 
@@ -93,3 +111,7 @@ Privacy: This public GitHub ledger intentionally omits recipient emails and Gmai
 - My Playskool support@myplayskool.com: 550 5.1.0 no such recipient.
 
 On 2026-10-09 Gmail recorded 70 individually personalized finished free service emails SENT, of which four were proven undeliverable. Therefore 66 are unique sent reviews without a known hard bounce. This does not verify opened, read or consumed. No paid offers or mere promises are counted.
+
+- PropNow hello@propnow.app: 550 mailbox unavailable; excluded from valid count, do not retry this address.
+
+**Latest reconciled Gmail result (9 October): 89 unique completed no-charge reports SENT, five known hard bounces, 84 without known hard bounce. This is not proof of delivery/opening.**
