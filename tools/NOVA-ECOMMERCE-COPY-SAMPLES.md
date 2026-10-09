@@ -26,7 +26,7 @@ Keep plans, sketches and daily thoughts together in a journal that opens flat wh
 
 **Title:** 350 ml Insulated Travel Mug — A Simple Sip on the Move
 
-**Description (72 words):**
+**Description (73 words):**
 
 From early train journeys to desk-side coffee breaks, this compact 350 ml travel mug helps make your favourite drink part of the day. Its double-wall stainless-steel body feels sturdy in hand, while the screw-on lid is designed to reduce everyday splashes when you're heading between stops. The clean, handle-free shape is easy to pack with your daily essentials. Hand-wash after use and enjoy a reliable companion for busy mornings, commutes and small adventures.
 
