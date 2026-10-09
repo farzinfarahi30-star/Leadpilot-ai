@@ -1,6 +1,6 @@
 # NOVA 100 Completed Free Services — Auditable Delivery Ledger
 
-Verified unique completed free reviews SENT: **31 / 100** on 2026-10-09. **Remaining: 69.**
+Verified unique completed free reviews SENT: **36 / 100** on 2026-10-09. **Remaining: 64.**
 
 Source of truth: Gmail messages with the `SENT` label, unique customer organizations. Payment pitches and offers to perform work are NOT counted. Delivery is an outbound personalized finished review; receipt/readership and outcome not verified.
 
@@ -39,6 +39,11 @@ Privacy: This public GitHub ledger intentionally omits recipient emails and Gmai
 | 29 | Christmas Shop 24 | [Source](https://community.shopify.com/t/feedback-on-christmasshop24/651751) | Free Christmas Shop 24 checkout and personalization review — following your feedback request | 2026-10-09 |
 | 30 | KandiByKelton | [Source](https://community.shopify.com/t/pre-launch-store-review/600853) | Free KandibyKelton first-visit review — three small shopper clarity fixes | 2026-10-09 |
 | 31 | Arvane Leather | Shopify Community feedback request; exact thread URL not carried forward | Free pre-ad website improvement notes for Arvane Leather (Shopify feedback request) | 2026-10-09 |
+| 32 | Mastermind China | [Source](https://community.shopify.com/t/feedback-requested-cultural-craft-shopify-store-for-ou-kiln-celadon-and-chinese-gifts/657438) | Free Mastermind China Ou Kiln product and category clarity review | 2026-10-09 |
+| 33 | Heativo | [Source](https://community.shopify.com/t/feedback-about-my-store-looking-for-uk-based-tester/660782) | Free Heativo UK landing-page review — no purchase or checkout charge | 2026-10-09 |
+| 34 | Art For Light | [Source](https://community.shopify.com/t/honest-feedback-needed-for-my-first-shopify-jewelry-store/646775) | Free Art For Light jewellery product-detail review from your Shopify feedback request | 2026-10-09 |
+| 35 | Casa Carlini | [Source](https://community.shopify.com/t/store-review-requested-looking-for-feedback-to-improve-conversions-for-my-independent-book-publisher/651401) | Free Casa Carlini book-discovery review from your Shopify feedback request | 2026-10-09 |
+| 36 | Patch&Bagel | [Source](https://community.shopify.com/t/seeking-feedback-on-my-custom-patch-store-targeting-b2b-corporate-clients/653350) | Free Patch&Bagel B2B ordering clarity review following your feedback request | 2026-10-09 |
 
 ## Accounting rules
 
