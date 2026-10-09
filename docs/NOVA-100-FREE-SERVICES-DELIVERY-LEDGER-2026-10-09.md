@@ -1,6 +1,6 @@
 # NOVA 100 Completed Free Services — Auditable Delivery Ledger
 
-Verified unique completed free reviews SENT: **48 / 100** on 2026-10-09. **Remaining: 52.**
+Verified unique completed free reviews SENT: **66 / 100** on 2026-10-09. **Remaining: 34.**
 
 Source of truth: Gmail messages with the `SENT` label, unique customer organizations. Payment pitches and offers to perform work are NOT counted. Delivery is an outbound personalized finished review; receipt/readership and outcome not verified.
 
@@ -55,7 +55,25 @@ Privacy: This public GitHub ledger intentionally omits recipient emails and Gmai
 | 45 | Simple Safety UK | [Source](https://community.shopify.com/t/looking-for-advice-about-my-store/657883) | Free Simple Safety UK category and product-information review from your feedback request | 2026-10-09 |
 | 46 | Taste Culinary Food Services | [Source](https://community.shopify.com/t/store-feedback/613904) | Free Taste Culinary Food Services wholesale homepage clarity review | 2026-10-09 |
 | 47 | Jadeo Studio | [Source](https://community.shopify.com/t/how-can-i-improve-my-new-online-store/591807) | Free Jadeo Studio review — duplicate homepage copy and material-variant clarity | 2026-10-09 |
-| 48 | LoveBox Co | [Source](https://community.shopify.com/t/honest-review/583689) | Free LoveBox Co romantic room-kit shopping clarity review | 2026-10-09 |
+| 48 | Dust & Ember Co | [Source](https://community.shopify.com/t/store-feedback/583937) | Free Dust & Ember Co review — custom order navigation and product proof | 2026-10-09 |
+| 49 | Selenaire | [Source](https://community.shopify.com/t/how-is-my-korean-skincare-website-give-honest-reviews-and-improvements-that-can-be-made/585918) | Free Selenaire skincare homepage and contact trust review | 2026-10-09 |
+| 50 | Dekoras | [Source](https://community.shopify.com/t/suspension-for-misrepresentation-2-months-of-struggling-need-help-reviewing-my-shopify-store/583934) | Bezpłatna analiza strony sklepdekoras.pl — jasność wariantów i dostawy | 2026-10-09 |
+| 51 | GoCozyy | [Source](https://community.shopify.com/t/new-store-needs-feedback/592615) | Free GoCozyy play-blanket review — first-visit product clarity | 2026-10-09 |
+| 52 | decky.net | [Source](https://community.shopify.com/t/honest-feedback-on-my-store-please/578631) | Kostenloses Feedback für decky.net — Steam-Deck-Kompatibilität klarer darstellen | 2026-10-09 |
+| 53 | BattleReady Fightwear | [Source](https://community.shopify.com/t/review-my-store-please/590760) | Free BattleReady Fightwear product and size-path review from your feedback request | 2026-10-09 |
+| 54 | Lokator100 | [Source](https://community.shopify.com/t/store-review/583926) | Kostenloses Lokator100-Feedback — bessere Fotobuch-Navigation und Versandhinweise | 2026-10-09 |
+| 55 | Rari Design | [Source](https://community.shopify.com/t/review-my-store-www-raridesign-com/669157) | Free Rari solid-gold jewellery page review after your Shopify feedback request | 2026-10-09 |
+| 56 | Kaffee Korrekte | [Source](https://community.shopify.com/t/can-you-find-ways-to-improve-my-shop-kaffeekorrekte-de/591849) | Kostenlose Shop-Analyse für Kaffee Korrekte – Sortiment, Mahlgrad, Warenkorb | 2026-10-09 |
+| 57 | RetroDesire | [Source](https://community.shopify.com/t/store-feedback-for-t-shirt-store/585547) | Free RetroDesire homepage review — music-led streetwear sizing and navigation | 2026-10-09 |
+| 58 | Vitorious | [Source](https://community.shopify.com/t/vitorious-health-beauty-start-up/652435) | Free Vitorious herbal-tea homepage review after your Shopify feedback request | 2026-10-09 |
+| 59 | Gigi + Jeremiah | [Source](https://community.shopify.com/t/seeking-feedback-on-store-design/628903) | Free Gigi + Jeremiah homepage review — clearer gift navigation and seasonal choices | 2026-10-09 |
+| 60 | NovaVibe Store | [Source](https://community.shopify.com/t/can-you-please-review/683228) | Free NovaVibe Store pet-product review following your Shopify feedback request | 2026-10-09 |
+| 61 | Crowny Shop | [Source](https://community.shopify.com/t/how-can-i-make-this-small-shopify-merchandise-store-feel-more-complete/644250) | Free Crowny merch shop review — clearer purpose for a deliberately small catalogue | 2026-10-09 |
+| 62 | Aloha Estate Jewelry | [Source](https://community.shopify.com/t/site-review-and-feedback-most-appreciated/592994) | Free Aloha Estate Jewelry site review — estate-piece detail and Honolulu trust | 2026-10-09 |
+| 63 | Timebox | [Source](https://community.shopify.com/t/site-redesign-according-to-suggestions-from-last-post-and-a-big-seo-problem/614729) | Free Timebox digital-frame page QA following your redesign feedback request | 2026-10-09 |
+| 64 | R&D Gadgets Malta | [Source](https://community.shopify.com/t/feedback-online-store/599485) | Free R&D Gadgets Malta product discovery and local delivery feedback | 2026-10-09 |
+| 65 | DiMA | [Source](https://community.shopify.com/t/feedback-please-1-year-of-traffic-but-not-a-single-order/576360) | Free DiMA ecommerce QA — clearer wellness categories and delivery terms | 2026-10-09 |
+| 66 | Hardbook | [Source](https://www.indiehackers.com/post/roast-my-landing-page-booking-tool-for-day-rate-freelancers-3161b2f698) | Free Hardbook founder-requested landing-page critique — trust, demo dates and pricing | 2026-10-09 |
 
 ## Accounting rules
 
@@ -66,9 +84,12 @@ Privacy: This public GitHub ledger intentionally omits recipient emails and Gmai
 - Before counting additional sends, search Gmail Sent, suppressions/opt-outs and verify that the recipient explicitly requested constructive feedback.
 - Sending does not mean the recipient read the content or became a customer; this project target is free-service delivery count.
 
-## Excluded bounced sends (do not count or retry)
 
-- Garlik Goods: Gmail accepted outbound, but subsequently returned **550 5.1.1 nonexistent mailbox** for published support@garlikgoods.de. Not counted toward 100; do not guess alternate recipient.
-- Heativo: Gmail accepted outbound, but subsequently returned **554 5.7.1 relay access denied** for published hello@heativo.co.uk. Not counted toward 100; do not retry without a verified corrected delivery channel.
+## Excluded bounces (do not count / retry)
 
-Audit status as of October 9 earlier checkpoint: **36** completed original reviews were issued via Gmail; **2** delivery failures observed; **34** unique sends with no known bounce. Additional late bounces must be subtracted. Gmail SENT label alone is not proof of delivery or reading.
+- Garlik Goods support@garlikgoods.de: 550 5.1.1 no such user.
+- Heativo hello@heativo.co.uk: 554 5.7.1 relay access denied.
+- LoveBox Co hello@love-box.co: 550 5.1.1 no such user.
+- My Playskool support@myplayskool.com: 550 5.1.0 no such recipient.
+
+On 2026-10-09 Gmail recorded 70 individually personalized finished free service emails SENT, of which four were proven undeliverable. Therefore 66 are unique sent reviews without a known hard bounce. This does not verify opened, read or consumed. No paid offers or mere promises are counted.
