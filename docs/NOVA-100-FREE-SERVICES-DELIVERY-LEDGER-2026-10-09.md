@@ -1,6 +1,6 @@
 # NOVA 1,000 Free Services — Auditable Delivery Ledger (original 100-record file)
 
-Verified unique completed free reviews SENT without known hard bounce: **100 / 1,000** on 2026-10-09. **Remaining: 900.**
+Verified unique completed free reviews SENT without known hard bounce: **103 / 1,000** on 2026-10-09. **Remaining: 897.**
 
 Source of truth: Gmail messages with the `SENT` label, unique customer organizations. Payment pitches and offers to perform work are NOT counted. Delivery is an outbound personalized finished review; receipt/readership and outcome not verified.
 
@@ -108,6 +108,9 @@ Privacy: This public GitHub ledger intentionally omits recipient emails and Gmai
 | 98 | GREIN | [Source](https://community.shopify.com/t/feedback-on-my-new-store/591966) | Free GREIN Reliefboard first-purchase clarity review following your Shopify feedback request | 2026-10-09 |
 | 99 | Ghosthunt | [Source](https://community.shopify.com/t/feedback-on-a-new-store-new-user-experience-etc/551491) | Free Ghosthunt apparel storefront review following your request for honest Shopify feedback | 2026-10-09 |
 | 100 | Big Bud Smoker's Club | [Source](https://community.shopify.com/t/quick-site-review/684318) | Free Big Bud Smoker’s Club homepage and membership flow review from your Shopify feedback request | 2026-10-09 |
+| 101 | Skynolie | [Founder request](https://www.indiehackers.com/post/looking-for-first-buyer-feedback-on-a-9-personalized-star-map-poster-700aa84024) | Free Skynolie buyer-journey review — a few specific next improvements beyond your new print guide | 2026-10-09 |
+| 102 | Wanloria | [Team request](https://dev.to/wanloria/show-dev-free-1-3-day-city-plans-group-trip-voting-what-would-stop-you-from-signing-up-3bep) | Free Wanloria onboarding and route-accuracy review — from your October feedback invitation | 2026-10-09 |
+| 103 | StoreTwin by Shugert | [Founder request](https://www.indiehackers.com/post/i-built-a-visual-twin-of-shopify-stores-to-find-where-customers-get-stuck-qBl2bqI8HbZBZTUcKsqE) | Free StoreTwin public-demo copy and evidence-boundary review after the founder's feedback request | 2026-10-09 |
 
 ## Accounting rules
 
@@ -144,3 +147,9 @@ On 2026-10-09 Gmail recorded 70 individually personalized finished free service 
 ## Corrected user target (9 October 2026)
 
 User clarified the original target was **1,000 completed free services**, not 100. The 100 entries above are a **10% milestone only**, not the finished target. Do not mark the goal complete or stop tracking at 100. **900 more distinct, substantive no-charge service deliverables need to be completed and sent to appropriate willing businesses or requesting contacts**, with bounce and duplicate exclusions and opt-out suppression; never count merely researching a lead, proposing future work, or generating a draft. The previous automatic watch was disabled based on the misunderstood target and should now track the 1,000 goal. Sending still does not prove inbox placement, reading, customer satisfaction or revenue. Respect anti-spam requirements and service relevance.
+
+## Additional 1,000-goal sends on 9 October 2026
+
+- Three new unique, owner-requested, finished free reviews emailed to Skynolie, Wanloria and StoreTwin by Shugert. Gmail accepted all three into Sent, and no new hard-bounce notification had appeared at the reconciliation check. This increases the target count to **103 / 1,000**, with **897 remaining**.
+- The earlier '100 achieved' sections document the **old 100 milestone**, not the final 1,000 goal.
+- Future hard bounces may reduce the count; accepted Sent messages do not establish that the recipients opened or read them.
