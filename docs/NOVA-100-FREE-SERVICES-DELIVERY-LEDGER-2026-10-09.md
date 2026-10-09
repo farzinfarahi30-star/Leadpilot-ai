@@ -1,6 +1,6 @@
-# NOVA 100 Completed Free Services — Auditable Delivery Ledger
+# NOVA 1,000 Free Services — Auditable Delivery Ledger (original 100-record file)
 
-Verified unique completed free reviews SENT: **100 / 100** on 2026-10-09. **Remaining: 0.**
+Verified unique completed free reviews SENT without known hard bounce: **100 / 1,000** on 2026-10-09. **Remaining: 900.**
 
 Source of truth: Gmail messages with the `SENT` label, unique customer organizations. Payment pitches and offers to perform work are NOT counted. Delivery is an outbound personalized finished review; receipt/readership and outcome not verified.
 
@@ -134,9 +134,13 @@ On 2026-10-09 Gmail recorded 70 individually personalized finished free service 
 
 - Wispoak support@wispoak.com: 550 5.1.1 no such user. Excluded from valid count, do not retry.
 
-## Goal verification
+## First 100 milestone verification
 
 - 109 total Gmail messages were sent in the day, including 3 paid outreach pitches (excluded), 106 finished free deliverables and 6 observed hard bounce notifications. Therefore **100 distinct finished free-service reviews SENT with no known hard bounce as of final reconciliation**.
 - 100 unique recipient business emails, 100 unique named companies, no repeats among counted reviews.
 - Actual recipient acknowledgement, inbox placement and whether the owner acted on recommendations remain unverified; any newly arriving hard bounce must reduce the count.
 - Goal is completed SERVICE EMAIL SENDS, not sales, not offers to do work, and not researched leads.
+
+## Corrected user target (9 October 2026)
+
+User clarified the original target was **1,000 completed free services**, not 100. The 100 entries above are a **10% milestone only**, not the finished target. Do not mark the goal complete or stop tracking at 100. **900 more distinct, substantive no-charge service deliverables need to be completed and sent to appropriate willing businesses or requesting contacts**, with bounce and duplicate exclusions and opt-out suppression; never count merely researching a lead, proposing future work, or generating a draft. The previous automatic watch was disabled based on the misunderstood target and should now track the 1,000 goal. Sending still does not prove inbox placement, reading, customer satisfaction or revenue. Respect anti-spam requirements and service relevance.
