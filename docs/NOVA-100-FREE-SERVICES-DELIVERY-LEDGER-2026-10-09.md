@@ -1,6 +1,6 @@
 # NOVA 1,000 Free Services — Auditable Delivery Ledger (original 100-record file)
 
-Verified unique completed free reviews SENT without known hard bounce: **103 / 1,000** on 2026-10-09. **Remaining: 897.**
+Verified unique completed free reviews SENT without known hard bounce: **105 / 1,000** on 2026-10-09. **Remaining: 895.**
 
 Source of truth: Gmail messages with the `SENT` label, unique customer organizations. Payment pitches and offers to perform work are NOT counted. Delivery is an outbound personalized finished review; receipt/readership and outcome not verified.
 
@@ -111,6 +111,8 @@ Privacy: This public GitHub ledger intentionally omits recipient emails and Gmai
 | 101 | Skynolie | [Founder request](https://www.indiehackers.com/post/looking-for-first-buyer-feedback-on-a-9-personalized-star-map-poster-700aa84024) | Free Skynolie buyer-journey review — a few specific next improvements beyond your new print guide | 2026-10-09 |
 | 102 | Wanloria | [Team request](https://dev.to/wanloria/show-dev-free-1-3-day-city-plans-group-trip-voting-what-would-stop-you-from-signing-up-3bep) | Free Wanloria onboarding and route-accuracy review — from your October feedback invitation | 2026-10-09 |
 | 103 | StoreTwin by Shugert | [Founder request](https://www.indiehackers.com/post/i-built-a-visual-twin-of-shopify-stores-to-find-where-customers-get-stuck-qBl2bqI8HbZBZTUcKsqE) | Free StoreTwin public-demo copy and evidence-boundary review after the founder's feedback request | 2026-10-09 |
+| 104 | Island Canvas by KR | [Owner requested feedback](https://community.shopify.com/t/looking-for-feedback/600824) | Free Island Canvas by KR print-size and gift-route review from your store feedback request | 2026-10-09 |
+| 105 | Mond Products | [Owner requested feedback](https://community.shopify.com/t/store-review-please/578010) | Free Mond Luminous Repair Masque product-page and seasonal-offer QA from your shop review | 2026-10-09 |
 
 ## Accounting rules
 
@@ -153,3 +155,9 @@ User clarified the original target was **1,000 completed free services**, not 10
 - Three new unique, owner-requested, finished free reviews emailed to Skynolie, Wanloria and StoreTwin by Shugert. Gmail accepted all three into Sent, and no new hard-bounce notification had appeared at the reconciliation check. This increases the target count to **103 / 1,000**, with **897 remaining**.
 - The earlier '100 achieved' sections document the **old 100 milestone**, not the final 1,000 goal.
 - Future hard bounces may reduce the count; accepted Sent messages do not establish that the recipients opened or read them.
+
+## Additional verified updates October 9
+
+- Island Canvas by KR and Mond Products: two distinct personalised, finished, no-cost service reviews actually sent, Gmail message IDs kept private in Gmail Sent. No additional known delivery-failure notice at reconciliation; progress is **105 / 1,000** (895 remaining).
+- Luna Nova message attempt was blocked by sending safety checks, NOT sent and NOT counted. Do not bypass or retry the blocked send.
+- Background automation is hourly/conditional rather than continuously executing between runs. The count changes only after verifiable work is sent, never from prospects, drafts or attempted but blocked sends.
