@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="960" viewBox="0 0 1440 960"><title>NOVA CV formatting - fictional before and after demonstration</title>
+<rect width="1440" height="960" fill="#f0f3f7"/><rect width="1440" height="134" fill="#122439"/>
+<style>
+text{font-family:Arial,Helvetica,sans-serif;fill:#14263e}
+.head{font-weight:800;font-size:39px;fill:#fff;letter-spacing:.6px}
+.sub{font-size:19px;fill:#d4e1ed}
+.pill{font-weight:bold;font-size:24px;fill:#fff}
+.body{font-size:17px}
+.muted{font-size:15px;fill:#5a7087}
+.section{font-size:20px;font-weight:bold;fill:#187dbb}
+.name{font-size:39px;font-weight:bold}
+.role{font-size:18px;font-weight:bold;fill:#187dbb}
+.job{font-size:17px;font-weight:bold}
+.foot{font-size:16px;fill:#273951}
+.note{font-size:15px;fill:#4f6985}
+</style>
+<text x="54" y="66" class="head">CV FORMATTING | BEFORE &amp; AFTER</text>
+<text x="55" y="105" class="sub">Fictional example  •  Identical information, stronger presentation</text>
+<rect x="45" y="165" width="650" height="690" rx="20" fill="white"/><rect x="745" y="165" width="650" height="690" rx="20" fill="white"/><rect x="65" y="184" width="610" height="55" rx="10" fill="#c45c54"/><rect x="765" y="184" width="610" height="55" rx="10" fill="#24a4a6"/>
+<text x="230" y="220" class="pill">BEFORE - cluttered</text>
+<text x="942" y="220" class="pill">AFTER - clear</text>
+<text x="90" y="288" class="body">Alex Morgan    customer support specialist</text>
+<text x="90" y="317" class="muted">Manchester  |  alex.morgan@example.com  |  07123 000 000</text>
+<text x="90" y="373" class="body">PROFILE - Customer support specialist with 4 years of experience.</text>
+<text x="90" y="405" class="body">Handles 45 customer cases daily. Uses Zendesk and Excel.</text>
+<text x="90" y="455" class="body">Experience - Service Desk Associate - Beacon Retail - 2022-2026</text>
+<text x="90" y="488" class="body">Responded to enquiries via email, chat, and phone.</text>
+<text x="90" y="521" class="body">Handled approximately 45 cases each day. Recorded actions</text>
+<text x="90" y="554" class="body">in Zendesk. Updated weekly reports in Excel.</text>
+<text x="90" y="616" class="body">Education: Business Administration Diploma - 2021</text>
+<text x="90" y="657" class="body">Skills: Customer service Zendesk Excel email support</text>
+<text x="90" y="687" class="body">Phone support complaint resolution weekly reporting</text>
+<rect x="80" y="734" width="580" height="94" rx="12" fill="#fbece9"/>
+<text x="96" y="761" class="job">WHY IT'S HARDER TO SCAN</text>
+<text x="96" y="790" class="muted">Weak section hierarchy • dense text</text>
+<text x="96" y="816" class="muted">Uneven spacing • skills run together</text>
+<text x="785" y="312" class="name">ALEX MORGAN</text>
+<text x="785" y="343" class="role">CUSTOMER SUPPORT SPECIALIST</text>
+<text x="785" y="376" class="muted">Manchester  |  alex.morgan@example.com  |  07123 000 000</text>
+<line x1="785" y1="399" x2="1355" y2="399" stroke="#ccdae8" stroke-width="2"/>
+<text x="785" y="444" class="section">PROFILE</text>
+<text x="785" y="472" class="body">Customer support specialist with 4 years of experience.</text>
+<text x="785" y="495" class="body">Handles 45 customer cases daily. Uses Zendesk and Excel.</text>
+<text x="785" y="543" class="section">EXPERIENCE</text>
+<text x="785" y="572" class="job">Service Desk Associate | Beacon Retail | 2022-2026</text>
+<text x="805" y="601" class="body">• Responded to customer enquiries via email, chat, and phone.</text>
+<text x="805" y="628" class="body">• Handled approximately 45 cases each day.</text>
+<text x="805" y="655" class="body">• Recorded actions in Zendesk and updated Excel reports.</text>
+<text x="785" y="703" class="section">EDUCATION</text>
+<text x="785" y="731" class="body">Business Administration Diploma | 2021</text>
+<text x="785" y="778" class="section">SKILLS</text>
+<text x="785" y="806" class="body">Customer service • Zendesk • Excel • Email and phone support</text>
+<text x="785" y="829" class="body">Complaint resolution • Weekly reporting</text>
+<text x="54" y="897" class="foot">£19 fixed price • Up to 4 pages • One revision • Word + PDF • Deadline agreed before payment</text>
+<text x="54" y="928" class="note">All names, employer and personal details are fictional. Formatting does not guarantee interviews or employment.</text>
+</svg>
