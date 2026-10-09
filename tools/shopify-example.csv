@@ -1,0 +1,4 @@
+URL handle,Title,SKU,Price,Status,Product image URL,Option1 name,Option1 value,SEO title
+sample-notebook,Example Notebook,NOTE-001,12.99,draft,https://example.com/note.jpg,Size,A5,Example Notebook – A5
+sample-hoodie,Example Hoodie,HOODIE-M,34.95,draft,https://example.com/hoodie.jpg,Size,M,Example Hoodie
+sample-hoodie,,HOODIE-L,34.95,draft,,Size,L,
