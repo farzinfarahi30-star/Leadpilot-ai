@@ -1,6 +1,6 @@
 # NOVA 100 Completed Free Services — Auditable Delivery Ledger
 
-Verified unique completed free reviews SENT: **34 / 100** on 2026-10-09. **Remaining: 66.**
+Verified unique completed free reviews SENT: **48 / 100** on 2026-10-09. **Remaining: 52.**
 
 Source of truth: Gmail messages with the `SENT` label, unique customer organizations. Payment pitches and offers to perform work are NOT counted. Delivery is an outbound personalized finished review; receipt/readership and outcome not verified.
 
@@ -42,6 +42,20 @@ Privacy: This public GitHub ledger intentionally omits recipient emails and Gmai
 | 32 | Art For Light | [Source](https://community.shopify.com/t/honest-feedback-needed-for-my-first-shopify-jewelry-store/646775) | Free Art For Light jewellery product-detail review from your Shopify feedback request | 2026-10-09 |
 | 33 | Casa Carlini | [Source](https://community.shopify.com/t/store-review-requested-looking-for-feedback-to-improve-conversions-for-my-independent-book-publisher/651401) | Free Casa Carlini book-discovery review from your Shopify feedback request | 2026-10-09 |
 | 34 | Patch&Bagel | [Source](https://community.shopify.com/t/seeking-feedback-on-my-custom-patch-store-targeting-b2b-corporate-clients/653350) | Free Patch&Bagel B2B ordering clarity review following your feedback request | 2026-10-09 |
+| 35 | Lylo Watch Co | [Source](https://community.shopify.com/t/i-need-honest-feedback-on-my-brand-store/646492) | Free Lylo Watch Co review: watch-versus-jewellery navigation and delivery detail | 2026-10-09 |
+| 36 | Alia’s Vinyl Frontier | [Source](https://community.shopify.com/t/store-feedback/660721) | Free Alia’s Vinyl Frontier homepage QA — two live placeholders and navigation fix | 2026-10-09 |
+| 37 | The Silver Nutmeg | [Source](https://community.shopify.com/t/new-store-feedback-please/600888) | Free Silver Nutmeg store critique — make IOD supplies obvious to new visitors | 2026-10-09 |
+| 38 | Chagrin River Outfitters | [Source](https://community.shopify.com/t/provide-feedback-please/629933) | Free Chagrin River Outfitters navigation and product clarity review | 2026-10-09 |
+| 39 | Luca Di Raffaello | [Source](https://community.shopify.com/t/luca-di-raffaello-modern-fine-pearl-jewellery/637591) | Free Luca Di Raffaello studio review — pearl product detail and return clarity | 2026-10-09 |
+| 40 | Vintage French Treasures | [Source](https://community.shopify.com/t/new-store-would-value-some-critique/638892) | Free Vintage French Treasures product-page and provenance review | 2026-10-09 |
+| 41 | Desi Gentleman | [Source](https://community.shopify.com/t/please-rate-my-store-and-tell-me-how-to-get-more-sales/628208) | Free Desi Gentleman homepage and fit-info review following your Shopify feedback request | 2026-10-09 |
+| 42 | Ik drink op Oranje! | [Source](https://community.shopify.com/t/feedback-on-my-first-shopify-store-launch/629134) | Gratis feedback voor Ik drink op Oranje! — voorraad en productduidelijkheid | 2026-10-09 |
+| 43 | Snoozybaby | [Source](https://community.shopify.com/t/looking-for-store-feedback-from-mums-or-mums-to-be/599098) | Free Snoozybaby storefront clarity check from your Shopify review request | 2026-10-09 |
+| 44 | ALTEX Apparel | [Source](https://community.shopify.com/t/store-feedback-for-clothing-store/614761) | Free ALTEX Apparel storefront review — outdated drop banner and trust clarity | 2026-10-09 |
+| 45 | Simple Safety UK | [Source](https://community.shopify.com/t/looking-for-advice-about-my-store/657883) | Free Simple Safety UK category and product-information review from your feedback request | 2026-10-09 |
+| 46 | Taste Culinary Food Services | [Source](https://community.shopify.com/t/store-feedback/613904) | Free Taste Culinary Food Services wholesale homepage clarity review | 2026-10-09 |
+| 47 | Jadeo Studio | [Source](https://community.shopify.com/t/how-can-i-improve-my-new-online-store/591807) | Free Jadeo Studio review — duplicate homepage copy and material-variant clarity | 2026-10-09 |
+| 48 | LoveBox Co | [Source](https://community.shopify.com/t/honest-review/583689) | Free LoveBox Co romantic room-kit shopping clarity review | 2026-10-09 |
 
 ## Accounting rules
 
@@ -57,4 +71,4 @@ Privacy: This public GitHub ledger intentionally omits recipient emails and Gmai
 - Garlik Goods: Gmail accepted outbound, but subsequently returned **550 5.1.1 nonexistent mailbox** for published support@garlikgoods.de. Not counted toward 100; do not guess alternate recipient.
 - Heativo: Gmail accepted outbound, but subsequently returned **554 5.7.1 relay access denied** for published hello@heativo.co.uk. Not counted toward 100; do not retry without a verified corrected delivery channel.
 
-Audit status as of October 9: **36** completed original reviews were issued via Gmail; **2** delivery failures observed; **34** unique sends with no known bounce. Additional late bounces must be subtracted. Gmail SENT label alone is not proof of delivery or reading.
+Audit status as of October 9 earlier checkpoint: **36** completed original reviews were issued via Gmail; **2** delivery failures observed; **34** unique sends with no known bounce. Additional late bounces must be subtracted. Gmail SENT label alone is not proof of delivery or reading.
