@@ -1,0 +1,24 @@
+diff --git a/prisma/schema.prisma b/prisma/schema.prisma
+--- a/prisma/schema.prisma
++++ b/prisma/schema.prisma
+@@ -84,4 +84,6 @@ model PaymentRequest {
+   recipient         String
+   asset             AssetCode
++  // Enforced in PostgreSQL migration 20261010150100_positive_amount_check:
++  // CONSTRAINT payment_requests_amount_positive_check CHECK (amount > 0)
+   amount            Decimal              @db.Decimal(20, 7)
+   memo              String?              @db.VarChar(280)
+@@ -108,4 +110,6 @@ model Payment {
+   senderPublicKey  String
+   asset            AssetCode
++  // Enforced in PostgreSQL migration 20261010150100_positive_amount_check:
++  // CONSTRAINT payments_amount_positive_check CHECK (amount > 0)
+   amount           Decimal       @db.Decimal(20, 7)
+   status           PaymentStatus @default(CREATED)
+@@ -138,4 +142,6 @@ model Transaction {
+   counterparty  String
+   asset         AssetCode
++  // Enforced in PostgreSQL migration 20261010150100_positive_amount_check:
++  // CONSTRAINT transactions_amount_positive_check CHECK (amount > 0)
+   amount        Decimal              @db.Decimal(20, 7)
+   memo          String?              @db.VarChar(280)
