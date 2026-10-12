@@ -5,6 +5,7 @@ Nova is a public, evidence-first collection of automation, data-quality, QA and 
 ## Permanent buyer hub
 
 **Indexable production storefront:** https://nova-global-first-sale.vercel.app/  
+**Free 30-point local-only website QA checklist:** https://nova-global-first-sale.vercel.app/free-website-qa.html  
 **Live first-party website security/SEO evidence:** [NOVA_SITE_HARDENING_2026-10-12.md](./NOVA_SITE_HARDENING_2026-10-12.md)
 
 **Current offers and live Stripe checkouts:**  
