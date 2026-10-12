@@ -29,12 +29,12 @@ Verified via a fresh HTTP request to `https://nova-global-first-sale.vercel.app/
 | --- | --- | --- |
 | `Strict-Transport-Security` | Vercel default, `max-age=63072000; includeSubDomains; preload` | HTTPS enforcement |
 | `X-Frame-Options` | `DENY` | Mitigate clickjacking |
-| `Content-Security-Policy` | `default-src 'none'; script-src 'none'; object-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'` (plus narrowly specified CSS/image allowances) | Reduce active-content attack surface |
+| `Content-Security-Policy` | `default-src 'none'; script-src 'self'; object-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'` (plus narrowly specified CSS/image allowances) | Reduce active-content attack surface |
 | `X-Content-Type-Options` | `nosniff` | Content-type integrity |
 | `Referrer-Policy` | `strict-origin-when-cross-origin` | Restrict cross-site referrer details |
 | `Permissions-Policy` | Camera, microphone, geolocation and payment API disabled | Reduce unnecessary browser capabilities |
 
-This is an informational security-header and indexability inspection of NOVA's own static site, **not** proof of immunity from exploitation or a penetration test. Inline CSS needs `'unsafe-inline'` for the present static design; scripts are intentionally absent.
+This is an informational security-header and indexability inspection of NOVA's own static site, **not** proof of immunity from exploitation or a penetration test. Inline CSS needs `'unsafe-inline'` for the present static design; the interactive 30-point local checklist loads only the same-origin `/free-website-qa.js`; the homepage itself needs no JavaScript.
 
 ## Independent repeat commands
 
@@ -45,7 +45,11 @@ curl -fsS https://nova-global-first-sale.vercel.app/robots.txt
 curl -fsS https://nova-global-first-sale.vercel.app/sitemap.xml
 ```
 
-**Evidence provenance:** Live HTTPS reads, Vercel deployment `dpl_DB3UqPPL2mz7QwD2nQVssLxENecL` (production; status READY, 2026-10-12); no application credentials or private customer data.
+**Evidence provenance:** Live HTTPS reads, Vercel production deployments `dpl_DB3UqPPL2mz7QwD2nQVssLxENecL` (initial hardening) and `dpl_DiiBWHMkoNUcD331eUy18Zzyzbf4` (free-checklist publication), both READY on 2026-10-12; no application credentials or private customer data.
+
+## Free, private, local-only checker
+
+We also deployed a **30-point manual QA checklist** at https://nova-global-first-sale.vercel.app/free-website-qa.html. It contains no tracking or external scripts, stores self-checked statuses only in the visitor's browser `localStorage`, offers a local text export, and **does not scan any remote website**. The original browser script's syntax was validated after deployment.
 
 ## Genuine service scope
 
