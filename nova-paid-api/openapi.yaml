@@ -1,0 +1,36 @@
+openapi: 3.0.3
+info:
+  title: Nova Website Audit API
+  version: 1.0.0
+  description: Technical and conversion-signal website audit.
+servers:
+  - url: https://YOUR_PUBLIC_HOST
+paths:
+  /health:
+    get:
+      summary: Health check
+      responses:
+        "200": { description: OK }
+  /api/preview:
+    get:
+      summary: Free compact audit preview
+      parameters:
+        - in: query
+          name: url
+          required: true
+          schema: { type: string, format: uri }
+      responses:
+        "200": { description: Preview result }
+        "400": { description: Invalid or blocked URL }
+  /api/audit:
+    get:
+      summary: Full paid website audit
+      parameters:
+        - in: query
+          name: url
+          required: true
+          schema: { type: string, format: uri }
+      responses:
+        "200": { description: Full audit JSON }
+        "402": { description: Payment required in x402 mode }
+        "400": { description: Invalid or blocked URL }
