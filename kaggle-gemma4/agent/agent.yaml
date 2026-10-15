@@ -1,0 +1,15 @@
+name: nova_repository_fixer
+model: gemma-4-31b-it-qat-w4a16-ct
+instruction: !include prompts/system.md
+tools:
+  - run_command
+  - read_file
+  - edit_file
+  - write_file
+  - get_status
+  - submit_patch
+generate_content_config:
+  temperature: 0.15
+  max_output_tokens: 8192
+  thinking_config:
+    include_thoughts: false
