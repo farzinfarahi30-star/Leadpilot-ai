@@ -132,7 +132,7 @@ def jobbi_candidates(payload: Any, now: dt.datetime) -> list[Candidate]:
             continue
         if meta.get('payout_grade') not in ('A', 'A-', 'B', 'B-', 'C+', 'C'):
             continue
-        if meta.get('source') not in ('bountyhub', 'algora', 'frantic', 'agentbounties'):
+        if meta.get('source') not in ('bountyhub', 'algora', 'frantic'):
             continue
         reward = meta.get('reward') or {}
         if not isinstance(reward, dict):
