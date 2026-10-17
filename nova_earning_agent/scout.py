@@ -16,6 +16,7 @@ from typing import Any
 TASKMARKET = 'https://api.taskmarket.dev/api/tasks?status=open&limit=50'
 RINER = 'https://api.riner.io/api/v1/tasks?limit=50'
 TASK_BOUNTY = 'https://www.task-bounty.com/api/v1/tasks'
+JOBBI = 'https://jobbi.org/gigs.json?lane=agent&min_reward=20&limit=150'
 BLOCKED = re.compile(
     r'\b(?:promotion|promote|viral|followers|likes|bot accounts|referral|invest|'
     r'token launch|buy tokens|fake|spam|impersonat|post on|publications|twitter|'
@@ -112,12 +113,68 @@ def riner_candidates(payload: Any, now: dt.datetime) -> list[Candidate]:
     return found
 
 
+def jobbi_candidates(payload: Any, now: dt.datetime) -> list[Candidate]:
+    """Conservatively shortlist recent escrow-listed programming bounties.
+    Source is a third-party index; each listing needs primary-source verification.
+    """
+    if not isinstance(payload, dict) or not isinstance(payload.get('items'), list):
+        raise ValueError('Unrecognized Jobbi JSON Feed: cannot infer zero tasks')
+    found: list[Candidate] = []
+    for item in payload['items']:
+        if not isinstance(item, dict):
+            continue
+        meta = item.get('_jobbi', {})
+        if not isinstance(meta, dict):
+            continue
+        if meta.get('lane') != 'agent' or meta.get('claims_open') is not True:
+            continue
+        if meta.get('payment_state') != 'escrowed':
+            continue
+        if meta.get('payout_grade') not in ('A', 'A-', 'B', 'B-', 'C+', 'C'):
+            continue
+        if meta.get('source') not in ('bountyhub', 'algora', 'frantic', 'agentbounties'):
+            continue
+        reward = meta.get('reward') or {}
+        if not isinstance(reward, dict):
+            continue
+        if reward.get('currency') not in ('USD', 'USDC'):
+            continue
+        amount = float(reward.get('amount') or 0)
+        if amount < 20 or amount > 3000:
+            continue
+        link = str(item.get('url') or '')
+        if not link.startswith('https://'):
+            continue
+        published = str(item.get('date_published') or '')
+        modified = str(item.get('date_modified') or '')
+        pub_age = -future_hours(published, now)
+        mod_age = -future_hours(modified, now)
+        if not (0 <= pub_age <= 24 * 30 and 0 <= mod_age <= 24 * 14):
+            continue
+        title = str(item.get('title') or '')
+        description = str(item.get('content_text') or '')
+        if BLOCKED.search(title + ' ' + description):
+            continue
+        evidence = (
+            'Third-party Jobbi index labels this escrowed, not independently confirmed. '
+            f'Source={meta.get("source")} grade={meta.get("payout_grade")}; '
+            'verify issue state, funder, escrow, assignment, open claims, '
+            'competing PRs, and exact payout eligibility before beginning.'
+        )
+        found.append(Candidate(
+            str(meta['source']), str(item.get('id') or link), amount,
+            (title + ': ' + description)[:350], link,
+            str(meta.get('expires') or 'unspecified'), evidence))
+    return found
+
+
 def scan(now: dt.datetime | None = None, fetch=fetch_json) -> dict:
     now = now or dt.datetime.now(dt.timezone.utc)
     feeds = [
         ('taskmarket', TASKMARKET, taskmarket_candidates),
         ('riner', RINER, riner_candidates),
         ('task_bounty', TASK_BOUNTY, None),
+        ('jobbi', JOBBI, jobbi_candidates),
     ]
     results: list[Candidate] = []
     errors: dict[str, str] = {}
@@ -129,6 +186,12 @@ def scan(now: dt.datetime | None = None, fetch=fetch_json) -> dict:
                 if not isinstance(data, dict) or not isinstance(data.get('data'), list):
                     raise ValueError('Unrecognized task-bounty feed')
                 counts[name] = len(data['data'])
+                continue
+            if name == 'jobbi':
+                if not isinstance(data, dict) or not isinstance(data.get('items'), list):
+                    raise ValueError('Unrecognized Jobbi feed')
+                counts[name] = len(data['items'])
+                results += parse(data, now)
                 continue
             if not isinstance(data, dict) or not isinstance(data.get('tasks'), list):
                 raise ValueError('Unrecognized task feed')
