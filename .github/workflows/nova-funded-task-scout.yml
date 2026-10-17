@@ -1,5 +1,9 @@
 name: NOVA read-only funded task scout
 on:
+  push:
+    paths:
+      - 'nova_earning_agent/**'
+      - '.github/workflows/nova-funded-task-scout.yml'
   schedule:
     - cron: '23 */6 * * *'
   workflow_dispatch:
