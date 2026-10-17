@@ -60,13 +60,53 @@ class ScoutTests(unittest.TestCase):
             raise OSError('offline')
         result = scout.scan(NOW, fetch=fail)
         self.assertEqual(result['state'], 'partial')
-        self.assertEqual(len(result['feed_errors']), 3)
+        self.assertEqual(len(result['feed_errors']), 4)
+
+    def jobbi_item(self, **changes):
+        meta = {
+            'lane': 'agent', 'claims_open': True, 'payment_state': 'escrowed',
+            'payout_grade': 'B', 'source': 'bountyhub',
+            'reward': {'amount': 100, 'currency': 'USD', 'rail': 'stripe'},
+            'expires': None,
+        }
+        item = {
+            'id': 'bountyhub:open-issue-1', 'url': 'https://github.com/org/repo/issues/12',
+            'title': 'Fix tested TypeScript parser', 'content_text': 'Build a parser and tests',
+            'date_published': '2026-10-16T12:00:00Z',
+            'date_modified': '2026-10-17T19:00:00Z',
+            '_jobbi': meta,
+        }
+        for k, v in changes.items():
+            if k.startswith('meta_'):
+                meta[k[5:]] = v
+            else:
+                item[k] = v
+        return item
+
+    def test_jobbi_recent_escrow_listing_is_review_candidate_not_income(self):
+        candidates = scout.jobbi_candidates({'items': [self.jobbi_item()]}, NOW)
+        self.assertEqual(len(candidates), 1)
+        self.assertIn('not independently confirmed', candidates[0].evidence)
+
+    def test_jobbi_rejects_promises_and_old_issues(self):
+        promised = self.jobbi_item(meta_payment_state='promised')
+        stale = self.jobbi_item(date_published='2025-12-01T12:00:00Z')
+        bonds = self.jobbi_item(content_text='Pay a bond before coding')
+        self.assertEqual(scout.jobbi_candidates(
+            {'items': [promised, stale, bonds]}, NOW), [])
+
+    def test_jobbi_rejects_unrecognized_feed_and_deceptive_tasks(self):
+        with self.assertRaises(ValueError):
+            scout.jobbi_candidates({}, NOW)
+        bad = self.jobbi_item(title='Promote token airdrop')
+        self.assertEqual(scout.jobbi_candidates({'items': [bad]}, NOW), [])
 
     def test_no_leads_does_not_trigger_work(self):
         fixtures = {
             scout.TASKMARKET: {'tasks': [self.task(submissionCount=31)]},
             scout.RINER: {'tasks': []},
-            scout.TASK_BOUNTY: {'data': []}
+            scout.TASK_BOUNTY: {'data': []},
+            scout.JOBBI: {'items': []}
         }
         result = scout.scan(NOW, fetch=lambda url: fixtures[url])
         self.assertEqual(result['state'], 'complete')
