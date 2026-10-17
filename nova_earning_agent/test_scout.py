@@ -95,6 +95,10 @@ class ScoutTests(unittest.TestCase):
         self.assertEqual(scout.jobbi_candidates(
             {'items': [promised, stale, bonds]}, NOW), [])
 
+    def test_jobbi_agentbounties_requires_upfront_claim_bond_and_is_excluded(self):
+        task = self.jobbi_item(meta_source='agentbounties')
+        self.assertEqual(scout.jobbi_candidates({'items': [task]}, NOW), [])
+
     def test_jobbi_rejects_unrecognized_feed_and_deceptive_tasks(self):
         with self.assertRaises(ValueError):
             scout.jobbi_candidates({}, NOW)
