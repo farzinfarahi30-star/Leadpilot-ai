@@ -1,0 +1,35 @@
+name: NOVA read-only funded task scout
+on:
+  schedule:
+    - cron: '23 */6 * * *'
+  workflow_dispatch:
+permissions:
+  contents: read
+  issues: write
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate candidate screening rules
+        run: python -m unittest discover -v -s nova_earning_agent -p 'test_*.py'
+      - name: Read public task feeds; never apply or pay
+        run: python nova_earning_agent/scout.py
+      - name: Save candidate evidence (not payment evidence)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: public-task-candidates
+          path: reports/public-paid-task-scout.json
+          if-no-files-found: ignore
+          retention-days: 5
+      - name: Open deduplicated review issue only for viable new leads
+        if: success()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPOSITORY: ${{ github.repository }}
+        run: python nova_earning_agent/notify.py
