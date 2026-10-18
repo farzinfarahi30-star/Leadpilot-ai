@@ -37,7 +37,7 @@ This package is intentionally email-only. No advertising, calendar, CRM, browser
 
 Approved ordinary sends through `sendEmail` and the `mail_send` tool now check the Gmail account's **latest sent and incoming message** for the recipient immediately before sending. A message is blocked when:
 
-- the recipient has a Gmail label indicating a decline, opt-out, or outreach hold (for example, `NOVA / Declined - do not pitch` or `NOVA / Pause outreach - awaiting reply`);
+- any matching Gmail message, including older conversation history, carries a label indicating a decline, opt-out, or outreach hold (for example, `NOVA / Declined - do not pitch`, `Cold Outreach / Do Not Contact`, or `NOVA / Pause outreach - awaiting reply`);
 - there was an outbound message within the preceding seven days and no newer inbound reply;
 - the message has multiple or invalid recipients, or a simultaneous send to the same recipient is in progress within this Node process;
 - Gmail history/label verification is unavailable. This fails closed without retrying on an alternate transport.
@@ -48,4 +48,4 @@ All non-transactional sends, including sends through Resend or Outlook, require 
 
 These protections apply **only to Nova Mail code paths**. They do not intercept direct sends from Gmail, ChatGPT connectors, external automations, other Gmail accounts, or separate running Nova Mail processes. Concurrent sends across processes can still race; a shared durable lock would be needed for stronger multi-process guarantees. A 7-day cooldown is not permission to contact a recipient who opted out; keep decline labels in place. The history scan is read-only and does not guarantee deliverability or buyer interest.
 
-Offline regression tests: `node --test src/outreach-guard.test.mjs` (synthetic Gmail fixtures; no emails are sent).
+Offline regression tests: `node --test src/outreach-guard.test.mjs` (10 synthetic checks verified on Node.js 22; no emails sent). Searches of historic labelled messages increase Gmail API reads per attempted send.
