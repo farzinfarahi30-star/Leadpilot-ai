@@ -81,9 +81,25 @@ async function outlook(endpoint,options){
   return data;
 }
 
+function mimeHeader(value){
+  const text=String(value ?? '');
+  // Never allow a caller-supplied header to inject additional MIME fields.
+  if(/[\r\n\u0000]/.test(text))throw new Error('Invalid email header value: CR, LF and NUL are not allowed');
+  return text.trim();
+}
+
 function mime(input){
-  const lines=['From: '+input.from,'To: '+input.to,input.cc?'Cc: '+input.cc:null,input.bcc?'Bcc: '+input.bcc:null,'Subject: '+input.subject,'MIME-Version: 1.0','Content-Type: text/plain; charset=UTF-8','',input.text].filter(Boolean);
-  return lines.join('\r\n');
+  const headers=[
+    'From: '+mimeHeader(input.from),
+    'To: '+mimeHeader(input.to),
+    input.cc?'Cc: '+mimeHeader(input.cc):null,
+    input.bcc?'Bcc: '+mimeHeader(input.bcc):null,
+    'Subject: '+mimeHeader(input.subject),
+    'MIME-Version: 1.0',
+    'Content-Type: text/plain; charset=UTF-8'
+  ].filter(Boolean);
+  // Exactly one empty line must separate RFC 5322 headers and the body.
+  return headers.join('\r\n')+'\r\n\r\n'+String(input.text ?? '');
 }
 
 export async function sendEmail(input){
