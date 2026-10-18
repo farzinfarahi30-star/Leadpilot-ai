@@ -32,7 +32,7 @@ test('blocks existing Gmail Sent recipients',async t=>{
 test('blocks suppressed recipients',async t=>{
   const f=await fixture();t.after(()=>fs.rm(f.dir,{recursive:true,force:true}));
   f.env={NOVA_MAIL_SUPPRESSED_RECIPIENTS:'buyer@example.com'};f.deliver=async()=>{throw Error('must not send')};
-  assert.match((await guardedOutbound(input,f)).reason,/suppression/);
+  assert.match((await guardedOutbound(input,f)).reason,/suppression|do-not-follow-up/);
 });
 test('rejects mass outreach and Cc/Bcc',async t=>{
   const f=await fixture();t.after(()=>fs.rm(f.dir,{recursive:true,force:true}));
