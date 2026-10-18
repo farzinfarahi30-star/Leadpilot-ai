@@ -31,3 +31,21 @@ Actual sending requires approved=true inside the mail service. A draft, database
 ## Scope
 
 This package is intentionally email-only. No advertising, calendar, CRM, browser automation, business generation, or other product logic belongs here.
+
+
+## Anti-duplicate outbound preflight (Gmail-backed)
+
+Approved ordinary sends through `sendEmail` and the `mail_send` tool now check the Gmail account's **latest sent and incoming message** for the recipient immediately before sending. A message is blocked when:
+
+- the recipient has a Gmail label indicating a decline, opt-out, or outreach hold (for example, `NOVA / Declined - do not pitch` or `NOVA / Pause outreach - awaiting reply`);
+- there was an outbound message within the preceding seven days and no newer inbound reply;
+- the message has multiple or invalid recipients, or a simultaneous send to the same recipient is in progress within this Node process;
+- Gmail history/label verification is unavailable. This fails closed without retrying on an alternate transport.
+
+One-to-one verified replies after new inbound messages are permitted unless a hold label remains. To resume a held conversation, review the entire thread and remove its hold label only when appropriate. **Never interpret a friendly acknowledgement as consent to repeated sales pitches.**
+
+All non-transactional sends, including sends through Resend or Outlook, require valid Gmail read credentials for this history preflight. Only **trusted internal code** may deliberately pass `purpose:'transactional'` for legitimate receipts and non-marketing service messages; the MCP tool does not expose this override. Explicit `approved:true` is still always required.
+
+These protections apply **only to Nova Mail code paths**. They do not intercept direct sends from Gmail, ChatGPT connectors, external automations, other Gmail accounts, or separate running Nova Mail processes. Concurrent sends across processes can still race; a shared durable lock would be needed for stronger multi-process guarantees. A 7-day cooldown is not permission to contact a recipient who opted out; keep decline labels in place. The history scan is read-only and does not guarantee deliverability or buyer interest.
+
+Offline regression tests: `node --test src/outreach-guard.test.mjs` (synthetic Gmail fixtures; no emails are sent).
