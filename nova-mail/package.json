@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node src/mcp-server.mjs",
     "smoke": "node src/smoke.mjs",
-    "test": "node --test test/*.test.mjs"
+    "test": "node --test test/*.test.mjs",
+    "smoke:outreach": "node src/outreach-guard-smoke.mjs"
   },
   "dependencies": {
     "@modelcontextprotocol/server": "2.0.0",
