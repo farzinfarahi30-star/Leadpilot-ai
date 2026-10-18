@@ -125,6 +125,9 @@ export async function guardedOutbound(input, {findRecentSent, deliver, ledgerFil
   catch { result = blocked('Provider result uncertain; review sent mail before any retry'); }
   const delivered = result?.sent === true;
   // If provider outcome is ambiguous, preserve the hold even if updating fails.
+  // Clear the FIRST lock's release callback before acquiring another lock;
+  // otherwise a failed second acquisition could unlink another worker's lock.
+  release = null;
   try {
     release = await lock(`${ledger}.lock`);
     const entries = await readJson(ledger, []);
