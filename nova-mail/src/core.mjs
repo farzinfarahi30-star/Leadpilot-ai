@@ -1,5 +1,6 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import {outreachRecipients, reserveOutreachRecipients, preflightOutreach} from './outreach-guard.mjs';
 
 const MAX_BODY=200000;
 const clean=function(v){return String(v==null?'':v).replace(/[\u0000-\u001f]+/g,' ').trim();};
@@ -91,6 +92,25 @@ export async function sendEmail(input){
   if(!input.to||!input.subject||!input.text)throw new Error('to, subject and text are required');
   if(String(input.text).length>MAX_BODY)throw new Error('message body too large');
   const provider=input.provider||process.env.NOVA_MAIL_PROVIDER||'gmail';
+  // All ordinary outbound is prospect outreach unless a trusted internal
+  // caller deliberately marks a receipt or service message transactional.
+  let unlock=null;
+  if(input.purpose!=='transactional'){
+    const recipients=outreachRecipients(input);
+    unlock=reserveOutreachRecipients(recipients);
+    if(!unlock)return {sent:false,blocked:true,reason:'another send to this recipient is in progress'};
+    try{
+      const check=await preflightOutreach(input,gmail);
+      if(!check.allowed){
+        unlock();
+        return {sent:false,blocked:true,reason:check.reason,recipient:check.recipient||null};
+      }
+    }catch(error){
+      unlock();
+      return {sent:false,blocked:true,reason:'outreach history could not be verified; send not attempted'};
+    }
+  }
+  try{
   if(provider==='resend')return await resend(input);
   if(provider==='gmail'){
     const sender=input.from||process.env.GMAIL_FROM||required('GMAIL_ACCOUNT');
@@ -109,6 +129,7 @@ export async function sendEmail(input){
     return {sent:true,provider:'outlook',accepted:true};
   }
   throw new Error('Unsupported mail provider: '+provider);
+  }finally{if(unlock)unlock();}
 }
 
 export async function searchThreads(input){
