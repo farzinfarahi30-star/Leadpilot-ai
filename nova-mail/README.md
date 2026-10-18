@@ -38,6 +38,7 @@ This package is intentionally email-only. No advertising, calendar, CRM, browser
 All `mail_send` calls default to `purpose: "outreach"`. To avoid duplicate pitches, the send path now:
 - checks the **actual Gmail Sent folder** for a message to that recipient within the last seven days, including messages sent from other chats or through the Gmail app;
 - enforces a seven-day per-recipient cooldown in a persistent on-disk ledger;
+- checks Gmail for bounce notices (Delivery Status Notification / Undeliverable) naming that destination address in the last 90 days and blocks repeat outreach pending address verification;
 - blocks multi-recipient, Cc and Bcc sales messages;
 - blocks permanently suppressed contacts from `NOVA_MAIL_SUPPRESSED_RECIPIENTS` (comma-separated runtime secret) or an optional JSON array at `NOVA_MAIL_SUPPRESSION_FILE`;
 - records failed or timed-out provider calls as **uncertain**, not safe to retry automatically through the xx fallback.
