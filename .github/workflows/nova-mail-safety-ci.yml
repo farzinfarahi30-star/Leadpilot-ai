@@ -34,3 +34,6 @@ jobs:
       - name: Run offline no-send regression tests
         working-directory: nova-mail
         run: npm test
+      - name: Run explicit no-contact smoke test
+        working-directory: nova-mail
+        run: npm run smoke:outreach
