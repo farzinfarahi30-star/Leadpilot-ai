@@ -1,0 +1,36 @@
+name: Nova Mail Safety CI
+on:
+  push:
+    branches: [main]
+    paths:
+      - "nova-mail/**"
+      - ".github/workflows/nova-mail-safety-ci.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: nova-mail-safety-ci
+  cancel-in-progress: true
+
+jobs:
+  offline-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Parse Nova Mail files
+        working-directory: nova-mail
+        run: |
+          node --check src/outreach-guard.mjs
+          node --check src/core.mjs
+          node --check src/mcp-server.mjs
+      - name: Run offline no-send regression tests
+        working-directory: nova-mail
+        run: npm test
