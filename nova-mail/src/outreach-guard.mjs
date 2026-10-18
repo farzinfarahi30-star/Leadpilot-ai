@@ -80,7 +80,7 @@ async function suppressed(recipient, file, env) {
  * retried with a different provider until delivery is checked manually.
  * `findRecentSent` MUST check actual Gmail SENT messages (cross-chat history).
  */
-export async function guardedOutbound(input, {findRecentSent, deliver, ledgerFile, suppressionFile, now, env}={}) {
+export async function guardedOutbound(input, {findRecentSent, findRecentDeliveryFailure, deliver, ledgerFile, suppressionFile, now, env}={}) {
   input = input || {};
   const config = env || process.env;
   const purpose = input.purpose || 'outreach'; // fail-closed default
@@ -113,6 +113,11 @@ export async function guardedOutbound(input, {findRecentSent, deliver, ledgerFil
     try { recent = await findRecentSent(recipient); }
     catch { return blocked('Gmail sent-history verification failed; outreach paused'); }
     if (recent !== false) return blocked('Gmail sent history is not clear within the last seven days');
+    if (typeof findRecentDeliveryFailure !== 'function') return blocked('Gmail delivery-failure check not configured');
+    let failed;
+    try { failed = await findRecentDeliveryFailure(recipient); }
+    catch { return blocked('Gmail delivery-failure verification failed; outreach paused'); }
+    if (failed !== false) return blocked('Prior delivery-failure notice for recipient within 90 days; verify address before any new sales email');
     entryId = digest(`${timestamp}:${recipient}:${fingerprint}:${Math.random()}`).slice(0,24);
     entries.push({id:entryId,recipient,bodyFingerprint:fingerprint,at:timestamp,state:'pending',provider:input.provider || config.NOVA_MAIL_PROVIDER || 'gmail'});
     await saveLedger(ledger, entries);
