@@ -47,3 +47,50 @@ test('preflight fails closed for multi-recipient email', async () => {
   const r=await preflightOutreach({to:'a@example.com,b@example.com'},async()=>{throw Error('should not fetch')},now);
   assert.equal(r.allowed,false);
 });
+
+test('historic do-not-contact label blocks even if recent messages are unlabelled', async () => {
+  const endpoints=[];
+  const gmail=async endpoint => {
+    endpoints.push(endpoint);
+    if (endpoint === 'labels') return {labels:[{id:'Label_99',name:'Cold Outreach / Do Not Contact'}]};
+    if (endpoint.startsWith('messages?maxResults=1&labelIds=')) {
+      assert.match(decodeURIComponent(endpoint),/\{from:buyer@example.com to:buyer@example.com\}/);
+      return {messages:[{id:'historic'}]};
+    }
+    if (endpoint.startsWith('messages?')) {
+      const q=new URL('https://x.test/'+endpoint).searchParams.get('q');
+      return {messages:[{id:q.startsWith('in:sent')?'out':'in'}]};
+    }
+    if (endpoint.includes('/out?')) return {internalDate:String(now-day),labelIds:[]};
+    if (endpoint.includes('/in?')) return {internalDate:String(now-1000),labelIds:[]};
+    throw new Error('unexpected endpoint '+endpoint);
+  };
+  const result=await preflightOutreach({to:'buyer@example.com'},gmail,now);
+  assert.equal(result.allowed,false);
+  assert.deepEqual(result.labels,['Cold Outreach / Do Not Contact']);
+  assert.ok(endpoints.some(e=>e.includes('labelIds=Label_99')));
+});
+test('unrelated recipient suppression does not block reply', async () => {
+  const gmail=async endpoint => {
+    if (endpoint === 'labels') return {labels:[{id:'Label_99',name:'NOVA / Declined - do not pitch'}]};
+    if (endpoint.startsWith('messages?maxResults=1&labelIds=')) return {messages:[]};
+    if (endpoint.startsWith('messages?')) {
+      const q=new URL('https://x.test/'+endpoint).searchParams.get('q');
+      return {messages:[{id:q.startsWith('in:sent')?'out':'in'}]};
+    }
+    if (endpoint.includes('/out?')) return {internalDate:String(now-day),labelIds:[]};
+    if (endpoint.includes('/in?')) return {internalDate:String(now-1000),labelIds:[]};
+    throw new Error('unexpected endpoint '+endpoint);
+  };
+  const result=await preflightOutreach({to:'buyer@example.com'},gmail,now);
+  assert.equal(result.allowed,true);
+});
+test('errors in historical label verification fail the preflight', async () => {
+  const gmail=async endpoint => {
+    if(endpoint==='labels')return {labels:[{id:'Label_88',name:'NOVA / Outreach Hold'}]};
+    if(endpoint.startsWith('messages?maxResults=1&labelIds='))throw Error('Gmail unavailable');
+    if(endpoint.startsWith('messages?'))return {messages:[]};
+    throw Error('unexpected endpoint '+endpoint);
+  };
+  await assert.rejects(preflightOutreach({to:'buyer@example.com'},gmail,now),/Gmail unavailable/);
+});
