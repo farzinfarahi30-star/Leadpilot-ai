@@ -11,7 +11,8 @@ The buyer-facing source lives in this public GitHub repository. Checkout uses li
 Audit one public webpage for technical SEO, structure, metadata, structured data and selected security headers.
 
 **Buy:** https://buy.stripe.com/4gM9AT3jm1a656Hc0p9Zn0V  
-**Details:** [NOVA_WEBSITE_AUDIT.md](./NOVA_WEBSITE_AUDIT.md)
+**Details:** [NOVA_WEBSITE_AUDIT.md](./NOVA_WEBSITE_AUDIT.md)  
+**Sample:** [Example report with reproducible evidence](./NOVA_WEBSITE_AUDIT_SAMPLE.md)
 
 Stripe collects the webpage URL at checkout.
 
