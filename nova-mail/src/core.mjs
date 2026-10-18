@@ -1,4 +1,5 @@
 import fs from 'node:fs/promises';
+import { guardedOutbound } from './outreach-guard.mjs';
 import path from 'node:path';
 
 const MAX_BODY=200000;
@@ -91,6 +92,17 @@ export async function sendEmail(input){
   if(!input.to||!input.subject||!input.text)throw new Error('to, subject and text are required');
   if(String(input.text).length>MAX_BODY)throw new Error('message body too large');
   const provider=input.provider||process.env.NOVA_MAIL_PROVIDER||'gmail';
+  return await guardedOutbound(input,{
+    findRecentSent: async recipient => {
+      const q='in:sent to:'+recipient+' newer_than:7d';
+      const history=await gmail('messages?maxResults=1&q='+encodeURIComponent(q));
+      return Array.isArray(history.messages) && history.messages.length>0;
+    },
+    deliver: () => deliverEmail(input,provider)
+  });
+}
+
+async function deliverEmail(input,provider){
   if(provider==='resend')return await resend(input);
   if(provider==='gmail'){
     const sender=input.from||process.env.GMAIL_FROM||required('GMAIL_ACCOUNT');
