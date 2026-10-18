@@ -28,7 +28,8 @@ A customer does not need a temporary website or a Nova-hosted app to understand 
 Submit one public webpage URL at checkout. Nova returns a technical SEO, structure, metadata, structured-data and selected security-header review with a transparent heuristic score and prioritized actions.
 
 **Checkout:** https://buy.stripe.com/4gM9AT3jm1a656Hc0p9Zn0V  
-**Details:** [NOVA_WEBSITE_AUDIT.md](./NOVA_WEBSITE_AUDIT.md)
+**Details:** [NOVA_WEBSITE_AUDIT.md](./NOVA_WEBSITE_AUDIT.md)  
+**See a real example:** [Sample technical audit of NOVA's own site](./NOVA_WEBSITE_AUDIT_SAMPLE.md) (historical evidence, not a client testimonial)
 
 ## Other live service families
 
