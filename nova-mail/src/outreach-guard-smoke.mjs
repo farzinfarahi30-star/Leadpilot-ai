@@ -30,6 +30,12 @@ try {
     ...options, deliver: async () => { delivered++; return {sent:true}; }
   });
   assert.equal(transactional.blocked, true);
+  const unapprovedTransactional = await guardedOutbound({
+    ...offer('allowed@example.com'), purpose:'transactional', approved:false
+  }, {
+    ...options, deliver: async () => { delivered++; return {sent:true}; }
+  });
+  assert.equal(unapprovedTransactional.blocked, true, 'No transactional bypass of approval');
   assert.equal(delivered, 0, 'No provider call for any explicitly suppressed contact');
 
   const first = await guardedOutbound(offer('buyer@example.com'), options);
@@ -54,7 +60,7 @@ try {
   const rows = JSON.parse(await fs.readFile(options.ledgerFile, 'utf8'));
   assert.equal(rows.some(row => row.recipient === 'buyer@example.com' && row.state === 'sent'), true);
   assert.equal(rows.some(row => row.recipient === 'uncertain@example.com' && row.state === 'uncertain'), true);
-  console.log(JSON.stringify({ok:true, safetyAssertions:14, realEmailsSent:0}));
+  console.log(JSON.stringify({ok:true, safetyAssertions:17, realEmailsSent:0}));
 } finally {
   await fs.rm(dir, {recursive:true, force:true});
 }
