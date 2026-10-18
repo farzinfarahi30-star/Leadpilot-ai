@@ -21,7 +21,7 @@ const PERMANENT_CONTACT_HOLD = new Set([
 // A new substantive inbound request needs human review before lifting a hold.
 export function activeContactHold(input = {}, env = process.env) {
   const extras = new Set(String(env.NOVA_MAIL_SUPPRESSED_RECIPIENTS || '')
-    .split(/[;,\\s]+/).map(canonical).filter(Boolean));
+    .split(/[;,]+/).map(canonical).filter(Boolean));
   return ['to', 'cc', 'bcc'].some(key => {
     const value = input[key];
     const items = Array.isArray(value) ? value : [value];
