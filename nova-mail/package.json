@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node src/mcp-server.mjs",
     "smoke": "node src/smoke.mjs",
-    "test": "node --test test/*.test.mjs",
+    "test": "node --test test/*.test.mjs && node src/idempotency-smoke.mjs && node src/mime-smoke.mjs && node src/xx-smoke.mjs",
     "smoke:outreach": "node src/outreach-guard-smoke.mjs"
   },
   "dependencies": {
