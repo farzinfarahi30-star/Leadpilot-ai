@@ -114,6 +114,13 @@ export async function sendEmail(input){
       const history=await gmail('messages?maxResults=1&q='+encodeURIComponent(q));
       return Array.isArray(history.messages) && history.messages.length>0;
     },
+    findRecentDeliveryFailure: async recipient => {
+      // Gmail indexes the quoted destination address inside bounce notices.
+      // A previous failed delivery requires review, not automatic retries.
+      const q='in:anywhere newer_than:90d {subject:"Delivery Status Notification (Failure)" subject:Undeliverable} "'+recipient+'"';
+      const failures=await gmail('messages?maxResults=1&q='+encodeURIComponent(q));
+      return Array.isArray(failures.messages) && failures.messages.length>0;
+    },
     deliver: () => deliverEmail(input,provider)
   });
 }
