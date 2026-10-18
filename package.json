@@ -4,7 +4,8 @@
   "type": "module",
   "scripts": {
     "deploy": "wrangler deploy",
-    "check": "node --check nova-audit-worker/worker.mjs"
+    "check": "node --check nova-audit-worker/worker.mjs",
+    "test:audit-url-safety": "node --test tests/worker-url-safety.test.mjs"
   },
   "devDependencies": {
     "wrangler": "^4.45.0"
