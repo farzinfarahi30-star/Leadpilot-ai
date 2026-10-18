@@ -11,6 +11,7 @@ const options = {
   now: Date.now(),
   env: {},
   findRecentSent: async () => false,
+  findRecentDeliveryFailure: async () => false,
   deliver: async () => ({sent:true, provider:'mock'})
 };
 const offer = (to, subject='Free audit follow-up') =>
