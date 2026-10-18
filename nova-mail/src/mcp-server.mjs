@@ -40,13 +40,14 @@ server.registerTool('mail_create_draft',{
 
 server.registerTool('mail_send',{
   title:'Send Email',
-  description:'Route outbound email through Nova first; when Nova is blocked, xx takes over. No outside fallback path exists.',
+  description:'Approved sales mail is checked against Gmail Sent history and a persistent suppression ledger; uncertain sends never fall back silently.',
   inputSchema:{
     provider:z.enum(['gmail','outlook','resend']).optional(),
     to:z.string(),from:z.string().optional(),replyTo:z.string().optional(),
     cc:z.string().default(''),bcc:z.string().default(''),
     subject:z.string(),text:z.string(),html:z.string().optional(),
-    approved:z.boolean().default(false),idempotencyKey:z.string().max(256).optional()
+    approved:z.boolean().default(false),purpose:z.enum(['outreach','transactional']).default('outreach'),
+    idempotencyKey:z.string().max(256).optional()
   }
 },async function(input){
   const data=await sendEmailViaXx(input);
