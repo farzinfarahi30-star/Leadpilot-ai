@@ -44,4 +44,4 @@ One agreed batch of client-supplied product listings: confirmed brand voice, 60â
 
 The free [local Shopify CSV preflight](./README-Shopify-CSV-QA.md) provides a separate proof of NOVA data-quality capability; it is not a live store import tool.
 
-[Request one small, free product-page review](https://ai-business-factory.hatchable.site/free-help.html) (opt-in; no purchase obligation).
+For independently purchasable services, see the [permanent NOVA offer catalog](../NOVA-PRODUCTS.md). This sample portfolio is free to read; any paid engagement requires agreed scope and verified product facts. The previous quota-dependent free-help form is not required to see the available offers.
