@@ -3,7 +3,8 @@
 A fixed-price technical audit for one public webpage.
 
 **Price:** £9 one-time  
-**Checkout:** https://buy.stripe.com/4gM9AT3jm1a656Hc0p9Zn0V
+**Checkout:** https://buy.stripe.com/4gM9AT3jm1a656Hc0p9Zn0V  
+**Sample:** [See an evidence-based audit of NOVA's own site](./NOVA_WEBSITE_AUDIT_SAMPLE.md) (12 October 2026, not a customer case study)
 
 ## What you receive
 
