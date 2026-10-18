@@ -1,5 +1,5 @@
 import fs from 'node:fs/promises';
-import { guardedOutbound } from './outreach-guard.mjs';
+import { guardedOutbound, activeContactHold } from './outreach-guard.mjs';
 import path from 'node:path';
 
 const MAX_BODY=200000;
@@ -166,6 +166,7 @@ async function ensureDir(file){await fs.mkdir(path.dirname(file),{recursive:true
 export async function scheduleEmail(input){
   input=input||{};
   if(input.approved!==true)return {scheduled:false,blocked:true,reason:'explicit approval required'};
+  if(activeContactHold(input))return {scheduled:false,blocked:true,reason:'recipient on NOVA do-not-follow-up hold'};
   const ts=new Date(input.sendAt).getTime();
   if(!Number.isFinite(ts)||ts<=Date.now())throw new Error('sendAt must be a future timestamp');
   const file=path.resolve(input.queueFile||'./status/scheduled-mail.json');
