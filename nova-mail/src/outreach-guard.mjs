@@ -12,6 +12,25 @@ const MAX_WAIT_MS = 2500;
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 const blocked = reason => ({sent:false, blocked:true, reason, safeguard:'nova-mail-outreach'});
 const canonical = v => String(v ?? '').trim().toLowerCase();
+const PERMANENT_CONTACT_HOLD = new Set([
+  'besteigenoffice@gmail.com',
+  'contact@wordykid.com'
+]);
+
+// Explicit holds apply to To/Cc/Bcc, to scheduled and transactional mail too.
+// A new substantive inbound request needs human review before lifting a hold.
+export function activeContactHold(input = {}, env = process.env) {
+  const extras = new Set(String(env.NOVA_MAIL_SUPPRESSED_RECIPIENTS || '')
+    .split(/[;,\\s]+/).map(canonical).filter(Boolean));
+  return ['to', 'cc', 'bcc'].some(key => {
+    const value = input[key];
+    const items = Array.isArray(value) ? value : [value];
+    return items.some(item => String(item ?? '').split(/[;,]/).some(part => {
+      const address = canonical(part.match(/<([^<>]+)>/)?.[1] || part);
+      return PERMANENT_CONTACT_HOLD.has(address) || extras.has(address);
+    }));
+  });
+}
 const digest = v => createHash('sha256').update(String(v ?? '')).digest('hex');
 
 function singleRecipient(input) {
@@ -65,6 +84,7 @@ export async function guardedOutbound(input, {findRecentSent, deliver, ledgerFil
   input = input || {};
   const config = env || process.env;
   const purpose = input.purpose || 'outreach'; // fail-closed default
+  if (activeContactHold(input, config)) return blocked('Recipient is on explicit NOVA do-not-follow-up hold');
   if (purpose !== 'outreach') {
     if (purpose !== 'transactional') return blocked('Unknown mail purpose');
     return await deliver();
