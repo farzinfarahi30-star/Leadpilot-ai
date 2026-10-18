@@ -21,4 +21,4 @@ Official format details: https://help.shopify.com/en/manual/products/import-expo
 
 ### Additional service
 
-For businesses that need deeper help with messy product records, mapping catalogue fields, duplicates, or nonstandard CSV exports, NOVA already has the CleanSheet and Ecommerce Catalog Cleanup offer categories. Submit one specific request voluntarily at https://ai-business-factory.hatchable.site/free-help.html . The free utility carries no obligation to buy.
+For businesses that need deeper help with messy product records, mapping catalogue fields, duplicates, or nonstandard CSV exports, NOVA offers [CleanSheet / CRM Rescue (£99 one-time)](../NOVA-PRODUCTS.md#nova-cleansheet--crm-rescue--99-one-time) and [Ecommerce Catalog Cleanup (£99 one-time)](../NOVA-PRODUCTS.md#nova-ecommerce-catalog-cleanup--99-one-time). The permanent [offer catalog](../NOVA-PRODUCTS.md) explains scope and links directly to Stripe-hosted checkout, without depending on quota-limited demo hosting. Review the scope before purchasing. This checker remains free to use with no obligation.
