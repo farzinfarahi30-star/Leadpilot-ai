@@ -85,11 +85,12 @@ export async function guardedOutbound(input, {findRecentSent, deliver, ledgerFil
   const config = env || process.env;
   const purpose = input.purpose || 'outreach'; // fail-closed default
   if (activeContactHold(input, config)) return blocked('Recipient is on explicit NOVA do-not-follow-up hold');
+  // Enforce owner approval for every purpose, even for direct guard callers.
+  if (input.approved !== true) return blocked('Explicit approval required');
   if (purpose !== 'outreach') {
     if (purpose !== 'transactional') return blocked('Unknown mail purpose');
     return await deliver();
   }
-  if (input.approved !== true) return blocked('Explicit approval required');
   const recipient = singleRecipient(input);
   if (!recipient) return blocked('Outreach requires exactly one valid To address and no Cc/Bcc');
   const ledger = path.resolve(ledgerFile || config.NOVA_MAIL_LEDGER_FILE || './status/nova-mail-ledger.json');
