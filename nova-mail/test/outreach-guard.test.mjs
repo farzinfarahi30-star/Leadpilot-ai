@@ -9,7 +9,7 @@ const input={to:'buyer@example.com',subject:'Proposal',text:'A respectful sales 
 async function fixture() {
   const dir=await fs.mkdtemp(path.join(os.tmpdir(),'nova-guard-'));
   return {dir,ledgerFile:path.join(dir,'ledger.json'),suppressionFile:path.join(dir,'supp.json'),now:1760000000000,env:{},
-    findRecentSent:async()=>false};
+    findRecentSent:async()=>false, findRecentDeliveryFailure:async()=>false};
 }
 
 test('first new outreach is delivered, repeat to same prospect is blocked',async t=>{
@@ -56,4 +56,29 @@ test('transactional mail is explicitly exempt from sales cooldown',async t=>{
   const f=await fixture();t.after(()=>fs.rm(f.dir,{recursive:true,force:true}));
   f.deliver=async()=>({sent:true});f.findRecentSent=async()=>true;
   assert.equal((await guardedOutbound({...input,purpose:'transactional'},f)).sent,true);
+});
+
+test('blocks contacts with a recent delivery-failure notice',async t=>{
+  const f=await fixture(); t.after(()=>fs.rm(f.dir,{recursive:true,force:true}));
+  let calls=0; f.findRecentDeliveryFailure=async recipient=>{
+    assert.equal(recipient,'buyer@example.com');return true;
+  };
+  f.deliver=async()=>{calls++;return {sent:true}};
+  const out=await guardedOutbound(input,f);
+  assert.equal(out.blocked,true); assert.match(out.reason,/delivery-failure/);
+  assert.equal(calls,0);
+});
+test('fails closed if bounce lookup cannot run',async t=>{
+  const f=await fixture(); t.after(()=>fs.rm(f.dir,{recursive:true,force:true}));
+  f.findRecentDeliveryFailure=async()=>{throw Error('Gmail token expired')};
+  f.deliver=async()=>{throw Error('must not send')};
+  const out=await guardedOutbound(input,f);
+  assert.equal(out.blocked,true); assert.match(out.reason,/verification failed/);
+});
+test('fails closed if bounce check not configured',async t=>{
+  const f=await fixture(); t.after(()=>fs.rm(f.dir,{recursive:true,force:true}));
+  delete f.findRecentDeliveryFailure;
+  f.deliver=async()=>{throw Error('must not send')};
+  const out=await guardedOutbound(input,f);
+  assert.equal(out.blocked,true); assert.match(out.reason,/not configured/);
 });
