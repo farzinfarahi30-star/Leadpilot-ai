@@ -1,7 +1,7 @@
 // Read-only pre-send verification. Gmail is the source of truth for known
 // outbound history; no credentials, recipients or private history are committed.
 const COOLDOWN_MS = 7 * 24 * 60 * 60 * 1000;
-const LABEL_HOLD = /(?:declined|do[ -]?not[ -]?follow|do[ -]?not[ -]?pitch|outreach hold|pause outreach|await(?:ing)? (?:buyer )?reply|opt[ -]?out|unsubscribe)/i;
+const LABEL_HOLD = /(?:declined|do[ -]?not[ -]?follow|do[ -]?not[ -]?pitch|outreach hold|pause outreach|await(?:ing)? (?:buyer )?reply|do[ -]?not[ -]?contact|no (?:further|more) follow[ -]?ups?|opt[ -]?out|unsubscribe)/i;
 const pending = new Set();
 
 export function outreachRecipients(input = {}) {
@@ -46,8 +46,19 @@ export async function preflightOutreach(input, gmail, now = Date.now()) {
     searchLatest(gmail, 'in:sent to:' + address),
     searchLatest(gmail, 'from:' + address)
   ]);
-  const heldLabels = [...new Set([...(sent?.labelIds || []), ...(inbound?.labelIds || [])]
-    .map(id => labelNames.get(id)).filter(name => name && LABEL_HOLD.test(name)))];
+  // A decline can live on an older message rather than the latest reply or
+  // latest sent item. Search all labelled history before allowing outreach.
+  const holdEntries = (labels.labels || []).filter(label => LABEL_HOLD.test(label.name || ''));
+  const matches = await Promise.all(holdEntries.map(label =>
+    gmail('messages?maxResults=1&labelIds=' + encodeURIComponent(label.id) +
+      '&q=' + encodeURIComponent('{from:' + address + ' to:' + address + '}'))
+  ));
+  const heldLabels = [...new Set([
+    ...[...(sent?.labelIds || []), ...(inbound?.labelIds || [])]
+      .map(id => labelNames.get(id)).filter(name => name && LABEL_HOLD.test(name)),
+    ...holdEntries.filter((label, i) => (matches[i]?.messages || []).length > 0)
+      .map(label => label.name)
+  ])];
   return {...assessOutreachHistory({latestSent:sent?.internalDate,
     latestInbound:inbound?.internalDate, heldLabels}, now), recipient:address};
 }
