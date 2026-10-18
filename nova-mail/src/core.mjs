@@ -46,8 +46,13 @@ async function resend(input){
   if(input.html)payload.html=input.html;
   if(input.tags)payload.tags=input.tags;
   if(input.headers)payload.headers=input.headers;
-  if(input.idempotencyKey)payload.idempotency_key=input.idempotencyKey;
-  const r=await fetch('https://api.resend.com/emails',{method:'POST',headers:{authorization:'Bearer '+key,'content-type':'application/json'},body:JSON.stringify(payload)});
+  const requestHeaders={authorization:'Bearer '+key,'content-type':'application/json'};
+  if(input.idempotencyKey!=null){
+    const idempotencyKey=String(input.idempotencyKey).trim();
+    if(!idempotencyKey || idempotencyKey.length>256)throw new Error('idempotencyKey must be 1–256 characters');
+    requestHeaders['Idempotency-Key']=idempotencyKey;
+  }
+  const r=await fetch('https://api.resend.com/emails',{method:'POST',headers:requestHeaders,body:JSON.stringify(payload)});
   const text=await r.text();
   let data={};try{data=text?JSON.parse(text):{};}catch{data={raw:text};}
   if(!r.ok)throw new Error('Resend '+r.status+': '+clean(data.message||data.name||text||'send failed'));
