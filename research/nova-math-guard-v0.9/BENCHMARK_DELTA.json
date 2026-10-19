@@ -1,0 +1,212 @@
+{
+  "project": "NOVA Math Guard",
+  "benchmarks": "twelve deliberately selected established mathematical cases, not a random external benchmark",
+  "novelty_claimed": false,
+  "records": [
+    {
+      "case": "real_only_base",
+      "hypotheses": [
+        "x**2+y**2=0"
+      ],
+      "goal": "x=0",
+      "v0.8": {
+        "verdict": "PROVED",
+        "kind": "real-sos",
+        "checked": true
+      },
+      "v0.9": {
+        "verdict": "PROVED",
+        "kind": "real-sos",
+        "checked": true
+      }
+    },
+    {
+      "case": "scaled_real_only",
+      "hypotheses": [
+        "4*x**2+9*y**2=0"
+      ],
+      "goal": "y=0",
+      "v0.8": {
+        "verdict": "PROVED",
+        "kind": "real-sos",
+        "checked": true
+      },
+      "v0.9": {
+        "verdict": "PROVED",
+        "kind": "real-sos",
+        "checked": true
+      }
+    },
+    {
+      "case": "affine_square",
+      "hypotheses": [
+        "(x+y)**2+z**2=0"
+      ],
+      "goal": "x+y=0",
+      "v0.8": {
+        "verdict": "PROVED",
+        "kind": "real-sos",
+        "checked": true
+      },
+      "v0.9": {
+        "verdict": "PROVED",
+        "kind": "real-sos",
+        "checked": true
+      }
+    },
+    {
+      "case": "combined_constraints",
+      "hypotheses": [
+        "x**2+y**2=0",
+        "z**2+w**2=0"
+      ],
+      "goal": "x+z=0",
+      "v0.8": {
+        "verdict": "PROVED",
+        "kind": "real-sos",
+        "checked": true
+      },
+      "v0.9": {
+        "verdict": "PROVED",
+        "kind": "real-sos",
+        "checked": true
+      }
+    },
+    {
+      "case": "field_radical",
+      "hypotheses": [
+        "x**2=0"
+      ],
+      "goal": "x=0",
+      "v0.8": {
+        "verdict": "PROVED",
+        "kind": "radical",
+        "checked": true
+      },
+      "v0.9": {
+        "verdict": "PROVED",
+        "kind": "radical",
+        "checked": true
+      }
+    },
+    {
+      "case": "negative_rational",
+      "hypotheses": [
+        "x*y=1"
+      ],
+      "goal": "x=y",
+      "v0.8": {
+        "verdict": "DISPROVED",
+        "kind": "conditional-counterexample",
+        "checked": true
+      },
+      "v0.9": {
+        "verdict": "DISPROVED",
+        "kind": "conditional-counterexample",
+        "checked": true
+      }
+    },
+    {
+      "case": "quartic",
+      "hypotheses": [
+        "x**4+y**4=0"
+      ],
+      "goal": "x=0",
+      "v0.8": {
+        "verdict": "UNKNOWN",
+        "kind": null,
+        "checked": false
+      },
+      "v0.9": {
+        "verdict": "PROVED",
+        "kind": "real-sos",
+        "checked": true
+      }
+    },
+    {
+      "case": "sextic",
+      "hypotheses": [
+        "x**6+y**6=0"
+      ],
+      "goal": "x=0",
+      "v0.8": {
+        "verdict": "UNKNOWN",
+        "kind": null,
+        "checked": false
+      },
+      "v0.9": {
+        "verdict": "PROVED",
+        "kind": "real-sos",
+        "checked": true
+      }
+    },
+    {
+      "case": "octic",
+      "hypotheses": [
+        "x**8+y**8=0"
+      ],
+      "goal": "x=0",
+      "v0.8": {
+        "verdict": "UNKNOWN",
+        "kind": null,
+        "checked": false
+      },
+      "v0.9": {
+        "verdict": "PROVED",
+        "kind": "real-sos",
+        "checked": true
+      }
+    },
+    {
+      "case": "mixed_positive_quartic",
+      "hypotheses": [
+        "x**4+2*x**2*y**2+y**4=0"
+      ],
+      "goal": "x=0",
+      "v0.8": {
+        "verdict": "UNKNOWN",
+        "kind": null,
+        "checked": false
+      },
+      "v0.9": {
+        "verdict": "PROVED",
+        "kind": "real-sos",
+        "checked": true
+      }
+    },
+    {
+      "case": "decic",
+      "hypotheses": [
+        "x**10+y**10=0"
+      ],
+      "goal": "x=0",
+      "v0.8": {
+        "verdict": "UNKNOWN",
+        "kind": null,
+        "checked": false
+      },
+      "v0.9": {
+        "verdict": "UNKNOWN",
+        "kind": null,
+        "checked": false
+      }
+    },
+    {
+      "case": "signed_quartic_invalid",
+      "hypotheses": [
+        "x**4-y**4=0"
+      ],
+      "goal": "x=0",
+      "v0.8": {
+        "verdict": "DISPROVED",
+        "kind": "conditional-counterexample",
+        "checked": true
+      },
+      "v0.9": {
+        "verdict": "DISPROVED",
+        "kind": "conditional-counterexample",
+        "checked": true
+      }
+    }
+  ]
+}

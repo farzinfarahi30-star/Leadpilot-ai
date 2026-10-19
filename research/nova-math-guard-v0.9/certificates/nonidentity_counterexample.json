@@ -1,0 +1,36 @@
+{
+  "domain": "Q-polynomial",
+  "evidence": {
+    "assignment": {
+      "x": "2"
+    },
+    "lhs_normal_form": [
+      {
+        "coefficient": "1",
+        "monomial": [
+          [
+            "x",
+            2
+          ]
+        ]
+      }
+    ],
+    "lhs_value": "4",
+    "rhs_normal_form": [
+      {
+        "coefficient": "1",
+        "monomial": [
+          [
+            "x",
+            1
+          ]
+        ]
+      }
+    ],
+    "rhs_value": "2"
+  },
+  "kind": "identity",
+  "schema": "NOVA-MATH-GUARD-CERT-1",
+  "statement": "x**2=x",
+  "verdict": "DISPROVED"
+}

@@ -1,0 +1,69 @@
+{
+  "domain": "Q-polynomial",
+  "evidence": {
+    "multipliers_normal_forms": [
+      [
+        {
+          "coefficient": "4",
+          "monomial": [
+            [
+              "x",
+              1
+            ],
+            [
+              "y",
+              1
+            ]
+          ]
+        },
+        {
+          "coefficient": "1",
+          "monomial": [
+            [
+              "x",
+              2
+            ]
+          ]
+        },
+        {
+          "coefficient": "6",
+          "monomial": [
+            [
+              "y",
+              2
+            ]
+          ]
+        }
+      ],
+      [
+        {
+          "coefficient": "4",
+          "monomial": [
+            [
+              "x",
+              1
+            ]
+          ]
+        },
+        {
+          "coefficient": "1",
+          "monomial": [
+            [
+              "y",
+              1
+            ]
+          ]
+        }
+      ]
+    ],
+    "power": 4
+  },
+  "goal": "x+y=0",
+  "hypotheses": [
+    "x**2=0",
+    "y**3=0"
+  ],
+  "kind": "radical",
+  "schema": "NOVA-MATH-GUARD-RADICAL-CERT-1",
+  "verdict": "PROVED"
+}

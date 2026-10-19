@@ -1,0 +1,80 @@
+{
+  "domain": "ordered-fields-over-Q",
+  "evidence": {
+    "multipliers_normal_forms": [
+      [
+        {
+          "coefficient": "2",
+          "monomial": []
+        }
+      ],
+      [
+        {
+          "coefficient": "2",
+          "monomial": []
+        }
+      ]
+    ],
+    "weighted_squares": [
+      {
+        "polynomial_normal_form": [
+          {
+            "coefficient": "1",
+            "monomial": [
+              [
+                "w",
+                1
+              ]
+            ]
+          }
+        ],
+        "weight": "2"
+      },
+      {
+        "polynomial_normal_form": [
+          {
+            "coefficient": "1",
+            "monomial": [
+              [
+                "x",
+                1
+              ]
+            ]
+          },
+          {
+            "coefficient": "-1",
+            "monomial": [
+              [
+                "z",
+                1
+              ]
+            ]
+          }
+        ],
+        "weight": "1"
+      },
+      {
+        "polynomial_normal_form": [
+          {
+            "coefficient": "1",
+            "monomial": [
+              [
+                "y",
+                1
+              ]
+            ]
+          }
+        ],
+        "weight": "2"
+      }
+    ]
+  },
+  "goal": "x+z=0",
+  "hypotheses": [
+    "x**2+y**2=0",
+    "z**2+w**2=0"
+  ],
+  "kind": "real-sos",
+  "schema": "NOVA-MATH-GUARD-REAL-SOS-CERT-1",
+  "verdict": "PROVED"
+}

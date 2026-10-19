@@ -1,0 +1,37 @@
+{
+  "domain": "ordered-fields-over-Q",
+  "evidence": {
+    "goal_even_power": 8,
+    "multipliers_normal_forms": [
+      [
+        {
+          "coefficient": "1",
+          "monomial": []
+        }
+      ]
+    ],
+    "weighted_squares": [
+      {
+        "polynomial_normal_form": [
+          {
+            "coefficient": "1",
+            "monomial": [
+              [
+                "y",
+                4
+              ]
+            ]
+          }
+        ],
+        "weight": "1"
+      }
+    ]
+  },
+  "goal": "x=0",
+  "hypotheses": [
+    "x**8+y**8=0"
+  ],
+  "kind": "real-sos",
+  "schema": "NOVA-MATH-GUARD-REAL-SOS-POWER-CERT-2",
+  "verdict": "PROVED"
+}

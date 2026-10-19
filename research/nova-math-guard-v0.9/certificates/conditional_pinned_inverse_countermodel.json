@@ -1,0 +1,31 @@
+{
+  "domain": "Q-polynomial",
+  "evidence": {
+    "assignment": {
+      "x": "2",
+      "y": "1/2"
+    },
+    "goal_values": {
+      "lhs": "2",
+      "rhs": "3"
+    },
+    "hypotheses_values": [
+      {
+        "lhs": "1",
+        "rhs": "1"
+      },
+      {
+        "lhs": "1/2",
+        "rhs": "1/2"
+      }
+    ]
+  },
+  "goal": "x=3",
+  "hypotheses": [
+    "x*y=1",
+    "y=1/2"
+  ],
+  "kind": "conditional-counterexample",
+  "schema": "NOVA-MATH-GUARD-CONDITIONAL-COUNTEREXAMPLE-CERT-1",
+  "verdict": "DISPROVED"
+}
