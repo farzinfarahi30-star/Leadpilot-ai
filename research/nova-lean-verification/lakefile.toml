@@ -1,0 +1,6 @@
+name = "novaLeanVerifier"
+version = "0.1.0"
+defaultTargets = ["NovaLeanVerifier"]
+
+[[lean_lib]]
+name = "NovaLeanVerifier"
