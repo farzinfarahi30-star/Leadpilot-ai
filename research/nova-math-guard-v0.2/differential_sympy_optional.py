@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-"""Optional independent differential tests (requires sympy)."""
 import random
 import sympy as s
 import nova_math_guard as g
@@ -35,4 +33,4 @@ for i in range(3000):
     mode=g.check_identity(atext+'='+b)
     equal=s.expand(sa-sb)==0
     assert mode.startswith('PROVED:')==equal,(i,mode,a,b)
-print('PASS: 3,000 independently cross-checked rational-polynomial comparisons with SymPy')
+print('PASS: 3,000 independently cross-checked rational-polynomial comparisons with SymPy 1.14.0')
