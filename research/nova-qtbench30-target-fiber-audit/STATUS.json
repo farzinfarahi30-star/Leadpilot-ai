@@ -1,0 +1,13 @@
+{
+  "date": "2026-10-19",
+  "program": "NOVA mathematical discovery",
+  "reference": "qtBench problem 30 / Chern-Fu Question 5.5",
+  "novelty_claim": false,
+  "open_problem_solved": false,
+  "first_payment_earned": false,
+  "baseline_reproduced": true,
+  "source_fibers_verified": 7,
+  "public_object_total": 4983,
+  "brute_force_max_n": 9,
+  "next_step": "construct and validate a natural grading-preserving bijection"
+}
