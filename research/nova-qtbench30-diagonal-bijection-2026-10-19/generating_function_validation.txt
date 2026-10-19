@@ -1,0 +1,1 @@
+PASS: independent SymPy rational generating-function coefficients n=1..13

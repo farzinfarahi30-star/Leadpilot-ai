@@ -1,0 +1,20 @@
+n= 2 injected= 1 target= 1 grades= {2: 1}
+n= 3 injected= 3 target= 3 grades= {2: 2, 3: 1}
+n= 4 injected= 5 target= 7 grades= {3: 4, 4: 1}
+n= 5 injected= 11 target= 21 grades= {3: 4, 4: 6, 5: 1}
+n= 6 injected= 21 target= 67 grades= {4: 12, 5: 8, 6: 1}
+n= 7 injected= 43 target= 237 grades= {4: 8, 5: 24, 6: 10, 7: 1}
+n= 8 injected= 85 target= 907 grades= {5: 32, 6: 40, 7: 12, 8: 1}
+n= 9 injected= 171 target= 3741 grades= {5: 16, 6: 80, 7: 60, 8: 14, 9: 1}
+n= 10 injected= 341 target= 16507 grades= {6: 80, 7: 160, 8: 84, 9: 16, 10: 1}
+n= 11 injected= 683 target= 77517 grades= {6: 32, 7: 240, 8: 280, 9: 112, 10: 18, 11: 1}
+n= 12 injected= 1365 target= 385627 grades= {7: 192, 8: 560, 9: 448, 10: 144, 11: 20, 12: 1}
+PASS: all image validity, grade, uniqueness, inverse, and target subset checks n=2..12
+3 source= 3 diagonal= 3 remainder= 0 first_offdiagonal= []
+4 source= 7 diagonal= 5 remainder= 2 first_offdiagonal= [{'composition': (1, 3), 'rows': (1, 1, 1, 2), 'grading': 3}]
+5 source= 21 diagonal= 11 remainder= 10 first_offdiagonal= [{'composition': (2, 3), 'rows': (1, 1, 1, 1, 2), 'grading': 3}]
+6 source= 67 diagonal= 21 remainder= 46 first_offdiagonal= [{'composition': (1, 5), 'rows': (1, 1, 1, 1, 1, 2), 'grading': 4}]
+7 source= 237 diagonal= 43 remainder= 194 first_offdiagonal= [{'composition': (2, 5), 'rows': (1, 1, 1, 1, 1, 1, 2), 'grading': 4}]
+8 source= 907 diagonal= 85 remainder= 822 first_offdiagonal= [{'composition': (1, 7), 'rows': (1, 1, 1, 1, 1, 1, 1, 2), 'grading': 5}]
+PASS independent source-side count and grading n=3..8
+PASS: negative tests; independent full inversion-sequence enumeration n=2..9; n=4 missing cases certified
