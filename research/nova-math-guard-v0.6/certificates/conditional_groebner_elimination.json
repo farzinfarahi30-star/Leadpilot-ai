@@ -1,0 +1,37 @@
+{
+  "domain": "Q-polynomial",
+  "evidence": {
+    "multipliers_normal_forms": [
+      [
+        {
+          "coefficient": "1",
+          "monomial": [
+            [
+              "y",
+              1
+            ]
+          ]
+        }
+      ],
+      [
+        {
+          "coefficient": "-1",
+          "monomial": [
+            [
+              "x",
+              1
+            ]
+          ]
+        }
+      ]
+    ]
+  },
+  "goal": "x=y",
+  "hypotheses": [
+    "x*y=1",
+    "y**2=1"
+  ],
+  "kind": "conditional",
+  "schema": "NOVA-MATH-GUARD-CONDITIONAL-CERT-1",
+  "verdict": "PROVED"
+}

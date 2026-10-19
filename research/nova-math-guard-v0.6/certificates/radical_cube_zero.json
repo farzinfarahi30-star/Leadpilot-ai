@@ -1,0 +1,21 @@
+{
+  "domain": "Q-polynomial",
+  "evidence": {
+    "multipliers_normal_forms": [
+      [
+        {
+          "coefficient": "1",
+          "monomial": []
+        }
+      ]
+    ],
+    "power": 3
+  },
+  "goal": "x=0",
+  "hypotheses": [
+    "x**3=0"
+  ],
+  "kind": "radical",
+  "schema": "NOVA-MATH-GUARD-RADICAL-CERT-1",
+  "verdict": "PROVED"
+}

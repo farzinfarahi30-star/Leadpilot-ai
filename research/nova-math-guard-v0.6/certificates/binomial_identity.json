@@ -1,0 +1,75 @@
+{
+  "domain": "Q-polynomial",
+  "evidence": {
+    "lhs_normal_form": [
+      {
+        "coefficient": "2",
+        "monomial": [
+          [
+            "x",
+            1
+          ],
+          [
+            "y",
+            1
+          ]
+        ]
+      },
+      {
+        "coefficient": "1",
+        "monomial": [
+          [
+            "x",
+            2
+          ]
+        ]
+      },
+      {
+        "coefficient": "1",
+        "monomial": [
+          [
+            "y",
+            2
+          ]
+        ]
+      }
+    ],
+    "rhs_normal_form": [
+      {
+        "coefficient": "2",
+        "monomial": [
+          [
+            "x",
+            1
+          ],
+          [
+            "y",
+            1
+          ]
+        ]
+      },
+      {
+        "coefficient": "1",
+        "monomial": [
+          [
+            "x",
+            2
+          ]
+        ]
+      },
+      {
+        "coefficient": "1",
+        "monomial": [
+          [
+            "y",
+            2
+          ]
+        ]
+      }
+    ]
+  },
+  "kind": "identity",
+  "schema": "NOVA-MATH-GUARD-CERT-1",
+  "statement": "(x+y)**2=x*x+2*x*y+y*y",
+  "verdict": "PROVED"
+}
