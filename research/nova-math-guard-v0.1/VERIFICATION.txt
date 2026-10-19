@@ -1,0 +1,12 @@
+NOVA Math Guard v0.1 verification (2026-10-19)
+
+Command: python3 nova_math_guard.py selftest
+Observed: PASS: 12 exact cases + 6 refusal tests.
+
+Command: python3 nova_math_guard.py prove '(x+y)**2=x**2+2*x*y+y**2'
+Observed: PROVED: polynomial identity (exact rational-coefficient normal form).
+
+Command: python3 nova_math_guard.py solve '3*x+7=22'
+Observed: PROVED: unique rational solution x = 5 (exact substitution checked).
+
+These tests support functionality of this prototype. They do not establish research novelty, security, absence of bugs, or any solution to an open mathematical problem.
