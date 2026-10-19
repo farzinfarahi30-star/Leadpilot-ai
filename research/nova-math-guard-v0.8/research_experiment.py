@@ -49,8 +49,11 @@ def run():
 if __name__ == '__main__':
     report = run()
     path = Path(__file__).parent / 'RESEARCH_RESULTS.json'
-    path.write_text(json.dumps(report, indent=2) + '\n', encoding='utf-8')
+    # Do not rewrite release files during self-tests: preserve source integrity.
+    stored = json.loads(path.read_text(encoding='utf-8'))
+    if any(stored.get(key) != value for key, value in report.items()):
+        raise AssertionError('Recorded research report disagrees with fresh verification')
     print(f'PASS: {report["certificates_verified"]} independently verified certificates '
           f'({report["valid_identities"]} classical truths, '
           f'{report["refuted_near_misses"]} counterexamples).')
-    print(f'Report: {path}')
+    print(f'Recorded report verified (read-only): {path}')
