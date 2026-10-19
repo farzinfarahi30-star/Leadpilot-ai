@@ -42,3 +42,13 @@ This type of distributional recurrence is *not claimed novel*: Martinez and Sava
 ## Next discriminating research experiment
 
 Construct an **object-level map** `forward(matrix)` and `inverse(sequence)` that is natural and uniform in `n`; preserve the exact semi-weight/distinct-entry grade; test with qtBench's independent evaluator and its anti-tautology checks. Failure on any fiber disproves that candidate. Without such a map, the central problem is unanswered.
+
+## Held-out n=10 prediction and validation
+
+The DP predicts the following polynomial at n=10 (not included in the qtBench public n=3..9 table):
+
+`P_10(z) = 1800 z^6 + 8400 z^7 + 5796 z^8 + 510 z^9 + z^10`, total 16,507.
+
+Independently checked using `verify_n10.cpp`, which actually enumerates **all 10! = 3,628,800** inversion sequences and filters without using the DP recurrence. The checks matched. This extends a finite computational baseline, *not* a new general theorem.
+
+Run with `g++ -std=c++17 -O2 verify_n10.cpp -o verify_n10 && ./verify_n10`.
