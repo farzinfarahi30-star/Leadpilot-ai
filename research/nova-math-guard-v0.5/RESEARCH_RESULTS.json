@@ -1,0 +1,70 @@
+{
+  "project": "NOVA Math Guard",
+  "version": "0.3",
+  "objective": "classical binomial identities and altered near-misses",
+  "novelty_claimed": false,
+  "tested_degrees": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12
+  ],
+  "certificates_verified": 24,
+  "valid_identities": 12,
+  "refuted_near_misses": 12,
+  "examples": [
+    {
+      "degree": 2,
+      "mutated": false,
+      "verdict": "PROVED",
+      "counterexample": null
+    },
+    {
+      "degree": 2,
+      "mutated": true,
+      "verdict": "DISPROVED",
+      "counterexample": {
+        "x": "1",
+        "y": "1"
+      }
+    },
+    {
+      "degree": 8,
+      "mutated": false,
+      "verdict": "PROVED",
+      "counterexample": null
+    },
+    {
+      "degree": 8,
+      "mutated": true,
+      "verdict": "DISPROVED",
+      "counterexample": {
+        "x": "1",
+        "y": "1"
+      }
+    },
+    {
+      "degree": 12,
+      "mutated": false,
+      "verdict": "PROVED",
+      "counterexample": null
+    },
+    {
+      "degree": 12,
+      "mutated": true,
+      "verdict": "DISPROVED",
+      "counterexample": {
+        "x": "1",
+        "y": "1"
+      }
+    }
+  ]
+}
