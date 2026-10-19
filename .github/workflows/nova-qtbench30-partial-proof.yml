@@ -1,0 +1,30 @@
+name: NOVA QtBench30 Extended Partial Bijection Tests
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'research/nova-qtbench30-extended-subfamily-2026-10-19/**'
+      - '.github/workflows/nova-qtbench30-partial-proof.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: research/nova-qtbench30-extended-subfamily-2026-10-19
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify published source checksums
+        run: sha256sum -c SHA256SUMS
+      - name: Install test-only independent symbolic algebra dependency
+        run: python -m pip install sympy==1.14.0
+      - name: Run inversion-sequence and source-matrix regression suite
+        run: python test_extended.py
+      - name: Reproduce sample enumerations
+        run: python extended_bijection.py
