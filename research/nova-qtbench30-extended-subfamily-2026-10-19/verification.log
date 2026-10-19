@@ -1,0 +1,22 @@
+test_disjoint_diagonal_and_new (__main__.ExtendedProofTest.test_disjoint_diagonal_and_new) ... ok
+test_generating_function (__main__.ExtendedProofTest.test_generating_function) ... ok
+test_negative_decoder (__main__.ExtendedProofTest.test_negative_decoder) ... ok
+test_new_source_membership (__main__.ExtendedProofTest.test_new_source_membership) ... ok
+test_original_diagonal_unmodified (__main__.ExtendedProofTest.test_original_diagonal_unmodified) ... ok
+test_small_exhaustive_target (__main__.ExtendedProofTest.test_small_exhaustive_target) ... ok
+test_target_and_inverse_large (__main__.ExtendedProofTest.test_target_and_inverse_large) ... ok
+test_small_source_membership_and_full_n4 (__main__.SourceCoverage.test_small_source_membership_and_full_n4) ... ok
+
+----------------------------------------------------------------------
+Ran 8 tests in 1.095s
+
+OK
+4 2 7
+5 4 15
+6 6 27
+7 8 51
+8 10 95
+9 12 183
+10 14 355
+11 16 699
+12 18 1383

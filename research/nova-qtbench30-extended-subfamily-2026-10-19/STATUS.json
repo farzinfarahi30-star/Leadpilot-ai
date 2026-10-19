@@ -1,0 +1,15 @@
+{
+  "date": "2026-10-19",
+  "problem": "Chern-Fu 2026 Question 5.5",
+  "status": "proved restricted infinite family; main problem OPEN",
+  "originality": "not established",
+  "lean_verified": false,
+  "new_source_objects_per_n": "2*(n-3) for n >= 4",
+  "grade_of_new_objects": "n-1",
+  "n4_full_correspondence": true,
+  "n5_target_total": 21,
+  "n5_covered": 15,
+  "n6_target_total": 67,
+  "n6_covered": 27,
+  "funding_or_customer_payments": "not implied by research"
+}
