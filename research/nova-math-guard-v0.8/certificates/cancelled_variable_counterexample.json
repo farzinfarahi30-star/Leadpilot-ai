@@ -1,0 +1,21 @@
+{
+  "domain": "Q-polynomial",
+  "evidence": {
+    "assignment": {
+      "x": "0"
+    },
+    "lhs_normal_form": [],
+    "lhs_value": "0",
+    "rhs_normal_form": [
+      {
+        "coefficient": "1",
+        "monomial": []
+      }
+    ],
+    "rhs_value": "1"
+  },
+  "kind": "identity",
+  "schema": "NOVA-MATH-GUARD-CERT-1",
+  "statement": "x-x=1",
+  "verdict": "DISPROVED"
+}

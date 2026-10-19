@@ -1,0 +1,36 @@
+{
+  "domain": "ordered-fields-over-Q",
+  "evidence": {
+    "multipliers_normal_forms": [
+      [
+        {
+          "coefficient": "1",
+          "monomial": []
+        }
+      ]
+    ],
+    "weighted_squares": [
+      {
+        "polynomial_normal_form": [
+          {
+            "coefficient": "1",
+            "monomial": [
+              [
+                "y",
+                1
+              ]
+            ]
+          }
+        ],
+        "weight": "1"
+      }
+    ]
+  },
+  "goal": "x=0",
+  "hypotheses": [
+    "x**2+y**2=0"
+  ],
+  "kind": "real-sos",
+  "schema": "NOVA-MATH-GUARD-REAL-SOS-CERT-1",
+  "verdict": "PROVED"
+}
