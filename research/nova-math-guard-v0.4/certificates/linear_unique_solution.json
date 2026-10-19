@@ -1,0 +1,26 @@
+{
+  "domain": "Q-polynomial",
+  "evidence": {
+    "difference_normal_form": [
+      {
+        "coefficient": "-15",
+        "monomial": []
+      },
+      {
+        "coefficient": "3",
+        "monomial": [
+          [
+            "x",
+            1
+          ]
+        ]
+      }
+    ],
+    "solution": "5",
+    "variable": "x"
+  },
+  "kind": "linear",
+  "schema": "NOVA-MATH-GUARD-CERT-1",
+  "statement": "3*x+7=22",
+  "verdict": "UNIQUE"
+}
