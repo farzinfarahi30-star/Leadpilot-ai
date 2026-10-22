@@ -1,0 +1,24 @@
+name: Audit Worker URL Safety
+on:
+  pull_request:
+    paths:
+      - 'nova-audit-worker/worker.mjs'
+      - 'tests/worker-url-safety.test.mjs'
+      - 'package.json'
+      - '.github/workflows/audit-worker-url-safety.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  url-safety:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify Worker syntax
+        run: npm run check
+      - name: Run URL safety regression suite
+        run: npm run test:audit-url-safety
