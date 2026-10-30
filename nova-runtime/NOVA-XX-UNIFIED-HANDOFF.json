@@ -202,7 +202,7 @@
       "validation": {
         "ok": true,
         "errors": [],
-        "checkedAt": "2026-10-30T00:01:32.891Z"
+        "checkedAt": "2026-10-30T06:08:12.704Z"
       },
       "rule": "Nova operates the replicated company through the existing Boss/Governor control plane; no competing controller is created."
     },
@@ -364,7 +364,7 @@
       "validation": {
         "ok": true,
         "errors": [],
-        "checkedAt": "2026-10-30T00:01:32.893Z"
+        "checkedAt": "2026-10-30T06:08:12.706Z"
       },
       "rule": "Nova operates the replicated crypto project through the existing runtime/governance controls; no competing controller is created."
     }
@@ -373,17 +373,17 @@
     "registry": {
       "ok": true,
       "errors": [],
-      "checkedAt": "2026-10-30T00:01:32.890Z"
+      "checkedAt": "2026-10-30T06:08:12.703Z"
     },
     "company": {
       "ok": true,
       "errors": [],
-      "checkedAt": "2026-10-30T00:01:32.891Z"
+      "checkedAt": "2026-10-30T06:08:12.704Z"
     },
     "crypto": {
       "ok": true,
       "errors": [],
-      "checkedAt": "2026-10-30T00:01:32.893Z"
+      "checkedAt": "2026-10-30T06:08:12.706Z"
     }
   },
   "rule": "Nova is the operating owner of every registered XX target; external authority and irreversible actions remain governed by their real authorization boundaries."
