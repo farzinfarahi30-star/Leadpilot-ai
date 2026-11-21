@@ -1,6 +1,6 @@
 {
   "schema": "nova.xx.unified.takeover.proof.v1",
-  "verifiedAt": "2026-11-20T21:23:59.288Z",
+  "verifiedAt": "2026-11-21T02:40:43.288Z",
   "independentExecutor": "GitHub-hosted Nova Runtime",
   "success": true,
   "handoff": {
@@ -207,7 +207,7 @@
         "validation": {
           "ok": true,
           "errors": [],
-          "checkedAt": "2026-11-20T21:23:59.244Z"
+          "checkedAt": "2026-11-21T02:40:43.230Z"
         },
         "rule": "Nova operates the replicated company through the existing Boss/Governor control plane; no competing controller is created."
       },
@@ -369,7 +369,7 @@
         "validation": {
           "ok": true,
           "errors": [],
-          "checkedAt": "2026-11-20T21:23:59.245Z"
+          "checkedAt": "2026-11-21T02:40:43.232Z"
         },
         "rule": "Nova operates the replicated crypto project through the existing runtime/governance controls; no competing controller is created."
       }
@@ -378,17 +378,17 @@
       "registry": {
         "ok": true,
         "errors": [],
-        "checkedAt": "2026-11-20T21:23:59.243Z"
+        "checkedAt": "2026-11-21T02:40:43.229Z"
       },
       "company": {
         "ok": true,
         "errors": [],
-        "checkedAt": "2026-11-20T21:23:59.244Z"
+        "checkedAt": "2026-11-21T02:40:43.230Z"
       },
       "crypto": {
         "ok": true,
         "errors": [],
-        "checkedAt": "2026-11-20T21:23:59.245Z"
+        "checkedAt": "2026-11-21T02:40:43.232Z"
       }
     },
     "rule": "Nova is the operating owner of every registered XX target; external authority and irreversible actions remain governed by their real authorization boundaries."
