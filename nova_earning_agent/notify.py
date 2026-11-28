@@ -50,8 +50,19 @@ def existing_titles() -> set[str]:
 
 
 def main():
-    with open('reports/public-paid-task-scout.json', encoding='utf-8') as file:
-        result = json.load(file)
+    # Gracefully handle missing report file – in CI or test environments the
+    # JSON payload may not be present. Rather than raising FileNotFoundError,
+    # emit a helpful message and exit cleanly.
+    try:
+        with open('reports/public-paid-task-scout.json', encoding='utf-8') as file:
+            result = json.load(file)
+    except FileNotFoundError:
+        print('Report file not found. No qualified leads to process.')
+        return
+    except json.JSONDecodeError as exc:
+        # Corrupt JSON should also not crash the whole script; surface the error.
+        raise RuntimeError('Failed to parse public-paid-task-scout.json') from exc
+
     candidates = result.get('candidates', [])
     if not candidates:
         print('No qualified leads. Creating no GitHub issues.')
